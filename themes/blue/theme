@@ -1,0 +1,82 @@
+---------------------------
+-- Default awesome theme --
+---------------------------
+
+font          = Profont 8
+# font          = DejaVu Sans Mono 8
+
+bg_normal     = #4e6274
+bg_focus      = #839ab1
+bg_urgent     = #288ef6
+
+fg_normal     = #a8a8dd
+fg_focus      = #cfffff
+fg_urgent     = #ffaaaa
+
+## specific 
+fg_sb_hi     = #cfcfff
+fg_batt_mid  = #00cb00
+fg_batt_low  = #e6f21d
+fg_batt_crit = #f8700a
+widg_cpu0 = #243367
+widg_cpu1 = #285577
+widg_cpu2 = #AEC6D8
+
+border_width  = 1
+border_normal = #000124
+border_focus  = #4148ea
+border_marked = #0000f0
+
+# calendar settings
+calendar_w = 160
+calendar_fg = #cfffff
+calendar_bg = #4e6274
+
+menu_height = 15
+menu_width = 100
+
+# There are another variables sets
+# overriding the default one when
+# defined, the sets are:
+# [taglist|tasklist]_[bg|fg]_[focus|urgent]
+# titlebar_[bg|fg]_[normal|focus]
+# Example:
+#taglist_bg_focus = #ff0000
+titlebar_bg_focus = #839ab1
+titlebar_bg_normal = #4e6274
+
+# Display the taglist squares
+taglist_squares = true
+taglist_squares_sel = /home/perry/.config/awesome/themes/blue/taglist/squarefw.png
+taglist_squares_unsel = /home/perry/.config/awesome/themes/blue/taglist/squarew.png
+
+tasklist_floating_icon = /home/perry/.config/awesome/themes/blue/tasklist/float.gif
+
+# You can add as many variables as
+# you wish and access them by using
+# beautiful.variable in your rc.lua
+#bg_widget    = #cc0000
+
+# Display close button inside titlebar
+titlebar_close_button = true
+
+# Define the image to load
+# @ (if titlebar_close_button_[normal|focus] these values are ignored)
+titlebar_close_button_normal = /home/perry/.config/awesome/themes/blue/titlebar/close-inactive.png
+titlebar_close_button_focus = /home/perry/.config/awesome/themes/blue/titlebar/close-active.png
+
+# You can use your own layout icons like this:
+layout_dwindle = /home/perry/.config/awesome/themes/blue/layouts/dwindlew.png
+layout_fairh = /home/perry/.config/awesome/themes/blue/layouts/fairhw.png
+layout_fairv = /home/perry/.config/awesome/themes/blue/layouts/fairvw.png
+layout_floating = /home/perry/.config/awesome/themes/blue/layouts/floatingw.png
+layout_magnifier = /home/perry/.config/awesome/themes/blue/layouts/magnifierw.png
+layout_max = /home/perry/.config/awesome/themes/blue/layouts/maxw.png
+layout_spiral = /home/perry/.config/awesome/themes/blue/layouts/spiralw.png
+layout_tilebottom = /home/perry/.config/awesome/themes/blue/layouts/tilebottomw.png
+layout_tileleft = /home/perry/.config/awesome/themes/blue/layouts/tileleftw.png
+layout_tile = /home/perry/.config/awesome/themes/blue/layouts/tilew.png
+layout_tiletop = /home/perry/.config/awesome/themes/blue/layouts/tiletopw.png
+
+iconpath = /home/perry/.config/awesome/themes/blue/
+wallpaper_cmd = awsetbg /home/perry/.config/awesome/themes/blue/wp.png
