@@ -65,7 +65,7 @@ function init(w, cardid, channel, colors)
                  })
 
   vol("update")
-  awful.hooks.timer.register(10, function () vol("update") end)
+  awful.hooks.timer.register(10, function () vol("update") end, true)
 
 end
 -- vim: filetype=lua fdm=marker tabstop=2 shiftwidth=2 expandtab smarttab autoindent smartindent:

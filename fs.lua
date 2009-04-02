@@ -56,7 +56,7 @@ function init(w,args)
   fs.config.interval = args.interval or 59
   fs.widget = w
   stats()
-  awful.hooks.timer.register(fs.config.interval,stats)
+  awful.hooks.timer.register(fs.config.interval,stats,true)
 
 end
 -- }}} 
