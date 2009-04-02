@@ -394,6 +394,7 @@ function del(tag)
       t.screen = nil
       awful.hooks.user.call("tags", scr)
     end
+    if client.focus then client.focus:raise() end
   end
 end
 --}}}
@@ -567,15 +568,20 @@ end
 --}}}
 
 --{{{ init : search shifty.config.tags for initial set of tags to open
---FIXME: when awesome reloads, this init is too simple, some tags are left 
---with empty properties, this makes them resistant to normal del and sweep
---functions
---
 function init()
-  numscr = screen.count()
+  local numscr = screen.count()
+
   for i, j in pairs(config.tags) do
-    if j.init and ((j.screen or 1) <= numscr) then
-        add({ name = i, persist = true, screen = (j.screen or 1), layout = j.layout, mwfact = j.mwfact }) 
+    local scr = j.screen or 1
+    if j.init and ( scr <= numscr ) then
+        add({ name = i, persist = true, screen = scr, layout = j.layout, mwfact = j.mwfact }) 
+    end
+  end
+
+  -- try and prevent ugly awesome 'default' tag from appearing
+  for s = 1,numscr do
+    if #screen[s]:tags() < 1 then
+      add({ name = "1:shifty", persist = true, screen = s, layout = (config.defaults.layout or awful.util.suit.tile)})
     end
   end
 end
