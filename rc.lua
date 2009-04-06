@@ -24,7 +24,7 @@ settings = {
   ["icon_path"] = beautiful.iconpath,
 
   --{{{ apps
-  ["apps"] = { 
+  ["apps"] = {
     ["terminal"]  = "urxvtc",
     ["browser"]   = "firefox",
     ["mail"]      = "thunderbird",
@@ -33,7 +33,7 @@ settings = {
     ["editor"]    = os.getenv("EDITOR") or "vim",
   },
   --}}}
-  
+
   --{{{ settings.layouts
   ["layouts"] = {
     awful.layout.suit.tile,
@@ -80,16 +80,16 @@ shifty.config.apps = {
 --}}}
 
 shifty.config.defaults={  layout = awful.layout.suit.tile.bottom, ncol = 1, floatBars=true,
-                            run = function(tag) 
-                            naughty.notify({ 
-                              text = markup.fg( beautiful.fg_normal,  markup.font("monospace",markup.fg(beautiful.fg_sb_hi, 
+                            run = function(tag)
+                            naughty.notify({
+                              text = markup.fg( beautiful.fg_normal,  markup.font("monospace",markup.fg(beautiful.fg_sb_hi,
                                                 "Shifty Created: "
                                                   ..(awful.tag.getproperty(tag,"position") or shifty.tag2index(mouse.screen,tag))..
-                                                    " : "..tag.name))) 
+                                                    " : "..tag.name)))
                             }) end,
                        }
 
--- }}} 
+-- }}}
 -- }}}
 
 -- {{{ -- Statusbar, menus & Widgets
@@ -115,9 +115,9 @@ mytasklist.buttons = { button({ }, 1, function (c) client.focus = c; c:raise() e
                        button({ }, 5, function () awful.client.focus.byidx(-1); client.focus:raise() end) }
 
 widget_spacer_l = widget({type = "textbox", name = "widget_spacer", align = "left" })
-widget_spacer_l.width = 5 
+widget_spacer_l.width = 5
 widget_spacer_r  = widget({type = "textbox", name = "widget_spacer", align = "right" })
-widget_spacer_r.width = 5 
+widget_spacer_r.width = 5
 ---}}}
 
 -- {{{ -- DATE widget
@@ -130,9 +130,9 @@ datewidget = widget({
 datewidget.mouse_enter = function() calendar.add_calendar() end
 datewidget.mouse_leave = function() calendar.remove_calendar() end
 
-datewidget:buttons({ 
+datewidget:buttons({
   button({ }, 4, function() calendar.add_calendar(-1) end),
-  button({ }, 5, function() calendar.add_calendar(1) end), 
+  button({ }, 5, function() calendar.add_calendar(1) end),
 })
 wicked.register(datewidget, wicked.widgets.date,
    markup.fg(beautiful.fg_sb_hi, '%k:%M'))
@@ -168,13 +168,13 @@ mocpwidget.mouse_leave = function() awful.hooks.timer.unregister(mocp.popup) end
 
 -- {{{ -- FSWIDGET
 fswidget = widget({ type = "textbox", name = "fswidget", align = "right" })
-fs.init( fswidget, 
-        { interval = 59, 
+fs.init( fswidget,
+        { interval = 59,
           parts = {   ['sda7'] = {label = "/"},
                       ['sda5'] = {label = "d"} } })
 -- }}}
 
--- {{{ -- BATTERY 
+-- {{{ -- BATTERY
 batterywidget = widget({ type = "textbox", name = "batterywidget", align = "right" })
 battery.init(batterywidget)
 awful.hooks.timer.register(50, battery.info,true)
@@ -214,19 +214,19 @@ for s = 1, screen.count() do
     -- Create the wibox
     mywibox[s] = wibox({ position = "top", fg = beautiful.fg_normal, bg = beautiful.bg_normal })
     -- Add widgets to the wibox - order matters
-    mywibox[s].widgets = { 
+    mywibox[s].widgets = {
         widget_spacer_l, mylayoutbox[s], widget_spacer_l,
-        mytaglist[s], 
+        mytaglist[s],
         mypromptbox[s], widget_spacer_l,
         mytasklist[s], widget_spacer_r,
         s == 1 and fswidget or nil, s == 1 and widget_spacer_r,
         s == 1 and batterywidget, s == 1 and widget_spacer_r,
         s == 1 and memwidget, s == 1 and widget_spacer_r,
         s == 1 and cpuwidget, s == 1 and widget_spacer_r,
-        s == 1 and mocpwidget, 
+        s == 1 and mocpwidget,
         s == 1 and pb_volume, s == 1 and widget_spacer_r,
         s == 1 and datewidget,s == 1 and widget_spacer_r, s == 1 and mysystray or nil
-    } 
+    }
     mywibox[s].screen = s
 end
 -- }}}
@@ -277,6 +277,7 @@ globalkeys =
       t = shifty.name2tag("web",s)
       if t ~= nil then
         awful.tag.viewonly(t)
+        awful.screen.focus(awful.util.cycle(screen.count(),s+mouse.screen))
         return
       end
     end
@@ -287,6 +288,7 @@ globalkeys =
       t = shifty.name2tag("mail",s)
       if t ~= nil then
         awful.tag.viewonly(t)
+        awful.screen.focus(awful.util.cycle(screen.count(),s+mouse.screen))
         return
       end
     end
@@ -298,6 +300,7 @@ globalkeys =
       t = shifty.name2tag("vbx",s)
       if t ~= nil then
         awful.tag.viewonly(t)
+        awful.screen.focus(awful.util.cycle(screen.count(),s+mouse.screen))
         return
       end
     end
@@ -308,6 +311,7 @@ globalkeys =
       t = shifty.name2tag("dz",s)
       if t ~= nil then
         awful.tag.viewonly(t)
+        awful.screen.focus(awful.util.cycle(screen.count(),s+mouse.screen))
         return
       end
     end
