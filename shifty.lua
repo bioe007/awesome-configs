@@ -624,8 +624,9 @@ function completion(cmd, cur_pos, ncomp)
 
   -- gather names from existing tags, starting with the current screen
   for i = 1, screen.count() do
+    local tags = screen[i]:tags()
     local s = awful.util.cycle(screen.count(), mouse.screen + i - 1)
-    for j, t in pairs(tags[s]) do table.insert(list, t.name) end
+    for j, t in pairs(tags) do table.insert(list, t.name) end
   end
 
   -- gather names from history
