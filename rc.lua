@@ -46,8 +46,10 @@ settings = {
 
   -- {{{ opacity
   ["opacity"] = { 
-    ["default"] = { focus = 1.0, unfocus = 0.7 },
+    ["default"] = { focus = 1.0, unfocus = 0.8 },
     ["Easytag"] = { focus = 1.0, unfocus = 0.9 },
+    ["Gschem"] = { focus = 1.0, unfocus = 1.0 },
+    ["Gimp"] = { focus = 1.0, unfocus = 1.0 },
   },
   -- }}}
 }
