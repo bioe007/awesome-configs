@@ -43,6 +43,13 @@ settings = {
     awful.layout.suit.floating
   },
   --}}}
+
+  -- {{{ opacity
+  ["opacity"] = { 
+    ["default"] = { focus = 1.0, unfocus = 0.7 },
+    ["Easytag"] = { focus = 1.0, unfocus = 0.9 },
+  },
+  -- }}}
 }
 
 beautiful.init(settings.theme_path)        -- Initialize theme
@@ -52,7 +59,7 @@ shifty.modkey = settings.modkey
 --{{{ configured tags
 shifty.config.tags = {
     ["w2"] =     { layout = awful.layout.suit.max,          mwfact=0.62, exclusive = false, solitary = false, position = 1, init = true, screen = 2} ,
-    ["w1"] =     { layout = awful.layout.suit.max,          mwfact=0.62, exclusive = false, solitary = false, position = 1, init = true, screen = 1, slave = true } ,
+    ["w1"] =     { layout = awful.layout.suit.tile,          mwfact=0.62, exclusive = false, solitary = false, position = 1, init = true, screen = 1, slave = true } ,
     ["ds"] =     { layout = awful.layout.suit.max,          mwfact=0.70, exclusive = false, solitary = false, position = 2, persist = false, nopopup = false, slave = false } ,
     ["web"] =    { layout = awful.layout.suit.tile.bottom,  mwfact=0.65, exclusive = true , solitary = true , position = 4, spawn = settings.apps.browser  } ,
     ["dz"] =     { layout = awful.layout.suit.tile,         mwfact=0.70, exclusive = false, solitary = false, position = 3, nopopup = true, leave_kills = true, } ,
@@ -75,7 +82,7 @@ shifty.config.apps = {
          { match = { "VBox.*","VirtualBox.*"                               } , tag = "vbx",                           } ,
          { match = { "Mplayer.*","Mirage","gimp","gtkpod","Ufraw","easytag"} , tag = "media",         nopopup = true, } ,
          { match = { "MPlayer", "Gnuplot", "galculator"                    } , float = true                           } ,
-         { match = { "urxvt","sakura","vim"                                } , honorsizehints = false, slave = true   } ,
+         { match = { "urxvt","vim"                                } , honorsizehints = false, slave = true   } ,
 }
 --}}}
 
@@ -198,7 +205,6 @@ for s = 1, screen.count() do
     mypromptbox[s] = widget({ type = "textbox", align = "left" })
 
     -- Create an imagebox widget which will contains an icon indicating which layout we're using.
-    -- We need one layoutbox per screen.
     mylayoutbox[s] = widget({ type = "imagebox", align = "left" })
     mylayoutbox[s]:buttons({ button({ }, 1, function () awful.layout.inc(settings.layouts, 1) end),
                              button({ }, 3, function () awful.layout.inc(settings.layouts, -1) end),
@@ -225,7 +231,7 @@ for s = 1, screen.count() do
         s == 1 and cpuwidget, s == 1 and widget_spacer_r,
         s == 1 and mocpwidget,
         s == 1 and pb_volume, s == 1 and widget_spacer_r,
-        s == 1 and datewidget,s == 1 and widget_spacer_r, s == 1 and mysystray or nil
+        datewidget, widget_spacer_r, s == 1 and mysystray or nil
     }
     mywibox[s].screen = s
 end
@@ -330,7 +336,7 @@ globalkeys =
   key({ settings.modkey, "Mod1" },"h", function () awful.util.spawn('sudo pm-hibernate') end),
   key({ settings.modkey, "Mod1" },"s", function () 
     os.execute('sudo pm-suspend')
-    awful.util.spawn('slock')
+    -- awful.util.spawn('slock')
   end),
   key({ settings.modkey, "Mod1" },"r", function () awful.util.spawn('sudo reboot') end),
   key({ settings.modkey, "Mod1" },"l", function () awful.util.spawn('slock') end),
@@ -470,9 +476,13 @@ root.keys(globalkeys)
 -- {{{ Hooks
 -- Hook function to execute when focusing a client.
 awful.hooks.focus.register(function (c)
-  c.urgent = false
   if not awful.client.ismarked(c) then
       c.border_color = beautiful.border_focus
+  end
+  if settings.opacity[c.class] then 
+    c.opacity = settings.opacity[c.class].focus
+  else
+    c.opacity = settings.opacity["default"].focus or 0.7
   end
 end)
 
@@ -480,6 +490,11 @@ end)
 awful.hooks.unfocus.register(function (c)
   if not awful.client.ismarked(c) then
       c.border_color = beautiful.border_normal
+  end
+  if settings.opacity[c.class] then 
+    c.opacity = settings.opacity[c.class].unfocus
+  else
+    c.opacity = settings.opacity["default"].unfocus or 0.7
   end
 end)
 
