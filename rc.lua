@@ -99,6 +99,19 @@ shifty.config.defaults={  layout = awful.layout.suit.tile.bottom, ncol = 1, floa
 -- }}}
 -- }}}
 
+-- {{{ tag run or raise... needed?
+function tagSearch(name)
+  for s = 1, screen.count() do
+    t = shifty.name2tag(name,s)
+    if t ~= nil then
+      awful.tag.viewonly(t)
+      awful.screen.focus(awful.util.cycle(screen.count(),s+mouse.screen))
+      return true
+    end
+  end
+  return false
+end
+-- }}}
 -- {{{ -- Statusbar, menus & Widgets
 -- Create a systray
 mysystray = widget({ type = "systray", align = "right" })
@@ -278,51 +291,11 @@ globalkeys =
   key({ settings.modkey }, "Return", function () awful.util.spawn(settings.apps.terminal) end),
 
   -- run or raise type behavior but with benefits of shifty
-  key({ settings.modkey},"w", function () 
-    for s = 1, screen.count() do 
-      t = shifty.name2tag("web",s)
-      if t ~= nil then
-        awful.tag.viewonly(t)
-        awful.screen.focus(awful.util.cycle(screen.count(),s+mouse.screen))
-        return
-      end
-    end
-    awful.util.spawn(settings.apps.browser) 
-  end),
-  key({ settings.modkey },"m", function () 
-    for s = 1, screen.count() do 
-      t = shifty.name2tag("mail",s)
-      if t ~= nil then
-        awful.tag.viewonly(t)
-        awful.screen.focus(awful.util.cycle(screen.count(),s+mouse.screen))
-        return
-      end
-    end
-    awful.util.spawn(settings.apps.mail) 
-  end),
-
-  key({ settings.modkey, "Mod1", "Shift" },"v", function ()
-    for s = 1, screen.count() do 
-      t = shifty.name2tag("vbx",s)
-      if t ~= nil then
-        awful.tag.viewonly(t)
-        awful.screen.focus(awful.util.cycle(screen.count(),s+mouse.screen))
-        return
-      end
-    end
-    awful.util.spawn('VBoxSDL -vm xp2')
-  end),
-  key({ settings.modkey },"g", function ()
-    for s = 1, screen.count() do 
-      t = shifty.name2tag("dz",s)
-      if t ~= nil then
-        awful.tag.viewonly(t)
-        awful.screen.focus(awful.util.cycle(screen.count(),s+mouse.screen))
-        return
-      end
-    end
-    awful.util.spawn('gschem')
-  end),
+  key({ settings.modkey},"w", function () if not tagSearch("web") then awful.util.spawn(settings.apps.browser) end end),
+  key({ settings.modkey },"m", function () if not tagSearch("mail") then awful.util.spawn(settings.apps.mail) end end),
+  key({ settings.modkey, "Mod1", "Shift" },"v", function () if not tagSearch("vbx") then awful.util.spawn('VBoxSDL -vm xp2') end end),
+  key({ settings.modkey },"g", function () if not tagSearch("dz") then awful.util.spawn('gschem') end end),
+  key({ settings.modkey },"p", function () if not tagSearch("dz") then awful.util.spawn('pcb') end end),
 
   key({ settings.modkey, "Mod1" },"f", function () awful.util.spawn(settings.apps.filemgr) end),
   key({ settings.modkey, "Mod1" },"c", function () awful.util.spawn("galculator") end),
