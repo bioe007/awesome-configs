@@ -30,13 +30,13 @@ function vol(mode, percent)
     -- config.widget.text = volume
     config.widget:bar_data_add("vol", volume)
   elseif mode == "up" then
-    awful.util.spawn("amixer -q -c " .. config.cardid .. " sset " .. config.channel .." "..(percent or 5).."%+")
+    awful.util.spawn("amixer -q -c " .. config.cardid .. " sset " .. config.channel .." "..(percent or 5).."%+",false)
     vol("update")
   elseif mode == "down" then
-    awful.util.spawn("amixer -q -c " .. config.cardid .. " sset " .. config.channel .." "..(percent or 5).."%-")
+    awful.util.spawn("amixer -q -c " .. config.cardid .. " sset " .. config.channel .." "..(percent or 5).."%-",false)
     vol("update")
   else
-    awful.util.spawn("amixer -c " .. config.cardid .. " sset " .. config.channel .. " toggle")
+    awful.util.spawn("amixer -c " .. config.cardid .. " sset " .. config.channel .. " toggle",false)
     vol("update")
   end
 end
