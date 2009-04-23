@@ -2,9 +2,9 @@
 -- Default awesome theme --
 ---------------------------
 
-font          = Profont 8
+# font          = Profont 8
 # font          = DejaVu Sans Mono 8
-
+font = Terminus 8
 bg_normal     = #4e6274
 bg_focus      = #839ab1
 bg_urgent     = #288ef6
@@ -18,9 +18,10 @@ fg_sb_hi     = #cfcfff
 fg_batt_mid  = #00cb00
 fg_batt_low  = #e6f21d
 fg_batt_crit = #f8700a
-widg_cpu0 = #243367
-widg_cpu1 = #285577
-widg_cpu2 = #AEC6D8
+widg_cpu_st  = #243367
+widg_cpu_mid = #285577
+widg_cpu_end = #AEC6D8
+vol_bg = #000000
 
 border_width  = 1
 border_normal = #000124
@@ -79,4 +80,4 @@ layout_tile = /home/perry/.config/awesome/themes/blue/layouts/tilew.png
 layout_tiletop = /home/perry/.config/awesome/themes/blue/layouts/tiletopw.png
 
 iconpath = /home/perry/.config/awesome/themes/blue/
-wallpaper_cmd = awsetbg /home/perry/.config/awesome/themes/blue/wp.png
+wallpaper_cmd = nitrogen --restore
