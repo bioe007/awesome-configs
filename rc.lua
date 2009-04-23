@@ -20,12 +20,12 @@ print("cachedir= " .. awful.util.getdir("cache"))
 -- {{{ Variable definitions
 settings = {
   ["modkey"] = "Mod4",
-  ["theme_path"] = "/home/perry/.config/awesome/themes/grey/theme",
+  ["theme_path"] = "/home/perry/.config/awesome/themes/blue/theme",
   ["icon_path"] = beautiful.iconpath,
 
   --{{{ apps
   ["apps"] = {
-    ["terminal"]  = "urxvtc",
+    ["terminal"]  = "urxvt",
     ["browser"]   = "firefox",
     ["mail"]      = "thunderbird",
     ["filemgr"]   = "pcmanfm",
@@ -61,14 +61,14 @@ shifty.modkey = settings.modkey
 --{{{ configured tags
 shifty.config.tags = {
     ["w2"] =     { layout = awful.layout.suit.max,          mwfact=0.62, exclusive = false, solitary = false, position = 1, init = true, screen = 2} ,
-    ["w1"] =     { layout = awful.layout.suit.tile,          mwfact=0.62, exclusive = false, solitary = false, position = 1, init = true, screen = 1, slave = true } ,
+    ["w1"] =     { layout = awful.layout.suit.tile,         mwfact=0.62, exclusive = false, solitary = false, position = 1, init = true, screen = 1, slave = true } ,
     ["ds"] =     { layout = awful.layout.suit.max,          mwfact=0.70, exclusive = false, solitary = false, position = 2, persist = false, nopopup = false, slave = false } ,
-    ["web"] =    { layout = awful.layout.suit.tile.bottom,  mwfact=0.65, exclusive = true , solitary = true , position = 4, spawn = settings.apps.browser  } ,
     ["dz"] =     { layout = awful.layout.suit.tile,         mwfact=0.70, exclusive = false, solitary = false, position = 3, nopopup = true, leave_kills = true, } ,
+    ["web"] =    { layout = awful.layout.suit.tile.bottom,  mwfact=0.65, exclusive = true , solitary = true , position = 4, spawn = settings.apps.browser  } ,
     ["mail"] =   { layout = awful.layout.suit.tile,         mwfact=0.55, exclusive = false, solitary = false, position = 5, spawn = settings.apps.mail, slave = true     } ,
-    ["vbx"] =    { layout = awful.layout.suit.tile.bottom,  mwfact=0.75, exclusive = true , solitary = true , position = 6,} ,
-    ["media"] =  { layout = awful.layout.suit.float,                     exclusive = false, solitary = false, position = 8 } ,
-    ["office"] = { position = 9, layout = awful.layout.suit.tile} ,
+    ["vbx"] =    { layout = awful.layout.suit.tile.bottom,  mwfact=0.75, exclusive = true , solitary = true , position = 6, } ,
+    ["media"] =  { layout = awful.layout.suit.float,                     exclusive = false, solitary = false, position = 8  } ,
+    ["office"] = { position = 9, layout = awful.layout.suit.tile  } ,
 }
 --}}}
 
@@ -94,7 +94,7 @@ shifty.config.defaults={  layout = awful.layout.suit.tile.bottom, ncol = 1, floa
                               text = markup.fg( beautiful.fg_normal,  markup.font("monospace",markup.fg(beautiful.fg_sb_hi,
                                                 "Shifty Created: "
                                                   ..(awful.tag.getproperty(tag,"position") or shifty.tag2index(mouse.screen,tag))..
-                                                    " : "..tag.name)))
+                                                    " : "..(tag.name or "foo"))))
                             }) end,
                        }
 
@@ -114,6 +114,7 @@ function tagSearch(name)
   return false
 end
 -- }}}
+
 -- {{{ -- Statusbar, menus & Widgets
 -- Create a systray
 mysystray = widget({ type = "systray", align = "right" })
@@ -179,10 +180,10 @@ mocpwidget = widget({ type = 'textbox', name = 'mocpwidget', align = 'right'})
 mocp.setwidget(mocpwidget)
 mocpwidget:buttons({
     button({ }, 1, function () mocp.play(); mocp.popup() end ),
-    button({ }, 2, function () awful.util.spawn('mocp --toggle-pause') end),
+    button({ }, 2, function () awful.util.spawn('mocp --toggle-pause',false) end),
     button({ }, 4, function () mocp.play(); mocp.popup() end),
-    button({ }, 3, function () awful.util.spawn('mocp --previous'); mocp.popup() end),
-    button({ }, 5, function () awful.util.spawn('mocp --previous'); mocp.popup() end)
+    button({ }, 3, function () awful.util.spawn('mocp --previous',false); mocp.popup() end),
+    button({ }, 5, function () awful.util.spawn('mocp --previous',false); mocp.popup() end)
 })
 mocpwidget.mouse_enter = function() awful.hooks.timer.register(1,mocp.popup) end
 mocpwidget.mouse_leave = function() awful.hooks.timer.unregister(mocp.popup) end
@@ -259,7 +260,7 @@ shifty.init()
 
 -- {{{ Mouse bindings
 root.buttons({
-    button({ }, 1, function() awful.util.spawn(settings.apps.terminal) end),
+    button({ }, 1, function() awful.util.spawn(settings.apps.terminal,false) end),
     button({ }, 4, awful.tag.viewnext),
     button({ }, 5, awful.tag.viewprev)
 })
@@ -290,7 +291,7 @@ globalkeys =
   key({ settings.modkey, "Shift"   }, "a",       function() shifty.add({ nopopup = true }) end), -- nopopup new tag
 
   -- {{{ - APPLICATIONS
-  key({ settings.modkey }, "Return", function () awful.util.spawn(settings.apps.terminal) end),
+  key({ settings.modkey }, "Return", function () awful.util.spawn(settings.apps.terminal,false) end),
 
   -- run or raise type behavior but with benefits of shifty
   key({ settings.modkey},"w", function () if not tagSearch("web") then awful.util.spawn(settings.apps.browser) end end),
@@ -300,36 +301,36 @@ globalkeys =
   key({ settings.modkey },"p", function () if not tagSearch("dz") then awful.util.spawn('pcb') end end),
 
   key({ settings.modkey, "Mod1" },"f", function () awful.util.spawn(settings.apps.filemgr) end),
-  key({ settings.modkey, "Mod1" },"c", function () awful.util.spawn("galculator") end),
+  key({ settings.modkey, "Mod1" },"c", function () awful.util.spawn("galculator",false) end),
   key({ settings.modkey, "Mod1", "Shift" } ,"g", function () awful.util.spawn('gimp') end),
-  key({ settings.modkey, "Mod1" },"o", function () awful.util.spawn('/home/perry/.bin/octave-start.sh') end),
-  key({ settings.modkey, "Mod1" },"v", function () awful.util.spawn('/home/perry/.bin/vim-start.sh') end),
-  key({ settings.modkey, "Mod1" },"i", function () awful.util.spawn('gtkpod') end),
+  key({ settings.modkey, "Mod1" },"o", function () awful.util.spawn('/home/perry/.bin/octave-start.sh',false) end),
+  key({ settings.modkey, "Mod1" },"v", function () awful.util.spawn('/home/perry/.bin/vim-start.sh',false) end),
+  key({ settings.modkey, "Mod1" },"i", function () awful.util.spawn('gtkpod',false) end),
   -- }}}
 
   -- {{{ - POWER
-  key({ settings.modkey, "Mod1" },"h", function () awful.util.spawn('sudo pm-hibernate') end),
+  key({ settings.modkey, "Mod1" },"h", function () awful.util.spawn('sudo pm-hibernate',false) end),
   key({ settings.modkey, "Mod1" },"s", function () 
     os.execute('sudo pm-suspend')
     -- awful.util.spawn('slock')
   end),
-  key({ settings.modkey, "Mod1" },"r", function () awful.util.spawn('sudo reboot') end),
-  key({ settings.modkey, "Mod1" },"l", function () awful.util.spawn('slock') end),
+  key({ settings.modkey, "Mod1" },"r", function () awful.util.spawn('sudo reboot',false) end),
+  key({ settings.modkey, "Mod1" },"l", function () awful.util.spawn('slock',false) end),
   -- }}} 
 
   -- {{{ - MEDIA
   key({ settings.modkey, "Mod1" },"p", mocp.play ),
   key({ },"XF86AudioPlay", mocp.play ),
   key({ settings.modkey },"Down", function() mocp.play(); mocp.popup() end ),
-  key({ settings.modkey },"Up", function () awful.util.spawn('mocp --previous');mocp.popup() end),
+  key({ settings.modkey },"Up", function () awful.util.spawn('mocp --previous',false);mocp.popup() end),
   key({ }, "XF86AudioRaiseVolume", function() volume.vol("up","5") end),
   key({ }, "XF86AudioLowerVolume", function() volume.vol("down","5") end),
   key({ settings.modkey }, "XF86AudioRaiseVolume",function() volume.vol("up","2")end),
   key({ settings.modkey }, "XF86AudioLowerVolume", function() volume.vol("down","2")end),
   key({ },"XF86AudioMute", function() volume.vol() end),
-  key({ },"XF86AudioPrev", function () awful.util.spawn('mocp -r') end),
+  key({ },"XF86AudioPrev", function () awful.util.spawn('mocp -r',false) end),
   key({ },"XF86AudioNext", mocp.play ),
-  key({ },"XF86AudioStop", function () awful.util.spawn('mocp --stop') end),
+  key({ },"XF86AudioStop", function () awful.util.spawn('mocp --stop',false) end),
   -- }}} 
 
   -- {{{ - SPECIAL keys
