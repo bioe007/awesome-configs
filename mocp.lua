@@ -155,9 +155,9 @@ end
 -- easier way to check|run mocp
 function play() 
   if trackinfo.state == "STOP" then
-    awful.util.spawn('mocp --play') 
+    awful.util.spawn('mocp --play',false) 
   elseif trackinfo.state == "PLAY" then
-    awful.util.spawn('mocp --next')
+    awful.util.spawn('mocp --next',false)
   else 
     if trackinfo.state == "PLAY" then
       trackinfo.state = "PAUSE"
@@ -165,7 +165,7 @@ function play()
       trackinfo.state = "PLAY"
     end
 
-    awful.util.spawn('mocp --toggle-pause')
+    awful.util.spawn('mocp --toggle-pause',false)
   end
 end
 ---}}}
@@ -222,7 +222,7 @@ function scroller(tb)
     end
 
     np.rtn = awful.util.escape(np.rtn)
-    settings.widget.text = markup.fg(beautiful.fg_normal,prefix) .. markup.fg(beautiful.fg_sb_hi,np.rtn) 
+    settings.widget.text = markup.fg(beautiful.fg_normal,prefix) .. markup.fg( (beautiful.fg_sb_hi or beautiful.fg_focus),np.rtn) 
 
     if settings.iScroller <= np.strng:len() then
       settings.iScroller = settings.iScroller +1
