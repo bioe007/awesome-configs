@@ -12,6 +12,8 @@ local print = print
 local setmetatable = setmetatable
 local util = require("awful.util")
 local package = package
+local dofile = dofile
+local pairs = pairs -- FIXME: debugging
 local capi =
 {
     screen = screen,
@@ -36,6 +38,7 @@ end
 -- @param path The theme file path.
 function init(path)
 
+    print("test beauty")
     if path then
         theme = dofile(path)
 
@@ -50,6 +53,7 @@ function init(path)
         if theme["bg_normal"] then capi.awesome.bg = theme["bg_normal"] end
     end
 
+    for k,v in pairs(theme) do print(k,v) end
 end
 
 --- Get the current theme.
