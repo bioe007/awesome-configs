@@ -302,6 +302,7 @@ clientkeys =
 -- SHIFTY: assign client keys to shifty for use in
 -- match() function (manage hook)
 shifty.config.clientkeys = clientkeys
+shifty.config.modkey = modkey
 --}}}
 
 -- Compute the maximum number of digit we need, limited to 9

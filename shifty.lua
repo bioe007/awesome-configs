@@ -420,8 +420,8 @@ function match(c)
   -- Add mouse bindings
   c:buttons({
     button({ }, 1, function (c) client.focus = c; c:raise() end),
-    button({ modkey }, 1, function (c) awful.mouse.client.move() end),
-    button({ modkey }, 3, awful.mouse.client.resize ),
+    button({ config.modkey }, 1, function (c) awful.mouse.client.move() end),
+    button({ config.modkey }, 3, awful.mouse.client.resize ),
   })
   c.border_color = beautiful.border_normal
   -- Set key bindings
@@ -464,7 +464,7 @@ function match(c)
     c.border_width = beautiful.border_width
     c.border_color = beautiful.border_normal
     if config.defaults.floatBars then       -- add a titlebar if requested in config.defaults
-      awful.titlebar.add( c, { modkey = modkey } )
+      awful.titlebar.add( c, { modkey = config.modkey } )
     end
     awful.placement.centered(c, c.transient_for)
     awful.placement.no_offscreen(c) -- this always seems to stick the client at 0,0 (incl titlebar)
