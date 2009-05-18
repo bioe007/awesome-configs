@@ -258,12 +258,11 @@ end
 shifty.taglist = mytaglist
 shifty.init()
 -- }}}
-
 -- {{{ Mouse bindings
 root.buttons(awful.util.table.join(
-    button({ }, 1, function() awful.util.spawn(settings.apps.terminal,false) end),
-    button({ }, 4, awful.tag.viewnext),
-    button({ }, 5, awful.tag.viewprev)
+    awful.button({ }, 1, function() awful.util.spawn(settings.apps.terminal,false) end),
+    awful.button({ }, 4, awful.tag.viewnext),
+    awful.button({ }, 5, awful.tag.viewprev)
 ))
 -- }}}
 
@@ -312,10 +311,9 @@ globalkeys = awful.util.table.join(
   awful.key({ settings.modkey, "Mod1" },"h", function () awful.util.spawn('sudo pm-hibernate',false) end),
   awful.key({ settings.modkey, "Mod1" },"s", function () 
     os.execute('sudo pm-suspend')
-    -- awful.util.spawn('slock')
+    awful.util.spawn('slock')
   end),
   awful.key({ settings.modkey, "Mod1" },"r", function () awful.util.spawn('sudo reboot',false) end),
-  awful.key({ settings.modkey, "Mod1" },"l", function () awful.util.spawn('slock',false) end),
   -- }}} 
 
   -- {{{ - MEDIA
@@ -384,11 +382,11 @@ globalkeys = awful.util.table.join(
 
 -- {{{ - TAGS loop bindings
 for i=1, ( shifty.config.maxtags or 9 ) do
-  table.insert(globalkeys, key({ settings.modkey }, i, function () local t =  awful.tag.viewonly(shifty.getpos(i)) end))
-  table.insert(globalkeys, key({ settings.modkey, "Control" }, i, function () local t = shifty.getpos(i); t.selected = not t.selected end))
-  table.insert(globalkeys, key({ settings.modkey, "Control", "Shift" }, i, function () if client.focus then awful.client.toggletag(shifty.getpos(i)) end end))
+  table.foreach(awful.key({ settings.modkey }, i, function () local t =  awful.tag.viewonly(shifty.getpos(i)) end), function(_, k) table.insert(globalkeys, k) end)
+  table.foreach(awful.key({ settings.modkey, "Control" }, i, function () local t = shifty.getpos(i); t.selected = not t.selected end), function(_, k) table.insert(globalkeys, k) end)
+  table.foreach(awful.key({ settings.modkey, "Control", "Shift" }, i, function () if client.focus then awful.client.toggletag(shifty.getpos(i)) end end), function(_, k) table.insert(globalkeys, k) end)
   -- move clients to other tags
-  table.insert(globalkeys, key({ settings.modkey, "Shift" }, i,
+  table.foreach(awful.key({ settings.modkey, "Shift" }, i,
     function () 
       if client.focus then 
         local c = client.focus
@@ -398,7 +396,7 @@ for i=1, ( shifty.config.maxtags or 9 ) do
         awful.tag.viewonly(t)
         if slave then awful.client.setslave(c) end
       end 
-    end))
+    end), function(_, k) table.insert(globalkeys, k) end)
 end
 -- }}}
 -- }}} 
@@ -418,7 +416,7 @@ clientkeys = awful.util.table.join(
   awful.key({ settings.modkey, "Shift" }, "j", function () awful.client.swap.byidx(1) end),                    -- change order
   awful.key({ settings.modkey, "Shift" }, "k", function () awful.client.swap.byidx(-1) end),
   awful.key({ settings.modkey, }, "s", function () awful.screen.focus(1) end),                                 -- switch screen focus
-  awful.key({ settings.modkey, "Control" }, "space", awful.client.togglefloating),                             -- toggle client float
+  -- awful.key({ settings.modkey, "Control" }, "space", awful.client.floating.toggle),                             -- toggle client float
   awful.key({ settings.modkey, "Control" }, "Return", function () client.focus:swap(awful.client.getmaster()) end),  -- switch focused client with master
   awful.key({ settings.modkey, "Shift" }, "s", awful.client.movetoscreen),   -- switch client to other screen
   awful.key({ settings.modkey }, "Tab", function() awful.client.focus.history.previous(); client.focus:raise() end ), -- toggle client focus history
