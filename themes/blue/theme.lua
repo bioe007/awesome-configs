@@ -1,4 +1,4 @@
-path="~/.config/awesome/themes/blue"
+path="/home/perry/.config/awesome/themes/blue"
 
 white = "#ffffff"
 blue_dark = "#4e6274"
@@ -74,6 +74,6 @@ theme.layout_tileleft   = path.."/layouts/tileleftw.png"
 theme.layout_tile       = path.."/layouts/tilew.png"
 theme.layout_tiletop    = path.."/layouts/tiletopw.png"
 theme.iconpath          = path.."/"
-theme.wallpaper_cmd  = { [1] = "nitrogen --restore" }
+theme.wallpaper_cmd  = { [1]= "nitrogen --restore" }
 
 return theme
