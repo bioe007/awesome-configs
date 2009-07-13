@@ -2,6 +2,7 @@ local io = io
 local awful = require("awful")
 local string = string
 local beautiful = require("beautiful")
+local print = print
 
 local config = {}
 
@@ -18,17 +19,20 @@ function vol(mode, percent)
 
     status = string.match(status, "%[(o[^%]]*)%]")
 
+    config.widget:set_value(volume/100)
     if string.find(status, "on", 1, true) then
       -- volume = volume .. "%"
-      config.widget:bar_properties_set("vol", {["bg"] = beautiful.vol_bg,
-                                               ["border_color"] = beautiful.bg_focus, })
+      config.widget:set_gradient_colors({ beautiful.fg_focus, beautiful.fg_focus })
+      -- config.widget:bar_properties_set("vol", {["bg"] = beautiful.vol_bg,
+                                               -- ["border_color"] = beautiful.bg_focus, })
     else
       -- volume = volume .. "M"
-      config.widget:bar_properties_set("vol", {["bg"] = beautiful.bg_normal,
-                                               ["border_color"] = beautiful.bg_normal, })
+      config.widget:set_gradient_colors({ beautiful.fg_normal, beautiful.fg_normal })
+      -- config.widget:bar_properties_set("vol", {["bg"] = beautiful.bg_normal,
+                                               -- ["border_color"] = beautiful.bg_normal, })
     end
     -- config.widget.text = volume
-    config.widget:bar_data_add("vol", volume)
+    config.widget:set_value(volume/100)
   elseif mode == "up" then
     awful.util.spawn("amixer -q -c " .. config.cardid .. " sset " .. config.channel .." "..(percent or 5).."%+",false)
     vol("update")
@@ -41,31 +45,25 @@ function vol(mode, percent)
   end
 end
 
-function init(w, cardid, channel, colors)
+-- returns the widget now
+function init(cardid, channel, colors)
 
-  if not w then return end
-  config.widget = w 
+  config.widget = awful.widget.progressbar({ align = "right" })
+  config.widget:set_width(13)
+  config.widget:set_height(18)
+  config.widget:set_vertical(true)
+  -- config.widget:set_border_width(1)
+  config.widget:set_border_color(beautiful.bg_focus)
+  config.widget:set_gradient_colors({ beautiful.fg_focus, beautiful.fg_focus })
+  config.widget:set_background_color(beautiful.vol_bg or "#000000")
+  config.widget:set_color(beautiful.fg_focus or "#ffffff")
+
   config.cardid  = cardid or 0
   config.channel = channel or "Master"
-  config.widget.width = 13
-  config.widget.height = 0.93
-  config.widget.border_padding = 1
-  config.widget.ticks_count = 6
-  config.widget.ticks_gap = 1
-
-  config.widget.vertical = true
- 
-  config.widget:bar_properties_set("vol", 
-  colors or { ["bg"] = beautiful.vol_bg,
-                   ["fg"] = beautiful.fg_focus,
-                   ["fg_center"] = beautiful.fg_focus, --"#ffffff", --beautiful.widg_cpu_mid,
-                   ["fg_end"] = beautiful.fg_focus, -- "#ffffff", -- beautiful.widg_cpu_end,
-                   ["fg_off"] = beautiful.bg_normal,
-                   ["border_color"] = beautiful.bg_focus,
-                 })
 
   vol("update")
   awful.hooks.timer.register(10, function () vol("update") end, true)
 
+  return config.widget
 end
 -- vim: filetype=lua fdm=marker tabstop=2 shiftwidth=2 expandtab smarttab autoindent smartindent:
