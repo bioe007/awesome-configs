@@ -28,9 +28,9 @@ local function state()
   local fd = {}
   local state ="" 
 
-  fd = io.popen('pgrep -fx mocp')
+  fd = io.popen('pgrep -fx \'mocp --server\'')
 
-  if fd ~= nil then 
+  if fd:read() ~= nil then 
     fd:close()
 
     fd = io.popen('mocp -i')
@@ -48,6 +48,7 @@ local function state()
     settings.widget.text = "" 
     settings.widget.width = 0
   end
+
   fd:close()
 end
 ---}}}
@@ -154,7 +155,11 @@ end
 ---{{{ mocplay() 
 -- easier way to check|run mocp
 function play() 
-  if trackinfo.state == "STOP" then
+  if trackinfo.state == "OFF" then
+    awful.util.spawn('mocp --server')
+    state()
+    play()
+  elseif trackinfo.state == "STOP" then
     awful.util.spawn('mocp --play',false) 
   elseif trackinfo.state == "PLAY" then
     awful.util.spawn('mocp --next',false)
