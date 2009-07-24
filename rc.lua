@@ -140,17 +140,15 @@ shifty.config.apps = {
 }
 --}}}
 
-shifty.config.defaults={ 
-    layout  = awful.layout.suit.tile.bottom, ncol = 1, floatBars=true,
-    run     = function(tag)
+shifty.config.defaults={ layout  = awful.layout.suit.tile.bottom, ncol = 1, floatBars=true }
+    --[[run     = function(tag)
                 naughty.notify({
                   text = markup.fg(beautiful.fg_normal, markup.font("monospace",
                     markup.fg( beautiful.fg_sb_hi,
                       "Shifty Created: "..(awful.tag.getproperty(tag,"position")
                                 or shifty.tag2index(mouse.screen,tag)).." : "..
                                 (tag.name or "foo"))))
-                              }) end, 
-}
+                              }) end, ]]--
 
 -- }}}
 -- Actually load theme
@@ -257,32 +255,22 @@ end --]]--
 
 --{{{ widgets
 -- Create a systray
-mysystray = widget({ type = "systray", align = "right" })
+mysystray = widget({ type = "systray" })
 
 --{{{ spacers
 widget_spacer_l = widget({type="textbox", align = "left" })
-widget_spacer_l.width = 5
+widget_spacer_l.text = " "
 widget_spacer_r  = widget({type="textbox", align = "right" })
 widget_spacer_r.width = 5
+widget_spacer_r.text = " "
 --}}}
 
--- {{{ -- MOCP Widget
+-- MOCP Widget
 mocpwidget = widget({type="textbox",align = "right"})
 mocp.setwidget(mocpwidget)
-mocpwidget:buttons ({
-  button({}, 1, function () mocp.play(); mocp.popup() end ),
-  button({}, 2, function () awful.util.spawn('mocp --toggle-pause',false) end),
-  button({}, 4, function () mocp.play(); mocp.popup() end),
-  button({}, 3, function () awful.util.spawn('mocp --previous',false); mocp.popup() end),
-  button({}, 5, function () awful.util.spawn('mocp --previous',false); mocp.popup() end)
-})
-
-mocpwidget.mouse_enter = function() awful.hooks.timer.register(1,mocp.popup) end
-mocpwidget.mouse_leave = function() awful.hooks.timer.unregister(mocp.popup) end
---}}}
 
 -- {{{ -- DATE widget
-datewidget = widget({type="textbox", align = 'right', })
+datewidget = widget({type="textbox", align = 'right' })
 
 datewidget.mouse_enter = function() calendar.add_calendar() end
 datewidget.mouse_leave = function() calendar.remove_calendar() end
@@ -373,12 +361,27 @@ mytasklist.buttons = awful.util.table.join(
     if client.focus then client.focus:raise() end
   end))
 
+widget_table1 = {
+    widget_spacer_r, datewidget, widget_spacer_r, 
+    s == 1 and mysystray or nil    , widget_spacer_r           , 
+    s == 1 and pb_volume or nil    , widget_spacer_r           , 
+    s == 1 and mocpwidget or nil   , widget_spacer_r           , 
+    s == 1 and cpuwidget or nil    , s == 1 and widget_spacer_r, 
+    s == 1 and memwidget or nil    , s == 1 and widget_spacer_r, 
+    s == 1 and batterywidget or nil, s == 1 and widget_spacer_r, 
+    s == 1 and fswidget or nil     , s == 1 and widget_spacer_r, 
+
+    ["layout"] = awful.widget.layout.horizontal.rightleft
+}
+
 for s = 1, screen.count() do
   -- Create a promptbox for each screen
-  mypromptbox[s] = awful.widget.prompt({ align = "left" })
+  -- mypromptbox[s] = awful.widget.prompt({ align = "left" })
+  mypromptbox[s] = awful.widget.prompt({ layout = awful.widget.layout.leftright })
 
   -- imagebox widget which will contains an icon indicating which layout
-  mylayoutbox[s] = awful.widget.layoutbox(s, { align = "left" })
+  -- mylayoutbox[s] = awful.widget.layoutbox(s, { align = "left" })
+  mylayoutbox[s] = awful.widget.layoutbox(s)
 
   mylayoutbox[s]:buttons(awful.util.table.join(
         awful.button({}, 2, function () awful.layout.inc(settings.layouts, 1 ) end),
@@ -399,18 +402,31 @@ for s = 1, screen.count() do
   mywibox[s] = awful.wibox({ position = "top", screen = s })
   -- Add widgets to the wibox - order matters
   mywibox[s].widgets = { 
-        widget_spacer_l, mylayoutbox[s], widget_spacer_l,
-        mytaglist[s],
-        mypromptbox[s], widget_spacer_l,
-        mytasklist[s], widget_spacer_r,
-        s == 1 and fswidget         or nil, s == 1 and widget_spacer_r,
-        s == 1 and batterywidget,   s == 1 and widget_spacer_r,
-        s == 1 and memwidget,       s == 1 and widget_spacer_r,
-        s == 1 and cpuwidget,       s == 1 and widget_spacer_r,
-        s == 1 and mocpwidget,      widget_spacer_r,
-        s == 1 and pb_volume,       widget_spacer_r,
-        datewidget, 
-        widget_spacer_r, s == 1 and mysystray or nil
+      { 
+          widget_spacer_l, mylayoutbox[s], widget_spacer_l,
+          mytaglist[s],
+          mypromptbox[s], widget_spacer_l,
+          ["layout"] = awful.widget.layout.horizontal.leftright
+      },
+      {
+          widget_spacer_r, datewidget, widget_spacer_r, 
+          s == 1 and mysystray or nil    , s == 1 and widget_spacer_r, 
+          s == 1 and pb_volume or nil    , s == 1 and widget_spacer_r, 
+          s == 1 and mocpwidget or nil   , s == 1 and widget_spacer_r, 
+          s == 1 and cpuwidget or nil    , s == 1 and widget_spacer_r, 
+          s == 1 and memwidget or nil    , s == 1 and widget_spacer_r, 
+          s == 1 and batterywidget or nil, s == 1 and widget_spacer_r, 
+          s == 1 and fswidget or nil     , s == 1 and widget_spacer_r, 
+
+          ["layout"] = awful.widget.layout.horizontal.rightleft
+      },
+
+      -- s == 1 and widget_table1,
+      {
+          mytasklist[s], widget_spacer_r,
+          ["layout"]= awful.widget.layout.horizontal.flex
+      },
+      ["layout"]= awful.widget.layout.horizontal.leftright
     }
 end
 -- }}}
@@ -515,18 +531,20 @@ globalkeys = awful.util.table.join(
     -- }}}
 
     -- {{{ - MEDIA
-    awful.key({ settings.modkey, "Mod1" },"p", mocp.play ),
-    awful.key({ },"XF86AudioPlay", mocp.play ),
-    awful.key({ settings.modkey },"Down", function() mocp.play(); mocp.popup() end ),
-    awful.key({ settings.modkey },"Up", function () awful.util.spawn('mocp --previous',false);mocp.popup() end),
-    awful.key({ }, "XF86AudioRaiseVolume", function() volume.vol("up","5") end),
-    awful.key({ }, "XF86AudioLowerVolume", function() volume.vol("down","5") end),
-    awful.key({ settings.modkey }, "XF86AudioRaiseVolume",function() volume.vol("up","2")end),
-    awful.key({ settings.modkey }, "XF86AudioLowerVolume", function() volume.vol("down","2")end),
-    awful.key({ },"XF86AudioMute", function() volume.vol() end),
-    awful.key({ },"XF86AudioPrev", function () awful.util.spawn('mocp -r',false) end),
-    awful.key({ },"XF86AudioNext", mocp.play ),
-    awful.key({ },"XF86AudioStop", function () awful.util.spawn('mocp --stop',false) end),
+    -- music player
+    awful.key({ settings.modkey, "Mod1" }, "p", function() mocp.play("PLAY") end),
+    awful.key({},"XF86AudioPlay",               function() mocp.play("PLAY") end),
+    awful.key({ settings.modkey },"Down",       function() mocp.play("FWD") end ),
+    awful.key({ settings.modkey },"Up",         function() mocp.play("REV") end),
+    awful.key({},"XF86AudioPrev",               function() mocp.play("REV") end),
+    awful.key({},"XF86AudioNext",               function() mocp.play("FWD") end ),
+    awful.key({},"XF86AudioStop",               function() mocp.play("STOP") end),
+
+    awful.key({},"XF86AudioRaiseVolume", function() volume.vol("up","5") end),
+    awful.key({},"XF86AudioLowerVolume", function() volume.vol("down","5") end),
+    awful.key({ settings.modkey },"XF86AudioRaiseVolume",function() volume.vol("up","2")end),
+    awful.key({ settings.modkey },"XF86AudioLowerVolume", function() volume.vol("down","2")end),
+    awful.key({},"XF86AudioMute", function() volume.vol() end),
     -- }}} 
     
     awful.key({ settings.modkey, "Control" }, "r", awesome.restart),
