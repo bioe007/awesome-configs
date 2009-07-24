@@ -1,7 +1,4 @@
 -- nice battery widget for awesome. 
--- user can config path to battery using 
---     battery.settings.ipath = <path to your info file>
---     battery.settings.spath = <path to your state file>
 --
 -- hal checking stolen from Kooky's battery widget
 --
