@@ -7,7 +7,7 @@ nearwhite = "#cfffff"
 
 theme = {}
 
-theme.font = "Terminus 8"
+theme.font = "Terminus 9"
 theme.bg_normal     = blue_dark
 theme.bg_focus      = blue_light
 theme.bg_urgent     = "#288ef6"
