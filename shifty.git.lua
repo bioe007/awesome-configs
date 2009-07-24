@@ -389,7 +389,7 @@ end
 
 --{{{ match : handles app->tag matching, a replacement for the manage hook in
 --            rc.lua
---@param c : client to be matched
+-- @param c : client to be matched
 function match(c, startup)
   local nopopup, intrusive, nofocus, run, slave, wfact, struts, geom
   local target_tag_names, target_tags = {}, {}
@@ -409,11 +409,11 @@ function match(c, startup)
     if a.match then
       for k, w in ipairs(a.match) do
         if
-          (cls and cls:find(w)) or
+          (cls  and cls:find(w))  or
           (inst and inst:find(w)) or
           (name and name:find(w)) or
           (role and role:find(w)) or
-          (typ and typ:find(w))
+          (typ  and typ:find(w))
         then
           if a.screen then target_screen = a.screen end
           if a.tag then
@@ -545,6 +545,7 @@ function match(c, startup)
     c:lower()
   end
 
+  if not client.focus then client.focus = awful.client.focus.history.get(target_screen,0) end
   -- execute run function if specified
   if run then run(c, target) end
 end
