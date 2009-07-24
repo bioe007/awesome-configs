@@ -48,7 +48,9 @@ end
 -- returns the widget now
 function init(cardid, channel, colors)
 
-  config.widget = awful.widget.progressbar({ align = "right" })
+  config.widget = awful.widget.progressbar()
+  -- config.widget = awful.widget.progressbar({ layout = awful.widget.layout.rightleft })
+  config.widget.layout = awful.widget.layout.leftright
   config.widget:set_width(13)
   config.widget:set_height(18)
   config.widget:set_vertical(true)
