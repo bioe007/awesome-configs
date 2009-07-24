@@ -1,6 +1,7 @@
 local string = string
 local os = os
 local math = math
+local mouse = mouse
 local awful = require("awful")
 local beautiful = require("beautiful")
 local naughty = require("naughty")
@@ -32,7 +33,8 @@ function add_calendar(inc_offset)
     timeout = 0, hover_timeout = 0.5,
     width = beautiful.calendar_w or 160,
     bg = beautiful.calendar_bg or beautiful.bg_focus or #000000,
-    fg = beautiful.calendar_fg or beautiful.fg_focus or #ffffff})
+    fg = beautiful.calendar_fg or beautiful.fg_focus or #ffffff,
+    screen = mouse.screen})
 end
 
 -- vim:set filetype=lua fdm=marker tabstop=4 shiftwidth=4 expandtab smarttab autoindent smartindent: --
