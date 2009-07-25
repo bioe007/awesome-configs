@@ -1,21 +1,21 @@
 path="/home/perry/.config/awesome/themes/blue"
 
 white = "#ffffff"
-blue_dark = "#4e6274"
+blue_dark = "#486274"
 blue_light = "#839ab1"
-nearwhite = "#cfffff"
+nearwhite = "#efffff"
 
 theme = {}
 
-theme.font = "Terminus 9"
+theme.font = "HeldustryFTVBasic Black 8"
 theme.bg_normal     = blue_dark
 theme.bg_focus      = blue_light
 theme.bg_urgent     = "#288ef6"
-theme.fg_normal     = "#a8a8dd"
+theme.fg_normal     = "#b9b9dd"
 theme.fg_focus      = nearwhite
 theme.fg_urgent     = white
   -- specific
-theme.fg_sb_hi     = "#cfcfff"
+theme.fg_sb_hi     = "#dfdfff"
 theme.fg_batt_mid  = "#00cb00"
 theme.fg_batt_low  = "#e6f21d"
 theme.fg_batt_crit = "#f8700a"
