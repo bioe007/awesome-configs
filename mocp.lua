@@ -40,7 +40,7 @@ settings = {
 -- and makes widget text/size changes as needed
 local function state()
 
-    print("in state")
+    -- print("in state")
     local fd = {}
     local tmp = nil
     local state ="" 
@@ -51,20 +51,20 @@ local function state()
     tmp = fd:read()
     -- if fd:read() == nil then 
     if tmp == nil then 
-        print("checking --server")
+        -- print("checking --server")
         fd = io.popen('pgrep -fx \'mocp --server\'')
         tmp = fd:read()
     end
 
     if tmp ~= nil then 
-        print("fd has read")
+        -- print("fd has read")
         fd:close()
 
         fd = io.popen('mocp -i')
         trackinfo.state = string.gsub(fd:read(),"State:%s*","")
         fd:close()
 
-        print("state is "..trackinfo.state)
+        -- print("state is "..trackinfo.state)
         if trackinfo.state == "STOP" then
             return false
         else
@@ -101,7 +101,7 @@ local function setTitle()
         fd:close()
     else
 
-        print("not state")
+        -- print("not state")
     end
 
 end
@@ -218,7 +218,7 @@ local function popup()
     else
         np.strng = "Artist: "..markup.fg(beautiful.fg_normal,trackinfo.artist).."\n"..
         "Song:   "..markup.fg(beautiful.fg_normal,trackinfo.songtitle).."\n"..
-        "Album:  "..markup.fg(beautiful.fg_normal,trackinfo.album).."\n"
+        "Album:  "..markup.fg(beautiful.fg_normal,string.gsub(trackinfo.album,".*Soundt","Soundtrack")).."\n"
         np.strng = np.strng..markup.fg(beautiful.fg_normal,getTime())
     end
     np.strng = markup.fg( beautiful.fg_focus, markup.font("monospace", np.strng.."  "))  
@@ -266,7 +266,7 @@ function setwidget(w)
     settings.widget = w
 
     -- assign buttons
-    settings.widget:buttons ({
+    settings.widget:buttons({
         button({}, 1, function() play("FWD")    end),
         button({}, 2, function() play("PAUSE")  end),
         button({}, 4, function() play("FWD")    end),
