@@ -110,10 +110,10 @@ myawesomemenu = {
    { "quit", awesome.quit }
 }
 
-mymainmenu = awful.menu.new({ items = { { "awesome", myawesomemenu, beautiful.awesome_icon },
-                                        { "open terminal", terminal }
-                                      }
-                            })
+mymainmenu = awful.menu({ items = { { "awesome", myawesomemenu, beautiful.awesome_icon },
+                                    { "open terminal", terminal }
+                                  }
+                        })
 
 mylauncher = awful.widget.launcher({ image = image(beautiful.awesome_icon),
                                      menu = mymainmenu })
@@ -126,40 +126,51 @@ mywibox = {}
 mypromptbox = {}
 mylayoutbox = {}
 mytaglist = {}
-mytaglist.buttons = { button({ }, 1, awful.tag.viewonly),
-                      button({ modkey }, 1, awful.client.movetotag),
-                      button({ }, 3, function (tag) tag.selected = not tag.selected end),
-                      button({ modkey }, 3, awful.client.toggletag),
-                      button({ }, 4, awful.tag.viewnext),
-                      button({ }, 5, awful.tag.viewprev) }
-mytasklist = {}
-mytasklist.buttons = { button({ }, 1, function (c)
-                                          if not c:isvisible() then
-                                              awful.tag.viewonly(c:tags()[1])
-                                          end
-                                          client.focus = c
-                                          c:raise()
-                                      end),
-                       button({ }, 3, function () if instance then instance:hide() instance = nil else instance = awful.menu.clients({ width=250 }) end end),
-                       button({ }, 4, function ()
-                                          awful.client.focus.byidx(1)
-                                          if client.focus then client.focus:raise() end
-                                      end),
-                       button({ }, 5, function ()
-                                          awful.client.focus.byidx(-1)
-                                          if client.focus then client.focus:raise() end
-                                      end) }
+mytaglist.buttons = awful.util.table.join(
+                    awful.button({ }, 1, awful.tag.viewonly),
+                    awful.button({ modkey }, 1, awful.client.movetotag),
+                    awful.button({ }, 3, function (tag) tag.selected = not tag.selected end),
+                    awful.button({ modkey }, 3, awful.client.toggletag),
+                    awful.button({ }, 4, awful.tag.viewnext),
+                    awful.button({ }, 5, awful.tag.viewprev)
+                    )
 
+mytasklist = {}
+mytasklist.buttons = awful.util.table.join(
+                     awful.button({ }, 1, function (c)
+                                              if not c:isvisible() then
+                                                  awful.tag.viewonly(c:tags()[1])
+                                              end
+                                              client.focus = c
+                                              c:raise()
+                                          end),
+                     awful.button({ }, 3, function ()
+                                              if instance then
+                                                  instance:hide()
+                                                  instance = nil
+                                              else
+                                                  instance = awful.menu.clients({ width=250 })
+                                              end
+                                          end),
+                     awful.button({ }, 4, function ()
+                                              awful.client.focus.byidx(1)
+                                              if client.focus then client.focus:raise() end
+                                          end),
+                     awful.button({ }, 5, function ()
+                                              awful.client.focus.byidx(-1)
+                                              if client.focus then client.focus:raise() end
+                                          end))
 for s = 1, screen.count() do
     -- Create a promptbox for each screen
-    mypromptbox[s] = widget({ type = "textbox", align = "left" })
+    mypromptbox[s] = awful.widget.prompt({ layout = awful.widget.layout.leftright })
     -- Create an imagebox widget which will contains an icon indicating which layout we're using.
     -- We need one layoutbox per screen.
-    mylayoutbox[s] = widget({ type = "imagebox", align = "right" })
-    mylayoutbox[s]:buttons({ button({ }, 1, function () awful.layout.inc(layouts, 1) end),
-                             button({ }, 3, function () awful.layout.inc(layouts, -1) end),
-                             button({ }, 4, function () awful.layout.inc(layouts, 1) end),
-                             button({ }, 5, function () awful.layout.inc(layouts, -1) end) })
+    mylayoutbox[s] = awful.widget.layoutbox(s)
+    mylayoutbox[s]:buttons(awful.util.table.join(
+                           awful.button({ }, 1, function () awful.layout.inc(layouts, 1) end),
+                           awful.button({ }, 3, function () awful.layout.inc(layouts, -1) end),
+                           awful.button({ }, 4, function () awful.layout.inc(layouts, 1) end),
+                           awful.button({ }, 5, function () awful.layout.inc(layouts, -1) end)))
     -- Create a taglist widget
     mytaglist[s] = awful.widget.taglist.new(s, awful.widget.taglist.label.all, mytaglist.buttons)
 
@@ -169,15 +180,22 @@ for s = 1, screen.count() do
                                               end, mytasklist.buttons)
 
     -- Create the wibox
-    mywibox[s] = wibox({ position = "top", fg = beautiful.fg_normal, bg = beautiful.bg_normal })
+    mywibox[s] = awful.wibox({ position = "top", screen = s })
     -- Add widgets to the wibox - order matters
-    mywibox[s].widgets = { mylauncher,
-                           mytaglist[s],
-                           mytasklist[s],
-                           mypromptbox[s],
-                           mytextbox,
-                           mylayoutbox[s],
-                           s == 1 and mysystray or nil }
+    mywibox[s].widgets = { 
+      { 
+        mylauncher,
+        mytaglist[s],
+        mypromptbox[s],
+        layout = awful.widget.layout.horizontal.leftright
+      }, 
+      mylayoutbox[s],
+      mytextbox,
+      s == 1 and mysystray or nil,
+      mytasklist[s],
+      layout = awful.widget.layout.horizontal.rightleft
+    } 
+
     mywibox[s].screen = s
 end
 -- }}}
@@ -373,24 +391,6 @@ end)
 --
 awful.hooks.manage.register(function (c, startup)
 end) --]]--
-
--- Hook function to execute when arranging the screen.
--- (tag switch, new client, etc)
-awful.hooks.arrange.register(function (screen)
-    local layout = awful.layout.getname(awful.layout.get(screen))
-    if layout and beautiful["layout_" ..layout] then
-        mylayoutbox[screen].image = image(beautiful["layout_" .. layout])
-    else
-        mylayoutbox[screen].image = nil
-    end
-
-    -- Give focus to the latest client in history if no window has focus
-    -- or if the current window is a desktop or a dock one.
-    if not client.focus then
-        local c = awful.client.focus.history.get(screen, 0)
-        if c then client.focus = c end
-    end
-end)
 
 -- Hook called every minute
 awful.hooks.timer.register(60, function ()
