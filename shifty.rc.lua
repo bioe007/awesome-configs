@@ -15,7 +15,7 @@ print("Entered rc.lua: " .. os.time())
 -- {{{ Variable definitions
 -- Themes define colours, icons, and wallpapers
 -- The default is a dark theme
-theme_path = "/usr/share/awesome/themes/default/theme"
+theme_path = "/usr/share/awesome/themes/default/theme.lua"
 -- Uncommment this for a lighter theme
 -- theme_path = "/usr/share/awesome/themes/sky/theme"
 
@@ -93,12 +93,6 @@ shifty.config.defaults={
   floatBars=true,
   guess_name=true,
   guess_position=true,
-  run = function(tag) 
-    local stitle = "Shifty Created: "
-    stitle = stitle .. (awful.tag.getproperty(tag,"position") or shifty.tag2index(mouse.screen,tag))
-    stitle = stitle .. " : "..tag.name
-    naughty.notify({ text = stitle })
-  end,
 }
 --}}}
 
@@ -106,7 +100,7 @@ shifty.config.defaults={
 -- Create a textbox widget
 mytextbox = widget({ type = "textbox", align = "right" })
 -- Set the default text in textbox
-mytextbox.text = "<b><small> " .. AWESOME_RELEASE .. " </small></b>"
+mytextbox.text = "<b><small> " .. awesome.release .. " </small></b>"
 
 -- Create a laucher widget and a main menu
 myawesomemenu = {
