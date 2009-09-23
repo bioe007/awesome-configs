@@ -4,6 +4,8 @@
 --
 print("Entered rc.lua: " .. os.time())
 require("awful")
+require("awful.autofocus")
+require("awful.rules")
 require("beautiful")
 require("wicked")
 require("naughty")
@@ -16,6 +18,7 @@ require("battery")
 require("markup")
 require("fs")
 require("volume")
+require("vicious")
 print("Modules loaded: " .. os.time())
 
 -- {{{ Variable definitions
@@ -29,9 +32,9 @@ settings = {
     ["terminal"]  = "urxvt",
     ["browser"]   = "firefox",
     ["mail"]      = "/home/perry/.bin/mutt-start.sh",
-    ["filemgr"]   = "pcmanfm",
+    ["filemgr"]   = "thunar",
     ["music"]     = "mocp --server",
-    ["editor"]    = os.getenv("EDITOR") or "vim",
+    ["editor"]    = "/home/perry/.bin/vim-start.sh"
   },
   --}}}
 
@@ -48,8 +51,8 @@ settings = {
   ["opacity"] = { 
     ["default"] = { focus = 1.0, unfocus = 0.8 },
     ["Easytag"] = { focus = 1.0, unfocus = 0.9 },
-    ["Gschem"] = { focus = 1.0, unfocus = 1.0 },
-    ["Gimp"] = { focus = 1.0, unfocus = 1.0 },
+    ["Gschem"]  = { focus = 1.0, unfocus = 1.0 },
+    ["Gimp"]    = { focus = 1.0, unfocus = 1.0 },
   },
   -- }}}
 }
@@ -57,13 +60,13 @@ settings = {
 --{{{ SHIFTY configuration
 --{{{ configured tags
 shifty.config.tags = {
-  ["w2"]     =  { layout = awful.layout.suit.tile.bottom , mwfact = 0.62,
+  ["w2"]     =  { layout = awful.layout.suit.tile.bottom, mwfact = 0.62,
                 exclusive = false, solitary = false, position = 1, init = true,
                 screen = 2 }, 
 
-  ["w1"]     =  { layout = awful.layout.suit.tile        , mwfact = 0.62,
+  ["vim"]     =  { layout = awful.layout.suit.tile, mwfact = 0.62,
                 exclusive = false, solitary = false, position = 1, init = true,
-                screen = 1, slave = true  }, 
+                screen = 1, slave = true, spawn = settings.apps.editor  }, 
 
   ["ds"]     =  { layout = awful.layout.suit.max        , mwfact = 0.70,
                 exclusive = false, solitary = false, position = 2, init = false,
@@ -89,8 +92,9 @@ shifty.config.tags = {
   ["media"]  =  { layout = awful.layout.suit.floating    , exclusive = false , 
                 solitary  = false, position = 8     }, 
 
-  ["gimp"]  =  { layout = awful.layout.suit.tile.left    , exclusive = false , 
-                solitary  = false, position = 8, ncol = 2, mwfact = 0.75,
+  ["gimp"]  =  { layout = awful.layout.suit.tile    , exclusive = false , 
+                solitary  = false, position = 8, ncol = 3, mwfact = 0.75,
+                nmaster=0,
                 spawn = 'gimp-2.6', slave = true                                    }, 
 
   ["office"] =  { layout = awful.layout.suit.tile        , position  = 9 }
@@ -99,6 +103,9 @@ shifty.config.tags = {
 
 --{{{ application matching rules
 shifty.config.apps = {
+  { match   = { "vim","gvim" }, 
+    tag     = "vim"                                         },
+
   { match   = { "Navigator","Vimperator","Gran Paradiso" }, 
     tag     = "web"                                         },
 
@@ -154,14 +161,12 @@ shifty.config.apps = {
 --}}}
 
 shifty.config.defaults={ layout  = awful.layout.suit.tile.bottom, ncol = 1, floatBars=true }
-    --[[run     = function(tag)
-                naughty.notify({
-                  text = markup.fg(beautiful.fg_normal, markup.font("monospace",
-                    markup.fg( beautiful.fg_sb_hi,
-                      "Shifty Created: "..(awful.tag.getproperty(tag,"position")
-                                or shifty.tag2index(mouse.screen,tag)).." : "..
-                                (tag.name or "foo"))))
-                              }) end, ]]--
+    run     = function(tag)
+                naughty.notify({ text = markup.fg(beautiful.fg_normal, markup.font("monospace",
+                    markup.fg( beautiful.fg_sb_hi, "Shifty Created: "..
+                        (awful.tag.getproperty(tag,"position") or shifty.tag2index(mouse.screen,tag)).." : "..
+                        (tag.name or "foo"))))
+            }) end, 
 
 -- }}}
 
@@ -183,7 +188,44 @@ function tagSearch(name)
 end
 -- }}}
 
---{{{ -- WIDGETS
+-- {{{ 
+function tagScreenless()
+    local allTags = {}
+    local curTag = awful.tag.selected()
+    for s = 1, screen.count() do
+        t = shifty.name2tag(name,s)
+        if t ~= nil then
+            awful.tag.viewonly(t)
+            awful.screen.focus(awful.util.cycle(screen.count(),s+mouse.screen))
+            return true
+        end
+    end
+    return false
+end
+-- }}}
+
+-- {{{ tagPop() 
+-- Called externally and just pops to or merges with my active vim server when 
+-- new files are dumped to it. (vim-start.sh) 
+-- though it could easily be used with any tag by passing a different 'name'
+-- parameter
+function tagPop(name)
+    for s = 1, screen.count() do
+        t = shifty.name2tag(name,s)
+        if t ~= nil then
+            if t.screen == awful.tag.selected().screen then
+                t.selected = true
+                awful.screen.focus(awful.util.cycle(screen.count(),s+mouse.screen))
+            else
+                awful.tag.viewonly(t)
+                awful.screen.focus(awful.util.cycle(screen.count(),s+mouse.screen))
+            end
+        end
+    end
+end
+-- }}}
+
+--{{{ widgets
 
 mysystray = widget({ type = "systray" })
 
@@ -208,16 +250,16 @@ datewidget = widget({type="textbox", align = 'right' })
 datewidget.mouse_enter = function() calendar.add_calendar() end
 datewidget.mouse_leave = function() calendar.remove_calendar() end
 datewidget:buttons({
-  button({ }, 4, function() calendar.add_calendar(-1) end),
-  button({ }, 5, function() calendar.add_calendar(1) end)
+  awful.button({ }, 4, function() calendar.add_calendar(-1) end),
+  awful.button({ }, 5, function() calendar.add_calendar(1) end)
 })
-wicked.register(datewidget, wicked.widgets.date, markup.fg(beautiful.fg_sb_hi, '%k:%M'))
+vicious.register(datewidget, vicious.widgets.date, markup.fg(beautiful.fg_sb_hi, '%k:%M'), 59)
 -- }}}
 
 -- {{{ -- CPU widget
 cpuwidget = widget({type="textbox", align = 'right' })
 cpuwidget.width = 40
-wicked.register(cpuwidget, wicked.widgets.cpu, 
+vicious.register(cpuwidget, vicious.widgets.cpu, 
                 'cpu:' .. markup.fg(beautiful.fg_sb_hi, '$1'))
 -- }}}
 
@@ -225,7 +267,7 @@ wicked.register(cpuwidget, wicked.widgets.cpu,
 memwidget = widget({type="textbox", align = 'right' })
 memwidget.width = 45
 
-wicked.register(memwidget, wicked.widgets.mem, 
+vicious.register(memwidget, vicious.widgets.mem, 
                 'mem:' ..  markup.fg(beautiful.fg_sb_hi,'$1'))
 -- }}}
 
@@ -240,7 +282,9 @@ fs.init( fswidget,
 -- {{{ -- BATTERY
 batterywidget = widget({ type = "textbox", align = "right" })
 battery.init(batterywidget)
-awful.hooks.timer.register(50, battery.info,true)
+battimer = timer { timeout = 50 }
+battimer:add_signal("timeout", battery.info)
+battimer:start()
 -- }}}
 
 -- {{{ -- VOLUME
@@ -279,13 +323,12 @@ widget_table1 = {
 --{{{ -- TAGLIST
 mytaglist = {}
 mytaglist.buttons = awful.util.table.join(
-        awful.button({                 }, 1, awful.tag.viewonly       ),
-        awful.button({ settings.modkey }, 1, awful.client.movetotag   ),
-        awful.button({                 }, 3, 
-            function (tag) tag.selected = not tag.selected end        ),
-        awful.button({ settings.modkey }, 3, awful.client.toggletag   ),
-        awful.button({                 }, 4, awful.tag.viewnext       ),
-        awful.button({                 }, 5, awful.tag.viewprev       )
+        awful.button({                } , 1, awful.tag.viewonly    ) , 
+        awful.button({ settings.modkey} , 1, awful.client.movetotag) , 
+        awful.button({                } , 3, awful.tag.viewtoggle  ) , 
+        awful.button({ settings.modkey} , 3, awful.client.toggletag) , 
+        awful.button({                } , 4, awful.tag.viewnext    ) , 
+        awful.button({                } , 5, awful.tag.viewprev    ) 
     )
 --}}}
 
@@ -321,7 +364,7 @@ mypromptbox = {}
 mylayoutbox = {}
 
 for s = 1, screen.count() do
-    mypromptbox[s] = awful.widget.prompt({ layout = awful.widget.layout.leftright })
+    mypromptbox[s] = awful.widget.prompt({ layout = awful.widget.layout.horizontal.leftright })
 
     mylayoutbox[s] = awful.widget.layoutbox(s)
 
@@ -348,7 +391,9 @@ for s = 1, screen.count() do
             mypromptbox[s], widget_spacer_l,
             ["layout"] = awful.widget.layout.horizontal.leftright
         },
-        s==1 and widget_table1,
+        (s==1 and widget_table1) or 
+            { widget_spacer_r, datewidget, widget_spacer_r,
+              ["layout"] = awful.widget.layout.horizontal.rightleft },
         {
             mytasklist[s], widget_spacer_r,
             ["layout"]= awful.widget.layout.horizontal.flex
@@ -404,7 +449,7 @@ globalkeys = awful.util.table.join(
     -- Layout manipulation
     awful.key({ settings.modkey, "Shift"   }, "j", function () awful.client.swap.byidx(  1) end),
     awful.key({ settings.modkey, "Shift"   }, "k", function () awful.client.swap.byidx( -1) end),
-    awful.key({ settings.modkey }, "s", function () awful.screen.focus(1) end),
+    awful.key({ settings.modkey }, "s", function () awful.screen.focus_relative(1) end),
     awful.key({ settings.modkey, "Shift" }, "s", awful.client.movetoscreen),   -- switch client to other screen
     awful.key({ settings.modkey,           }, "u", awful.client.urgent.jumpto),
     awful.key({ settings.modkey,           }, "Tab",
@@ -485,7 +530,6 @@ clientkeys = awful.util.table.join(
     awful.key({ settings.modkey, "Control" }, "space",  awful.client.floating.toggle                     ),
     awful.key({ settings.modkey, "Control" }, "Return", function (c) c:swap(awful.client.getmaster()) end),
     awful.key({ settings.modkey,           }, "o",      awful.client.movetoscreen                        ),
-    awful.key({ settings.modkey            }, "t",      awful.client.togglemarked                        ),
     awful.key({ settings.modkey, "Control"}, "m",
         function (c)
             c.maximized_horizontal = not c.maximized_horizontal
@@ -525,7 +569,7 @@ shifty.taglist = mytaglist
 shifty.init()
 
 -- {{{ Hooks
--- Hook function to execute when focusing a client.
+--[[ Hook function to execute when focusing a client.
 awful.hooks.focus.register(function (c)
   if not awful.client.ismarked(c) then
     c.border_color = beautiful.border_focus
@@ -535,9 +579,9 @@ awful.hooks.focus.register(function (c)
   else
     c.opacity = settings.opacity["default"].focus or 0.7
   end
-end)
+end) --]]--
 
--- Hook function to execute when unfocusing a client.
+--[[ Hook function to execute when unfocusing a client.
 awful.hooks.unfocus.register(function (c)
   if not awful.client.ismarked(c) then
     c.border_color = beautiful.border_normal
@@ -547,36 +591,8 @@ awful.hooks.unfocus.register(function (c)
   else
     c.opacity = settings.opacity["default"].unfocus or 0.7
   end
-end)
+end) --]]--
 
--- Hook function to execute when marking a client
-awful.hooks.marked.register(function (c)
-  c.border_color = beautiful.border_marked
-end)
-
--- Hook function to execute when unmarking a client.
-awful.hooks.unmarked.register(function (c)
-  c.border_color = beautiful.border_focus
-end)
-
--- Hook function to execute when the mouse enters a client.
-awful.hooks.mouse_enter.register(function (c)
-  -- Sloppy focus, but disabled for magnifier layout
-  if awful.layout.get(c.screen) ~= awful.layout.suit.magnifier
-    and awful.client.focus.filter(c) then
-    client.focus = c
-  end
-end)
-
--- Hook function to execute when switching tag selection.
-awful.hooks.tags.register(function (screen, tag, view)
-    -- Give focus to the latest client in history if no window has focus
-    -- or if the current window is a desktop or a dock one.
-    if not client.focus or not client.focus:isvisible() then
-        local c = awful.client.focus.history.get(screen, 0)
-        if c then client.focus = c end
-    end
-end)
---}}}
-
--- vim:set filetype=lua textwidth=80 fdm=marker tabstop=4 shiftwidth=4 expandtab smarttab autoindent smartindent: --
+client.add_signal("focus", function(c) c.border_color = beautiful.border_focus end)
+client.add_signal("unfocus", function(c) c.border_color = beautiful.border_normal end)
+-- vim:set filetype=lua textwidth=120 fdm=marker tabstop=4 shiftwidth=4 expandtab smarttab autoindent smartindent: --
