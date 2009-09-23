@@ -4,6 +4,7 @@ local pairs = pairs
 local string = string
 local markup = require("markup")
 local beautiful = require("beautiful")
+local timer = timer
 
 module("fs")
 
@@ -56,7 +57,9 @@ function init(w,args)
   fs.config.interval = args.interval or 59
   fs.widget = w
   stats()
-  awful.hooks.timer.register(fs.config.interval,stats,true)
+  fstimer = timer { timeout = fs.config.interval }
+  fstimer:add_signal("timeout",stats)
+  fstimer:start()
 
 end
 -- }}} 

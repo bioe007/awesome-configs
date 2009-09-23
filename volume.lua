@@ -10,6 +10,7 @@ local io = io
 local awful = require("awful")
 local string = string
 local beautiful = require("beautiful")
+local timer = timer
 
 -- local variables
 local config = {}
@@ -87,8 +88,9 @@ function init(args) --- cardid, channel, colors, layout)
 
     -- run the update fx once then register a hook to update this
     vol("update")
-    awful.hooks.timer.register(10, function () vol("update") end, true)
-
+    voltimer = timer { timeout = 10 }
+    voltimer:add_signal("timeout", function () vol("update") end )
+    voltimer:start()
     return config.widget
 end
 --}}}

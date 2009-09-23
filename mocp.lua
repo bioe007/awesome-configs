@@ -5,6 +5,7 @@ local beautiful = require("beautiful")
 local naughty   = require("naughty")
 local markup    = require("markup")
 local button    = button
+local timer    = timer
 
 local print = print -- debug
 
@@ -267,22 +268,31 @@ function setwidget(w)
 
     -- assign buttons
     settings.widget:buttons({
-        button({}, 1, function() play("FWD")    end),
-        button({}, 2, function() play("PAUSE")  end),
-        button({}, 4, function() play("FWD")    end),
-        button({}, 3, function() play("REV")    end),
-        button({}, 5, function() play("REV")    end)
+        awful.button({}, 1, function() play("FWD")    end),
+        awful.button({}, 2, function() play("PAUSE")  end),
+        awful.button({}, 4, function() play("FWD")    end),
+        awful.button({}, 3, function() play("REV")    end),
+        awful.button({}, 5, function() play("REV")    end)
     })
 
-    -- what to do when mouse over
-    settings.widget.mouse_enter = function() 
-                awful.hooks.timer.register(1,popup) 
-            end
-    settings.widget.mouse_leave = function()
-                awful.hooks.timer.unregister(popup)
-            end
+    moctimer = timer { timeout = settings.interval }
+    moctimer:add_signal("timeout", scroller)
+    moctimer:start()
 
-    awful.hooks.timer.register (settings.interval,scroller)
+    mocpoptimer = timer { timeout = 1 }
+    mocpoptimer:add_signal("timeout", popup)
+
+    -- what to do when mouse over
+    settings.widget.mouse_enter = mocpoptimer:start()
+    --[[function() 
+                awful.hooks.timer.register(1,popup) 
+            end --]]--
+    settings.widget.mouse_leave = mocpoptimer:stop()
+    --[[function()
+                awful.hooks.timer.unregister(popup)
+            end --]]--
+
+    -- awful.hooks.timer.register (settings.interval,scroller)
     state()
 end
 
