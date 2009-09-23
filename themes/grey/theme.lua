@@ -7,6 +7,10 @@
 
 theme          = {}
 theme.font     = "HeldustryFTVBasic Black 8"
+-- theme.font     = "mintsstrong 16"
+-- theme.font     = "SFAutomatonCondensed 9"
+-- theme.font     = "PTF NORDIC Std 11"
+-- theme.font     = "MANDATORY 9"
 theme.path     = os.getenv("HOME").."/.config/awesome/themes/grey"
 theme.iconpath = theme.path
 
@@ -31,7 +35,7 @@ theme.vol_bg             = "#000000"
 
 theme.border_width  = 1
 theme.border_normal = "#000000"
-theme.border_focus  = "#dfdfdf"
+theme.border_focus  = "#22cf9a"
 theme.border_marked = "#0000f0"
 
 -- calendar settings
