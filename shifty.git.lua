@@ -23,6 +23,7 @@ local tonumber = tonumber
 local wibox = wibox
 local root = root
 local dbg= dbg
+local print = print -- debug
 module("shifty")
 
 config = {}
@@ -401,6 +402,7 @@ function match(c, startup)
   local keys = config.clientkeys or c:keys() or {}
   local target_screen = mouse.screen
 
+  if role then print("have role "..role) end
   c.border_color = beautiful.border_normal
   c.border_width = beautiful.border_width
 
@@ -415,6 +417,11 @@ function match(c, startup)
           (role and role:find(w)) or
           (typ  and typ:find(w))
         then
+          print(c.name)
+        for j,y in pairs(config.apps[i]) do
+          print(k,y)
+        end
+        print("------------------------------")
           if a.screen then target_screen = a.screen end
           if a.tag then
             if type(a.tag) == "string" then
@@ -425,7 +432,9 @@ function match(c, startup)
           end
           if a.float ~= nil then awful.client.floating.set(c, a.float) end
           if a.geometry ~=nil then geom = { x = a.geometry[1], y = a.geometry[2], width = a.geometry[3], height = a.geometry[4] } end
-          if a.slave ~=nil then slave = a.slave end
+          if a.slave ~=nil then
+            -- print("slave for " .. c.name or "name nil")
+            slave = a.slave end
           if a.nopopup ~=nil then nopopup = a.nopopup end
           if a.intrusive ~=nil then intrusive = a.intrusive end
           if a.fullscreen ~=nil then c.fullscreen = a.fullscreen end
@@ -512,7 +521,10 @@ function match(c, startup)
   --FIXME: if target then target_screen = target.screen end
   if target_screen and c.screen ~= target_screen then c.screen = target_screen end
   if #target_tags > 0 then c:tags( target_tags ) end
-  if slave then awful.client.setslave(c) end
+  if slave then 
+    print("setting " .. c.name or "name nil" .. " slave")
+    awful.client.setslave(c)
+  end
   if wfact then awful.client.setwfact(wfact, c) end
   if geom then c:geometry(geom) end
   if struts then c:struts(struts) end
@@ -782,10 +794,21 @@ function getlayout(name)
 end
 -- }}}
 
-awful.hooks.manage.unregister(awful.tag.withcurrent)
-awful.hooks.tags.register(sweep)
-awful.hooks.tags.register(tagkeys)
-awful.hooks.clients.register(sweep)
-awful.hooks.manage.register(match)
+-- awful.hooks.manage.unregister(awful.tag.withcurrent)
+-- awful.hooks.tags.register(sweep)
+-- awful.hooks.tags.register(tagkeys)
+-- awful.hooks.clients.register(sweep)
+-- awful.hooks.manage.register(match)
+-- {{{ signals
+client.add_signal("manage", match)
+client.add_signal("unmanage", sweep)
+client.remove_signal("manage", awful.tag.withcurrent)
 
--- vim: foldmethod=marker:filetype=lua:expandtab:shiftwidth=2:tabstop=2:softtabstop=2:encoding=utf-8:textwidth=80
+for s = 1, screen.count() do
+  awful.tag.attached_add_signal(s, "property::selected", sweep)
+  awful.tag.attached_add_signal(s, "tagged", sweep)
+  screen[s]:add_signal("tag::history::update", tagkeys)
+end
+-- }}}
+
+-- vim: foldmethod=marker:filetype=lua:expandtab:shiftwidth=4:tabstop=4:softtabstop=4:encoding=utf-8:textwidth=80
