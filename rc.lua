@@ -7,7 +7,6 @@ require("awful")
 require("awful.autofocus")
 require("awful.rules")
 require("beautiful")
-require("wicked")
 require("naughty")
 -- custom modules
 require("shifty")
@@ -144,8 +143,8 @@ shifty.config.apps = {
     tag     = "gimp",                                     
     slave   = true, dockable = true                         },
     
-  { match   = { "MPlayer", "Gnuplot", "galculator" }, 
-    float   = true                                          },
+  { match   = { "MPlayer", "Gnuplot", "galculator","R Graphics" }, 
+    float   = true, honorsizehints = true                        },
 
   { match   = { "urxvt","vim","mutt" },
     honorsizehints = false, 
@@ -160,13 +159,16 @@ shifty.config.apps = {
 }
 --}}}
 
-shifty.config.defaults={ layout  = awful.layout.suit.tile.bottom, ncol = 1, floatBars=true }
+shifty.config.defaults={ layout  = awful.layout.suit.tile.bottom, ncol = 1, floatBars=true, 
     run     = function(tag)
                 naughty.notify({ text = markup.fg(beautiful.fg_normal, markup.font("monospace",
                     markup.fg( beautiful.fg_sb_hi, "Shifty Created: "..
                         (awful.tag.getproperty(tag,"position") or shifty.tag2index(mouse.screen,tag)).." : "..
                         (tag.name or "foo"))))
             }) end, 
+}
+
+shifty.config.sloppy = true
 
 -- }}}
 
@@ -179,8 +181,11 @@ function tagSearch(name)
   for s = 1, screen.count() do
     t = shifty.name2tag(name,s)
     if t ~= nil then
+        if t.screen ~= mouse.screen then
+            awful.screen.focus(t.screen)
+        end
       awful.tag.viewonly(t)
-      awful.screen.focus(awful.util.cycle(screen.count(),s+mouse.screen))
+      -- awful.screen.focus(awful.util.cycle(screen.count(),s+mouse.screen))
       return true
     end
   end
@@ -364,6 +369,7 @@ mypromptbox = {}
 mylayoutbox = {}
 
 for s = 1, screen.count() do
+
     mypromptbox[s] = awful.widget.prompt({ layout = awful.widget.layout.horizontal.leftright })
 
     mylayoutbox[s] = awful.widget.layoutbox(s)
@@ -436,7 +442,7 @@ globalkeys = awful.util.table.join(
     awful.key({ settings.modkey            }, "n",       shifty.send_next),          -- move client to next tag
     awful.key({ settings.modkey, "Control" }, "n",       function ()                 -- move a tag to next screen
         local ts = awful.tag.selected()
-        awful.tag.history.restore(ts.screen)
+        awful.tag.history.restore(ts.screen,1)
         shifty.set(ts,{ screen = awful.util.cycle(screen.count(), ts.screen +1)})
         awful.tag.viewonly(ts)
         mouse.screen = ts.screen
@@ -569,30 +575,47 @@ shifty.taglist = mytaglist
 shifty.init()
 
 -- {{{ Hooks
---[[ Hook function to execute when focusing a client.
-awful.hooks.focus.register(function (c)
-  if not awful.client.ismarked(c) then
+-- Hook function to execute when focusing a client.
+--[[ client.add_signal("manage", function(c)
+
+    print("print in manage ")
+    if c.name ~= nil then
+        print(c.name)
+    else
+        print("c.name is nil")
+        for k,v in pairs(c) do
+            print("k="..k.."\tv="..v)
+        end
+    end
+    if c.name ~= nil and string.find(c.name, "R Graphics") then
+        print("r graph found")
+        awful.client.floating.set(c,true)
+        awful.titlebar.add(c, { modkey = modkey })
+    end
+end) ]]--
+
+client.add_signal("focus", function (c)
+
     c.border_color = beautiful.border_focus
-  end
-  if settings.opacity[c.class] then 
-    c.opacity = settings.opacity[c.class].focus
-  else
-    c.opacity = settings.opacity["default"].focus or 0.7
-  end
+
+    if settings.opacity[c.class] then 
+       c.opacity = settings.opacity[c.class].focus
+    else
+        c.opacity = settings.opacity["default"].focus or 0.7
+    end
 end) --]]--
 
---[[ Hook function to execute when unfocusing a client.
-awful.hooks.unfocus.register(function (c)
-  if not awful.client.ismarked(c) then
+-- Hook function to execute when unfocusing a client.
+client.add_signal("unfocus", function (c)
+
     c.border_color = beautiful.border_normal
-  end
-  if settings.opacity[c.class] then 
-    c.opacity = settings.opacity[c.class].unfocus
-  else
-    c.opacity = settings.opacity["default"].unfocus or 0.7
-  end
-end) --]]--
 
-client.add_signal("focus", function(c) c.border_color = beautiful.border_focus end)
-client.add_signal("unfocus", function(c) c.border_color = beautiful.border_normal end)
+    if settings.opacity[c.class] then 
+        c.opacity = settings.opacity[c.class].unfocus
+    else
+        c.opacity = settings.opacity["default"].unfocus or 0.7
+    end
+end) --]]--
+-- }}}
+
 -- vim:set filetype=lua textwidth=120 fdm=marker tabstop=4 shiftwidth=4 expandtab smarttab autoindent smartindent: --
