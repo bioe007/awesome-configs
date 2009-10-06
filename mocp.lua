@@ -5,7 +5,7 @@ local beautiful = require("beautiful")
 local naughty   = require("naughty")
 local markup    = require("markup")
 local button    = button
-local timer    = timer
+local timer     = timer
 
 local print = print -- debug
 
@@ -234,7 +234,6 @@ local function popup()
 end
 ---}}}
 
-
 ---{{{ mocplay() 
 -- easier way to check|run mocp
 function play(plyrCmd) 
@@ -262,6 +261,7 @@ function play(plyrCmd)
 end
 ---}}}
 
+--{{{ setwidget
 function setwidget(w)
 
     settings.widget = w
@@ -295,6 +295,7 @@ function setwidget(w)
     -- awful.hooks.timer.register (settings.interval,scroller)
     state()
 end
+--}}}
 
 ---{{{ function update ( k, v)
 -- called by any kind of external script to trigger widget text update
