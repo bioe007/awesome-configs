@@ -33,9 +33,9 @@ theme.widg_cpu_mid       = "#888888"
 theme.widg_cpu_end       = "#cccccc"
 theme.vol_bg             = "#000000"
 
-theme.border_width  = 1
+theme.border_width  = 2
 theme.border_normal = "#000000"
-theme.border_focus  = "#22cf9a"
+theme.border_focus  = "#3accc5"
 theme.border_marked = "#0000f0"
 
 -- calendar settings
