@@ -89,7 +89,7 @@ end
 --@param prefix: if any prefix is to be added
 --@param no_selectall:
 function rename(tag, prefix, no_selectall)
-  local theme = beautiful.get()
+  local theme = beautiful.get() 
   local t = tag or awful.tag.selected(mouse.screen)
   local scr = t.screen
   local bg = nil
@@ -217,15 +217,6 @@ function set(t, args)
   local clientstomove = nil
   if scr > screen.count() then scr = screen.count() end
   if t.screen and scr ~= t.screen then
-    -- if #t:clients() > 0 then
-      -- clientstomove = {}
-      -- print("228: clients to move found")
-      -- for _,c in pairs(t:clients()) do
-        -- c.screen = scr
-        -- table.insert(clientstomove, c)
-        -- end
-      -- clientstomove = t:clients()
-    -- end
     tagtoscr(scr, t)
     t.screen = nil
   end
@@ -314,20 +305,6 @@ function set(t, args)
     awful.tag.setproperty(t, "initial", nil)
   end
 
-  -- if clientstomove ~= nil then
-    -- print("320: moving clients")
-    -- for _ , c in ipairs(clientstomove) do
-      -- print("t.scr = "..t.screen)
-      -- awful.client.property.set(c,"screen", t.screen)
-      -- c.screen = t.screen
-      -- c.screen = t.screen
-      -- print("c.scr = "..c.screen)
-      -- c:tags({t})
-      -- awful.client.movetotag(t,c)
-    -- end
-    -- else
-    -- print("320: not moving clients")
-  -- end
 
   return t
 end
@@ -489,20 +466,14 @@ function match(c, startup)
   -- set key bindings
   c:keys(keys)
 
-  if c.name ~= nil then print(c.name.." is ") end
   -- set properties of floating clients
   if float ~= nil then
     awful.client.floating.set(c, float) 
-  -- if awful.client.floating.get(c) then
-    print("floating")
     if config.defaults.floatBars then       -- add a titlebar if requested in config.defaults
-      print("adding titlebar")
       awful.titlebar.add( c, { modkey = modkey } )
     end
     awful.placement.centered(c, c.transient_for)
     awful.placement.no_offscreen(c) -- this always seems to stick the client at 0,0 (incl titlebar)
-    -- else
-      -- print("not floating")
   end
 
   -- if not matched to some names try putting client in c.transient_for or current tags
@@ -529,7 +500,6 @@ function match(c, startup)
     end
   end
 
-  if awful.client.floating.get(c) then print("532: now its floating") end
   -- translate target names to tag objects, creating missing ones
   if #target_tag_names > 0 and #target_tags == 0 then
     for i, tn in ipairs(target_tag_names) do
@@ -548,7 +518,6 @@ function match(c, startup)
     end
   end
 
-  if awful.client.floating.get(c) then print("548: now its floating") end
   -- set client's screen/tag if needed
   target_screen = target_tags[1].screen or target_screen
   if c.screen ~= target_screen then c.screen = target_screen end
@@ -558,7 +527,6 @@ function match(c, startup)
   if geom then c:geometry(geom) end
   if struts then c:struts(struts) end
 
-  if awful.client.floating.get(c) then print("558: now its floating") end
   -- switch or highlight
   local showtags = {}
   local u = nil
@@ -581,7 +549,6 @@ function match(c, startup)
     end
   end
 
-  if awful.client.floating.get(c) then print("580: now its floating") end
   -- focus and raise accordingly or lower if supressed
   if not (nofocus or c.hidden or c.minimized) then
     if (awful.tag.getproperty(target,"nopopup") or nopopup) and (target and target ~= sel) then
@@ -594,7 +561,6 @@ function match(c, startup)
     c:lower()
   end
 
-  if awful.client.floating.get(c) then print("592: now its floating") end
   if config.sloppy then
     -- Enable sloppy focus
     c:add_signal("mouse::enter", function(c)
@@ -607,7 +573,6 @@ function match(c, startup)
   -- execute run function if specified
   if run then run(c, target) end
 
-  if awful.client.floating.get(c) then print("604: now its floating") end
 end
 --}}}
 
