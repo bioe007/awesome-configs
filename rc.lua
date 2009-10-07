@@ -9,8 +9,8 @@ require("awful.rules")
 require("beautiful")
 require("naughty")
 -- custom modules
-require("shifty")
 require("markup")
+require("shifty")
 require("mocp")
 require("calendar")
 require("battery")
@@ -19,6 +19,11 @@ require("fs")
 require("volume")
 require("vicious")
 print("Modules loaded: " .. os.time())
+
+settings = {}
+settings.theme_path = os.getenv("HOME").."/.config/awesome/themes/grey/theme.lua"
+beautiful.init(settings.theme_path)
+-- beautiful.init("/usr/share/awesome/themes/default/theme.lua")
 
 -- {{{ Variable definitions
 settings = {
@@ -142,8 +147,8 @@ shifty.config.apps = {
   { match   = { "gimp-dock","gimp-toolbox" },
     tag     = "gimp",                                     
     slave   = true, dockable = true                         },
-    
-  { match   = { "MPlayer", "Gnuplot", "galculator","R Graphics" }, 
+
+  { match   = { "dialog", "MPlayer", "Gnuplot", "galculator","R Graphics" }, 
     float   = true, honorsizehints = true                        },
 
   { match   = { "urxvt","vim","mutt" },
@@ -154,25 +159,25 @@ shifty.config.apps = {
     buttons = awful.util.table.join(
         awful.button({ }, 1, function (c) client.focus = c; c:raise() end),
         awful.button({ settings.modkey }, 1, awful.mouse.client.move),
-        awful.button({ settings.modkey }, 3, awful.mouse.client.resize))
-                                                            }
+        awful.button({ settings.modkey }, 3, awful.mouse.client.resize),
+        awful.button({ settings.modkey }, 8, awful.mouse.client.resize))
+  }
 }
 --}}}
 
-shifty.config.defaults={ layout  = awful.layout.suit.tile.bottom, ncol = 1, floatBars=true, 
-    run     = function(tag)
-                naughty.notify({ text = markup.fg(beautiful.fg_normal, markup.font("monospace",
-                    markup.fg( beautiful.fg_sb_hi, "Shifty Created: "..
-                        (awful.tag.getproperty(tag,"position") or shifty.tag2index(mouse.screen,tag)).." : "..
-                        (tag.name or "foo"))))
-            }) end, 
+shifty.config.defaults={ layout = awful.layout.suit.tile.bottom, ncol = 1, floatBars=true, 
+    run = function(tag)
+            naughty.notify({ text = markup.fg(beautiful.fg_normal, markup.fg( beautiful.fg_sb_hi, "Shifty Created: "..
+                            (awful.tag.getproperty(tag,"position") or shifty.tag2index(mouse.screen,tag)).." : "..
+                            (tag.name or "foo")))
+            })
+        end, 
 }
 
 shifty.config.sloppy = true
 
 -- }}}
 
-beautiful.init(settings.theme_path)
 shifty.modkey = settings.modkey
 -- }}}
 
@@ -264,16 +269,14 @@ vicious.register(datewidget, vicious.widgets.date, markup.fg(beautiful.fg_sb_hi,
 -- {{{ -- CPU widget
 cpuwidget = widget({type="textbox", align = 'right' })
 cpuwidget.width = 40
-vicious.register(cpuwidget, vicious.widgets.cpu, 
-                'cpu:' .. markup.fg(beautiful.fg_sb_hi, '$1'))
+vicious.register(cpuwidget, vicious.widgets.cpu, 'cpu:' .. markup.fg(beautiful.fg_sb_hi, '$1'))
 -- }}}
 
 -- {{{ -- MEMORY widgets
 memwidget = widget({type="textbox", align = 'right' })
 memwidget.width = 45
 
-vicious.register(memwidget, vicious.widgets.mem, 
-                'mem:' ..  markup.fg(beautiful.fg_sb_hi,'$1'))
+vicious.register(memwidget, vicious.widgets.mem, 'mem:' ..  markup.fg(beautiful.fg_sb_hi,'$1'))
 -- }}}
 
 -- {{{ -- FSWIDGET
@@ -437,7 +440,7 @@ globalkeys = awful.util.table.join(
     end),
 
     -- shiftycentric
-    awful.key({ settings.modkey            }, "Escape",  awful.tag.history.restore), -- move to prev tag by history
+    awful.key({ settings.modkey            }, "Escape",  function() awful.tag.history.restore() end), -- move to prev tag by history
     awful.key({ settings.modkey, "Shift"   }, "n",       shifty.send_prev),          -- move client to prev tag
     awful.key({ settings.modkey            }, "n",       shifty.send_next),          -- move client to next tag
     awful.key({ settings.modkey, "Control" }, "n",       function ()                 -- move a tag to next screen
@@ -533,6 +536,7 @@ globalkeys = awful.util.table.join(
 clientkeys = awful.util.table.join(
     awful.key({ settings.modkey,           }, "f",      function (c) c.fullscreen = not c.fullscreen  end),
     awful.key({ settings.modkey, "Shift"   }, "c",      function (c) c:kill()                         end),
+    awful.key({ settings.modkey, "Shift"   }, "0",      function (c) c.sticky=not c.sticky            end),
     awful.key({ settings.modkey, "Control" }, "space",  awful.client.floating.toggle                     ),
     awful.key({ settings.modkey, "Control" }, "Return", function (c) c:swap(awful.client.getmaster()) end),
     awful.key({ settings.modkey,           }, "o",      awful.client.movetoscreen                        ),
