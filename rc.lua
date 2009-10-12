@@ -449,6 +449,13 @@ globalkeys = awful.util.table.join(
         shifty.set(ts,{ screen = awful.util.cycle(screen.count(), ts.screen +1)})
         awful.tag.viewonly(ts)
         mouse.screen = ts.screen
+
+        if #ts:clients() > 0 then
+            local c = ts:clients()[1]
+            client.focus = c
+            c:raise()
+        end
+        
     end),
     awful.key({ settings.modkey, "Shift"   }, "r",       shifty.rename),             -- rename a tag
     awful.key({ settings.modkey            }, "d",       shifty.del),                -- delete a tag
