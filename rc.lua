@@ -18,6 +18,7 @@ require("markup")
 require("fs")
 require("volume")
 require("vicious")
+require("revelation")
 print("Modules loaded: " .. os.time())
 
 settings = {}
@@ -57,6 +58,7 @@ settings = {
     ["Easytag"] = { focus = 1.0, unfocus = 0.9 },
     ["Gschem"]  = { focus = 1.0, unfocus = 1.0 },
     ["Gimp"]    = { focus = 1.0, unfocus = 1.0 },
+    ["MPlayer"] = { focus = 1.0, unfocus = 1.0 },
   },
   -- }}}
 }
@@ -98,7 +100,7 @@ shifty.config.tags = {
 
   ["gimp"]  =  { layout = awful.layout.suit.tile    , exclusive = false , 
                 solitary  = false, position = 8, ncol = 3, mwfact = 0.75,
-                nmaster=0,
+                nmaster=1,
                 spawn = 'gimp-2.6', slave = true                                    }, 
 
   ["office"] =  { layout = awful.layout.suit.tile        , position  = 9 }
@@ -115,9 +117,6 @@ shifty.config.apps = {
 
   { match   = { "mutt", "Shredder.*" },
     tag     = "mail"                                        },
-
-  { match   = { "pcmanfm" },
-    slave   = true                                          },
 
   { match   = { "OpenOffice.*" },
     tag     = "office"                                      },
@@ -136,20 +135,22 @@ shifty.config.apps = {
   { match   = { "VBox.*","VirtualBox.*" },
     tag     = "vbx"                                         },
 
-  { match   = { "Mplayer.*","Mirage","gtkpod","Ufraw","easytag"},
+  { match   = { "Mirage","gtkpod","Ufraw","easytag"},
     tag     = "media",
     nopopup = true                                          },
 
-  -- { match   = { "gimp-image-window","Ufraw" },
-  { match   = { "gimp","Ufraw" },
-    tag     = "gimp",                                       },
+  { match   = { "gimp%-image%-window","Ufraw"               },
+    tag     = "gimp"                                        },
 
-  { match   = { "gimp-dock","gimp-toolbox" },
+  { match   = { "gimp%-dock","gimp%-toolbox" },
     tag     = "gimp",                                     
-    slave   = true, dockable = true                         },
+    slave   = true, dockable = true, honorsizehints=false   },
 
-  { match   = { "dialog", "MPlayer", "Gnuplot", "galculator","R Graphics" }, 
-    float   = true, honorsizehints = true                        },
+  { match   = { "dialog", "Gnuplot", "galculator","R Graphics" }, 
+    float   = true, honorsizehints = true                   },
+
+  { match   = { "MPlayer" }, 
+    float   = true, honorsizehints = true, ontop=true       },
 
   { match   = { "urxvt","vim","mutt" },
     honorsizehints = false, 
@@ -190,7 +191,6 @@ function tagSearch(name)
             awful.screen.focus(t.screen)
         end
       awful.tag.viewonly(t)
-      -- awful.screen.focus(awful.util.cycle(screen.count(),s+mouse.screen))
       return true
     end
   end
@@ -426,18 +426,31 @@ awful.button({ }, 5, awful.tag.viewprev)
 globalkeys = awful.util.table.join(
 
     awful.key({ settings.modkey }, "space", awful.tag.viewnext),  -- move to next tag
+    awful.key({ settings.modkey, "Control"}, "space", function()  -- move to next tag on all screens
+        for s=1,screen.count() do
+            awful.tag.viewnext(screen[s])
+        end
+        end ),  
     awful.key({ settings.modkey, "Shift" }, "space", awful.tag.viewprev), -- move to previous tag
-
+    awful.key({ settings.modkey, "Control", "Shift"}, "space", function()  -- move to previous tag on all screens
+        for s=1,screen.count() do
+            awful.tag.viewprev(screen[s])
+        end
+        end ),  
     awful.key({ settings.modkey,           }, "j",
-    function ()
-        awful.client.focus.byidx( 1)
-        if client.focus then client.focus:raise() end
+        function ()
+            -- if screen.count() > 1 then
+            
+
+            awful.client.focus.byidx( 1)
+            if client.focus then client.focus:raise() end
     end),
     awful.key({ settings.modkey,           }, "k",
-    function ()
-        awful.client.focus.byidx(-1)
-        if client.focus then client.focus:raise() end
+        function ()
+            awful.client.focus.byidx(-1)
+            if client.focus then client.focus:raise() end
     end),
+    awful.key({ settings.modkey,    }, "e",  revelation.revelation),             -- rename a tag
 
     -- shiftycentric
     awful.key({ settings.modkey            }, "Escape",  function() awful.tag.history.restore() end), -- move to prev tag by history
@@ -459,8 +472,7 @@ globalkeys = awful.util.table.join(
     end),
     awful.key({ settings.modkey, "Shift"   }, "r",       shifty.rename),             -- rename a tag
     awful.key({ settings.modkey            }, "d",       shifty.del),                -- delete a tag
-    awful.key({ settings.modkey            }, "a",       shifty.add),                -- creat a new tag
-    awful.key({ settings.modkey, "Shift"   }, "a",       function() shifty.add({ nopopup = true }) end), -- nopopup new tag
+    awful.key({ settings.modkey, "Shift"   }, "a",       shifty.add),                -- creat a new tag
 
     -- Layout manipulation
     awful.key({ settings.modkey, "Shift"   }, "j", function () awful.client.swap.byidx(  1) end),
@@ -517,6 +529,8 @@ globalkeys = awful.util.table.join(
 
     awful.key({ settings.modkey,           }, "l",     function () awful.tag.incmwfact( 0.03)    end),
     awful.key({ settings.modkey,           }, "h",     function () awful.tag.incmwfact(-0.03)    end),
+    awful.key({ settings.modkey,           }, "q",     function (c) awful.client.incwfact( 0.03,c)    end),
+    awful.key({ settings.modkey,           }, "a",     function (c) awful.client.incwfact( -0.03,c)    end),
     awful.key({ settings.modkey, "Shift"   }, "h",     function () awful.tag.incnmaster( 1)      end),
     awful.key({ settings.modkey, "Shift"   }, "l",     function () awful.tag.incnmaster(-1)      end),
     awful.key({ settings.modkey, "Control" }, "h",     function () awful.tag.incncol( 1)         end),
@@ -612,7 +626,7 @@ client.add_signal("focus", function (c)
     if settings.opacity[c.class] then 
        c.opacity = settings.opacity[c.class].focus
     else
-        c.opacity = settings.opacity["default"].focus or 0.7
+        c.opacity = settings.opacity["default"].focus or 1
     end
 end) --]]--
 
