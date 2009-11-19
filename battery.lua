@@ -2,39 +2,52 @@
 --
 -- hal checking stolen from Kooky's battery widget
 --
-local io = io
-local string = string
-local math = math
+local io        = io
+local string    = string
+local math      = math
+local select    = select
+local type    = type
+local tonumber  = tonumber
+local pairs     = pairs
+local print     = print
 local beautiful = require("beautiful")
-local naughty = require("naughty")
-local markup = require("markup")
-local tonumber = tonumber
+local naughty   = require("naughty")
+local markup    = require("markup")
+local timer     = timer
+local widget = widget
 
 module("battery")
 local battwarn 
 local bwidget = {}
 local device
 
-settings = {}
+config = {
+    bwidget = nil,
+    width = 48,
+    width_small = 10,
+    width_warning = 200,
+    timeout = 50
+}
 
 --{{{ popup when battery level gets low
-function showWarning(s)
+local function showWarning(s)
 
     naughty.notify({ 
         text = markup.font("DejaVu Sans 8",
-        markup.bold(
-        markup.fg(beautiful.fg_batt_oshi or "#ff2233", 
+            markup.bold(
+                markup.fg(beautiful.fg_batt_oshi or "#ff2233", 
                                 "Warning, low battery! ".. s ))),
-        timeout = 0, hover_timeout = 0.5,
+        timeout = 0,
+        hover_timeout = 0.5,
         bg = beautiful.bg_focus,
-        width = beautiful.battery_w or 160,
+        width = config.width_warning or 260,
     })
 
 end
 --}}}
 
 --{{{ gets percentage of charge in battery
-function charge()
+local function charge()
     local level = 100
     local hal = io.popen("hal-get-property --udi "..device..
                                 " --key battery.charge_level.percentage")
@@ -48,7 +61,7 @@ end
 --}}}
 
 --{{{ evaluates the ac adapter state
-function state()
+local function state()
     local plug = "charged"
 
     local hal = io.popen("hal-get-property --udi "..device..
@@ -71,7 +84,7 @@ end
 ---}}}
 
 --{{{ populates bwidget.text with current state symbol and percentage
-function info()
+local function info()
 
     -- calculate remaining %
     local battery = tonumber(charge())
@@ -103,7 +116,9 @@ function info()
     if adapter:match("charged") then
         -- bwidget.text = "⚡"..battery.."↯"
         bwidget.text = "↯"
+        bwidget.width = config.width_small
     elseif adapter:match("discharging") then
+        bwidget.width = config.width or 48
         bwidget.text = "⚡"..battery.."▼"
     else
         bwidget.text = "⚡"..battery.."▲"
@@ -112,15 +127,37 @@ end
 ---}}}
 
 --{{{ 
-function init(w, width)
-    bwidget = w
-    bwidget.width = width or 48
+function init(...)
+
+    bwidget = widget({ type = "textbox", align = "right" })
+
+    -- parse vargs
+    local args = {n = select( '#', ... ), ... }
+    for k,v in pairs(args) do
+        if type(v) == "table" then
+            for k2,v2 in pairs(args[k]) do
+                if config[k2] ~= nil then
+                    config[k2] = v2
+                end
+            end
+            args[k] = nil
+        end
+    end
+
+    bwidget.width = config.width or 48
+
+    battimer = timer { timeout = 50 }
+    battimer:add_signal("timeout", info)
+    battimer:start()
+
     local hal = io.popen("hal-find-by-capability --capability battery")
     if hal ~= nil then
         device = hal:read()
         hal:close()
     end
+
     info()
+    return bwidget 
 end
 --}}}
 

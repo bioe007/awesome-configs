@@ -22,14 +22,13 @@ require("revelation")
 print("Modules loaded: " .. os.time())
 
 settings = {}
-settings.theme_path = os.getenv("HOME").."/.config/awesome/themes/grey/theme.lua"
-beautiful.init(settings.theme_path)
--- beautiful.init("/usr/share/awesome/themes/default/theme.lua")
+settings.theme_path = os.getenv("HOME").."/.config/awesome/themes/grey"
+beautiful.init(settings.theme_path.."/theme.lua")
 
 -- {{{ Variable definitions
 settings = {
   ["modkey"] = "Mod4",
-  ["theme_path"] = os.getenv("HOME").."/.config/awesome/themes/grey/theme.lua",
+  ["theme_path"] = os.getenv("HOME").."/.config/awesome/themes/grey",
   ["icon_path"] = beautiful.iconpath,
 
   --{{{ apps
@@ -46,6 +45,7 @@ settings = {
   --{{{ settings.layouts
   ["layouts"] = {
     awful.layout.suit.tile,
+    awful.layout.suit.tile.left,
     awful.layout.suit.tile.bottom,
     awful.layout.suit.max,
     awful.layout.suit.floating
@@ -198,7 +198,7 @@ function tagSearch(name)
 end
 -- }}}
 
--- {{{ 
+-- {{{ wip
 function tagScreenless()
     local allTags = {}
     local curTag = awful.tag.selected()
@@ -235,102 +235,71 @@ function tagPop(name)
 end
 -- }}}
 
---{{{ widgets
+-- {{{ widgets
+widgets = {}
 
-mysystray = widget({ type = "systray" })
+widgets["systray"] = widget({ type = "systray" }) 
 
---{{{ -- SPACERS
-widget_spacer_l = widget({type="textbox", align = "left" })
-widget_spacer_l.text = " "
-widget_spacer_l.width = 5
-widget_spacer_r  = widget({type="textbox", align = "right" })
-widget_spacer_r.width = 5
-widget_spacer_r.text = " "
+-- {{{ -- SPACERS
+widgets["lspace"]       = widget({ type = "textbox", align = "left" }) 
+widgets["lspace"].text  = " "
+widgets["lspace"].width = 5
+widgets["rspace"]       = widget({type = "textbox", align = "right" }) 
+widgets["rspace"].text  = " "
+widgets["rspace"].width = 5
 --}}}
 
---{{{ -- MOCP Widget
-mocpwidget = widget({type="textbox",align = "right"})
-mocpwidget.width = 120 
-mocp.setwidget(mocpwidget)
---}}}
+-- MOCP 
+widgets["mocp"] = mocp.init(settings.theme_path.."/music/sonata.png")
+widgets["mocp"].width = 120 
 
--- {{{ -- DATE widget
-datewidget = widget({type="textbox", align = 'right' })
-
-datewidget.mouse_enter = function() calendar.add_calendar() end
-datewidget.mouse_leave = function() calendar.remove_calendar() end
-datewidget:buttons({
-  awful.button({ }, 4, function() calendar.add_calendar(-1) end),
-  awful.button({ }, 5, function() calendar.add_calendar(1) end)
-})
-vicious.register(datewidget, vicious.widgets.date, markup.fg(beautiful.fg_sb_hi, '%k:%M'), 59)
+-- {{{ -- DATE 
+widgets["date"] = widget({type="textbox", align = 'right' })
+widgets["date"]:add_signal("mouse::enter",function() calendar.add(0) end)
+widgets["date"]:add_signal("mouse::leave",calendar.remove) 
+widgets["date"]:buttons(awful.util.table.join(
+  awful.button({}, 1, function() print("calendar add"); calendar.add(-1) end),
+  awful.button({}, 4, function() print("calendar add"); calendar.add(-1) end),
+  awful.button({}, 5, function() calendar.add(1) end)
+))
+vicious.register(
+    widgets["date"],
+    vicious.widgets.date,
+    markup.fg(beautiful.fg_sb_hi, '%k:%M'),
+    59)
 -- }}}
 
--- {{{ -- CPU widget
-cpuwidget = widget({type="textbox", align = 'right' })
-cpuwidget.width = 40
-vicious.register(cpuwidget, vicious.widgets.cpu, 'cpu:' .. markup.fg(beautiful.fg_sb_hi, '$1'))
+-- {{{ -- CPU
+widgets["cpu"] = widget({type = "textbox", align = 'right' })
+widgets["cpu"].width = 40
+vicious.register(
+    widgets["cpu"],
+    vicious.widgets.cpu,
+    'cpu:' .. markup.fg(beautiful.fg_sb_hi, '$2')
+    )
 -- }}}
 
--- {{{ -- MEMORY widgets
-memwidget = widget({type="textbox", align = 'right' })
-memwidget.width = 45
-
-vicious.register(memwidget, vicious.widgets.mem, 'mem:' ..  markup.fg(beautiful.fg_sb_hi,'$1'))
+-- {{{ MEMORY
+widgets["memory"] = widget({type = "textbox", align = 'right' })
+widgets["memory"].width = 45
+vicious.register(
+    widgets["memory"],
+    vicious.widgets.mem,
+    'mem:' ..  markup.fg(beautiful.fg_sb_hi,'$2')
+    )
 -- }}}
 
--- {{{ -- FSWIDGET
-fswidget = widget({ type = "textbox", align = "right" })
-fs.init( fswidget,
-        { interval = 59,
-          parts = {   ['sda7'] = {label = "/"},
-                      ['sda5'] = {label = "d"} } }) 
--- }}}
+widgets["diskspace"] = fs.init({interval = 59,
+                                parts = { ['sda7'] = {label = "/"},
+                                          ['sda5'] = {label = "d"} } }) 
+widgets["battery"] = battery.init()
 
--- {{{ -- BATTERY
-batterywidget = widget({ type = "textbox", align = "right" })
-battery.init(batterywidget)
-battimer = timer { timeout = 50 }
-battimer:add_signal("timeout", battery.info)
-battimer:start()
--- }}}
+-- VOLUME :: FIXME :: my buttons are broke
+widgets["volume"] = volume.init()
 
--- {{{ -- VOLUME
-pb_volume = volume.init()
---[[ pb_volume.buttons = awful.util.table.join(
-        awful.button({ }, 1, function () print("volumeup"); volume.vol("up","5") end),
-        awful.button({ }, 4, function () volume.vol("up","1") end),
-        awful.button({ }, 3, function () volume.vol("down","5") end),
-        awful.button({ }, 5, function () volume.vol("down","1") end),
-        awful.button({ }, 2, function () volume.vol() end)
-    ) --]]--
--- }}}
-
--- {{{ -- FSWIDGET
-fswidget = widget({ type = "textbox", align = "right" })
-fs.init( fswidget,
-        { interval = 59,
-          parts = {   ['sda7'] = {label = "/"},
-                      ['sda5'] = {label = "d"} } }) 
--- }}}
-
-widget_table1 = {
-    widget_spacer_r , 
-    datewidget      , widget_spacer_r , 
-    mysystray       , widget_spacer_r , 
-    pb_volume       , widget_spacer_r , 
-    mocpwidget      , widget_spacer_r , 
-    cpuwidget       , widget_spacer_r , 
-    memwidget       , widget_spacer_r , 
-    batterywidget   , widget_spacer_r , 
-    fswidget        , widget_spacer_r , 
-
-    ["layout"] = awful.widget.layout.horizontal.rightleft
-}
-
---{{{ -- TAGLIST
-mytaglist = {}
-mytaglist.buttons = awful.util.table.join(
+-- {{{ -- TAGLIST
+widgets["taglist"] = {}
+widgets["taglist"].buttons = awful.util.table.join(
         awful.button({                } , 1, awful.tag.viewonly    ) , 
         awful.button({ settings.modkey} , 1, awful.client.movetotag) , 
         awful.button({                } , 3, awful.tag.viewtoggle  ) , 
@@ -340,9 +309,9 @@ mytaglist.buttons = awful.util.table.join(
     )
 --}}}
 
---{{{ -- TASKLIST
-mytasklist = {}
-mytasklist.buttons = awful.util.table.join(
+-- {{{ -- TASKLIST
+widgets["tasklist"] = {}
+widgets["tasklist"].buttons = awful.util.table.join(
   awful.button({ }, 1, function (c)
         if not c:isvisible() then awful.tag.viewonly(c:tags()[1]) end
         client.focus = c
@@ -366,59 +335,86 @@ mytasklist.buttons = awful.util.table.join(
 
 --}}}
 
+widgets["promptbox"] = {}
+widgets["layoutbox"] = {}
+widgets["wibox"] = {}
+
 -- {{{ -- STATUSBAR 
-mywibox = {}
-mypromptbox = {}
-mylayoutbox = {}
+widget_table1 = {
+    widgets["rspace"]    , 
+    widgets["date"]      , widgets["rspace"] , 
+    widgets["systray"]   , widgets["rspace"] , 
+    widgets["volume"]    , widgets["rspace"] , 
+    widgets["mocp"]      , widgets["rspace"] , 
+    widgets["cpu"]       , widgets["rspace"] , 
+    widgets["memory"]    , widgets["rspace"] , 
+    widgets["battery"]   , widgets["rspace"] , 
+    widgets["diskspace"] , widgets["rspace"] , 
+
+    ["layout"] = awful.widget.layout.horizontal.rightleft
+}
 
 for s = 1, screen.count() do
 
-    mypromptbox[s] = awful.widget.prompt({ layout = awful.widget.layout.horizontal.leftright })
+    widgets["promptbox"][s] = awful.widget.prompt({ layout = awful.widget.layout.horizontal.leftright })
 
-    mylayoutbox[s] = awful.widget.layoutbox(s)
+    widgets["layoutbox"][s] = awful.widget.layoutbox(s)
 
-    mylayoutbox[s]:buttons(awful.util.table.join(
-            awful.button({}, 2, function () awful.layout.inc(settings.layouts, 1 ) end),
+    widgets["layoutbox"][s]:buttons(awful.util.table.join(
+            awful.button({}, 1, function () awful.layout.inc(settings.layouts, 1 ) end),
             awful.button({}, 3, function () awful.layout.inc(settings.layouts, -1) end),
             awful.button({}, 4, function () awful.layout.inc(settings.layouts, 1 ) end),
             awful.button({}, 5, function () awful.layout.inc(settings.layouts, -1) end))
         )
 
     -- Create a taglist widget
-    mytaglist[s] = awful.widget.taglist(s, awful.widget.taglist.label.all, mytaglist.buttons)
+    widgets["taglist"][s] = awful.widget.taglist(s, awful.widget.taglist.label.all, widgets["taglist"].buttons)
 
     -- Create a tasklist widget
-    mytasklist[s] = awful.widget.tasklist(function(c)
-            return awful.widget.tasklist.label.currenttags(c, s)
-        end, mytasklist.buttons)
+    widgets["tasklist"][s] = awful.widget.tasklist(function(c)
+                return awful.widget.tasklist.label.currenttags(c, s)
+            end, widgets["tasklist"].buttons)
 
-    mywibox[s] = awful.wibox({ position = "top", screen = s })
-    mywibox[s].widgets = { 
+    -- add widgets to the 'statusbar' wibox
+    widgets["wibox"][s] = awful.wibox({ position = "top", screen = s })
+    widgets["wibox"][s].widgets = { 
+
+        -- {{{ always have a taglist, promptbox and layoutbox
         { 
-            widget_spacer_l, mylayoutbox[s], widget_spacer_l,
-            mytaglist[s],
-            mypromptbox[s], widget_spacer_l,
+            widgets["lspace"] , widgets["layoutbox"][s]        , 
+            widgets["lspace"] , widgets["taglist"][s] , 
+            widgets["promptbox"][s]    , widgets["lspace"]     , 
+
             ["layout"] = awful.widget.layout.horizontal.leftright
         },
+        -- }}}
+        
         (s==1 and widget_table1) or 
-            { widget_spacer_r, datewidget, widget_spacer_r,
-              ["layout"] = awful.widget.layout.horizontal.rightleft },
+            { 
+                widgets["rspace"], widgets["date"], widgets["rspace"],
+                ["layout"] = awful.widget.layout.horizontal.rightleft
+            },
+
+        -- {{{ always put the tasklist on
         {
-            mytasklist[s], widget_spacer_r,
+            widgets["tasklist"][s], widgets["rspace"],
             ["layout"]= awful.widget.layout.horizontal.flex
         },
+        -- }}}
+        
         ["layout"]= awful.widget.layout.horizontal.leftright
     }
 end
 
 -- }}}
+
 -- }}}
 
 -- {{{ Mouse bindings
 root.buttons(awful.util.table.join(
-awful.button({ }, 3, function () mymainmenu:toggle() end),
-awful.button({ }, 4, awful.tag.viewnext),
-awful.button({ }, 5, awful.tag.viewprev)
+    awful.button({ }, 3, function () mymainmenu:toggle() end),
+    awful.button({ }, 4, awful.tag.viewnext),
+    awful.button({ }, 5, awful.tag.viewprev)
 ))
 -- }}}
 
@@ -439,9 +435,6 @@ globalkeys = awful.util.table.join(
         end ),  
     awful.key({ settings.modkey,           }, "j",
         function ()
-            -- if screen.count() > 1 then
-            
-
             awful.client.focus.byidx( 1)
             if client.focus then client.focus:raise() end
     end),
@@ -450,7 +443,7 @@ globalkeys = awful.util.table.join(
             awful.client.focus.byidx(-1)
             if client.focus then client.focus:raise() end
     end),
-    awful.key({ settings.modkey,    }, "e",  revelation.revelation),             -- rename a tag
+    awful.key({ settings.modkey,    }, "e",  revelation.revelation),
 
     -- shiftycentric
     awful.key({ settings.modkey            }, "Escape",  function() awful.tag.history.restore() end), -- move to prev tag by history
@@ -480,13 +473,10 @@ globalkeys = awful.util.table.join(
     awful.key({ settings.modkey }, "s", function () awful.screen.focus_relative(1) end),
     awful.key({ settings.modkey, "Shift" }, "s", awful.client.movetoscreen),   -- switch client to other screen
     awful.key({ settings.modkey,           }, "u", awful.client.urgent.jumpto),
-    awful.key({ settings.modkey,           }, "Tab",
-    function ()
-        awful.client.focus.history.previous()
-        if client.focus then
-            client.focus:raise()
-        end
-    end),
+    awful.key({ settings.modkey,           }, "Tab", function ()
+            awful.client.focus.history.previous()
+            if client.focus then client.focus:raise() end
+            end),
 
     -- {{{ - APPLICATIONS
     awful.key({ settings.modkey }, "Return", function () awful.util.spawn(settings.apps.terminal,false) end),
@@ -539,7 +529,7 @@ globalkeys = awful.util.table.join(
     awful.key({ settings.modkey, "Mod1", "Shift"   }, "l", function () awful.layout.inc(settings.layouts, -1) end),
 
     -- Prompt
-    awful.key({ settings.modkey },            "F1",     function () mypromptbox[mouse.screen]:run() end),
+    awful.key({ settings.modkey },            "F1",     function () widgets["promptbox"][mouse.screen]:run() end),
     -- }}}
 
     -- {{{ - POWER
@@ -596,29 +586,10 @@ end
 root.keys(globalkeys)
 -- }}}
 
-shifty.taglist = mytaglist
+shifty.taglist = widgets["taglist"]
 shifty.init()
 
--- {{{ Hooks
--- Hook function to execute when focusing a client.
---[[ client.add_signal("manage", function(c)
-
-    print("print in manage ")
-    if c.name ~= nil then
-        print(c.name)
-    else
-        print("c.name is nil")
-        for k,v in pairs(c) do
-            print("k="..k.."\tv="..v)
-        end
-    end
-    if c.name ~= nil and string.find(c.name, "R Graphics") then
-        print("r graph found")
-        awful.client.floating.set(c,true)
-        awful.titlebar.add(c, { modkey = modkey })
-    end
-end) ]]--
-
+-- {{{ signals
 client.add_signal("focus", function (c)
 
     c.border_color = beautiful.border_focus
@@ -628,7 +599,7 @@ client.add_signal("focus", function (c)
     else
         c.opacity = settings.opacity["default"].focus or 1
     end
-end) --]]--
+end) 
 
 -- Hook function to execute when unfocusing a client.
 client.add_signal("unfocus", function (c)
@@ -640,7 +611,7 @@ client.add_signal("unfocus", function (c)
     else
         c.opacity = settings.opacity["default"].unfocus or 0.7
     end
-end) --]]--
+end)
 -- }}}
 
 -- vim:set filetype=lua textwidth=120 fdm=marker tabstop=4 shiftwidth=4 expandtab smarttab autoindent smartindent: --

@@ -11,7 +11,7 @@ module("calendar")
 local calendar = nil
 local offset = 0
 
-function remove_calendar()
+function remove()
   if calendar ~= nil then
     naughty.destroy(calendar)
     calendar = nil
@@ -19,9 +19,9 @@ function remove_calendar()
   end
 end
 
-function add_calendar(inc_offset)
+function add(inc_offset)
   local save_offset = offset
-  remove_calendar()
+  remove()
   offset = save_offset + (inc_offset or 0)
   local datespec = os.date("*t")
   datespec = datespec.year * 12 + datespec.month - 1 + offset
@@ -29,7 +29,7 @@ function add_calendar(inc_offset)
   local cal = awful.util.pread("cal -m " .. datespec)
   cal = string.gsub(cal, "^%s*(.-)%s*$", "%1")
   calendar = naughty.notify({
-    text = markup.font("monospace", os.date("%a, %d %B %Y") .. "\n" .. cal),
+    text = markup.heading(markup.font("monospace", os.date("%a, %d %B %Y") .. "\n" .. cal)),
     timeout = 0, hover_timeout = 0.5,
     width = beautiful.calendar_w or 160,
     bg = beautiful.calendar_bg or beautiful.bg_focus or #000000,

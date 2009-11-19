@@ -1,10 +1,11 @@
-local io = io
-local awful = require("awful")
-local pairs = pairs
-local string = string
-local markup = require("markup")
+local io        = io
+local string    = string
+local pairs     = pairs
+local awful     = require("awful")
 local beautiful = require("beautiful")
-local timer = timer
+local timer     = timer
+local widget    = widget
+local markup    = require("markup")
 
 module("fs")
 
@@ -48,18 +49,19 @@ end
 -- {{{ init
 -- @param w - the widget
 -- @param args - table partitions, labels, config settings
-function init(w,args)
+function init(args)
 
-  if not (w and args) then return end
+  if not args then return end
 
   add(args.parts)
 
   fs.config.interval = args.interval or 59
-  fs.widget = w
+  fs.widget = widget({ type = "textbox", align = "right" })
   stats()
   fstimer = timer { timeout = fs.config.interval }
   fstimer:add_signal("timeout",stats)
   fstimer:start()
+  return fs.widget
 
 end
 -- }}} 

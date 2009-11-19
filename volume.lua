@@ -78,9 +78,18 @@ function init(args) --- cardid, channel, colors, layout)
                                 beautiful.fg_focus or "#ffffff")
 
     config.widget:set_gradient_colors(
-            {   args.gradient_start or beautiful.fg_focus,
-                args.gradient_stop or beautiful.fg_focus })
+                {   args.gradient_start or beautiful.fg_focus,
+                    args.gradient_stop or beautiful.fg_focus }
+            )
 
+            -- FIXME : these are broken
+    config.widget.buttons = awful.util.table.join(
+                awful.button({ }, 1, function () volume.vol("up","5") end),
+                awful.button({ }, 4, function () volume.vol("up","1") end),
+                awful.button({ }, 3, function () volume.vol("down","5") end),
+                awful.button({ }, 5, function () volume.vol("down","1") end),
+                awful.button({ }, 2, function () volume.vol() end)
+            )
 
     -- set config's sound properties
     config.cardid  = args.cardid or 0

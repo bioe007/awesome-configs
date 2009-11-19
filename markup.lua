@@ -6,6 +6,10 @@ local beautiful = require("beautiful")
 -- Markup helper functions
 module("markup")
 
+function italic(text) return '<i>'..text..'</i>' end
+
+function bold(text) return '<b>'..text..'</b>' end
+
 function bg(color, text)
     if text ~= nil then
         return '<bg color="'..color..'" />'..text
@@ -30,24 +34,12 @@ function font(font, text)
     end
 end
 
-function title(t)
-    return t
-end
-
-function title_normal(t)
-    return beautiful.title(t)
-end
-
 function title_focus(t)
     return bg(beautiful.bg_focus, fg(beautiful.fg_focus, title(t)))
 end
 
 function title_urgent(t)
     return bg(beautiful.bg_urgent, fg(beautiful.fg_urgent, title(t)))
-end
-
-function bold(text)
-    return '<b>'..text..'</b>'
 end
 
 function heading(text)
