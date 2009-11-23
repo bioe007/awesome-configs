@@ -1,3 +1,9 @@
+-- a mocp widget for awesome
+--
+-- perrydothargraveatgmaildotcom 
+-- bioe007
+--
+--
 local io        = io
 local string    = string
 local awful     = require("awful")
@@ -6,6 +12,7 @@ local naughty   = require("naughty")
 local markup    = require("markup")
 local button    = button
 local timer     = timer
+local widget    = widget
 
 local print = print -- debug
 
@@ -28,67 +35,70 @@ local trackinfo = {
     state     = ""
 }
 
--- public settings
-settings = {
+local iScroll = 1
+-- public config
+config = {
     iScroller = 1,
     MAXCH     = 15,
     interval  = 0.75,
+    tooltip = nil,
+    popup = { 
+        timeout = 3,
+        border_width = 2,
+        width = 300,
+        icon_size = 48,
+        margin = 10
+    }
 }
 --}}}
 
----{{{ local state()
+-- {{{ local state()
 -- updates trackinfo.state [ PLAY|PAUSE|STOP|OFF ]
 -- and makes widget text/size changes as needed
 local function state()
 
-    -- print("in state")
     local fd = {}
     local tmp = nil
     local state ="" 
 
-    -- check both 
     fd = io.popen('pgrep -fx \'mocp\'')
 
     tmp = fd:read()
-    -- if fd:read() == nil then 
     if tmp == nil then 
-        -- print("checking --server")
         fd = io.popen('pgrep -fx \'mocp --server\'')
         tmp = fd:read()
     end
 
     if tmp ~= nil then 
-        -- print("fd has read")
         fd:close()
 
         fd = io.popen('mocp -i')
         trackinfo.state = string.gsub(fd:read(),"State:%s*","")
         fd:close()
 
-        -- print("state is "..trackinfo.state)
         if trackinfo.state == "STOP" then
             return false
         else
-            settings.widget.width = 122
+            config.widget.width = 122
             return true
         end
     else
         trackinfo.state = "OFF"
-        settings.widget.text = "" 
-        settings.widget.width = 0
+        config.widget.text = "" 
+        config.widget.width = 0
     end
 
     fd:close()
 end
 ---}}}
 
----{{{ local setTitle
+-- {{{ local setTitle
 -- call to force update of trackinfo variables
 local function setTitle()
 
     local fd = {}
 
-    if not (trackinfo.state == "OFF" or trackinfo.state == "STOP") then --state() then
+    if not (trackinfo.state == "OFF" or trackinfo.state == "STOP") then 
         fd = io.popen('mocp -i')
 
         -- read to end of mocp -i
@@ -100,40 +110,37 @@ local function setTitle()
             end
         end
         fd:close()
-    else
-
-        -- print("not state")
     end
 
 end
 ---}}}
 
----{{{ local title(delim)
+-- {{{ local title(delim)
 local function title(delim)
 
     local eol = delim or " "
     local np = {}
 
     if trackinfo.artist == "" and state() then setTitle() end
-    np.song =string.gsub( string.gsub(trackinfo.songtitle,"^%d*",""),"%(.*","") .. eol
+    np.song = string.gsub( string.gsub(trackinfo.songtitle,"^%d*",""),"%(.*","") .. eol
 
     -- return for widget text
     return trackinfo.artist.." : "..np.song
 
 end
----}}}
+--}}}
 
----{{{ local function notdestroy()
+-- {{{ local function notdestroy()
 local function notdestroy()
     if mocbox ~= nil then
         naughty.destroy(mocbox)
         mocbox = nil
     end
 end
----}}}
+--}}}
 
----{{{ local getTime() gets ct and tt of track for popup
---@return string containig formatted times
+-- {{{ local getTime() gets ct and tt of track for popup
+-- return string containig formatted times
 local function getTime()
     local fd = {}
     local ttable = {}
@@ -155,7 +162,7 @@ local function getTime()
 
     return tstring
 end
----}}}
+--}}}
 
 -- {{{ local scroller 
 -- mocp widget, scrolls text
@@ -164,50 +171,50 @@ local function scroller(tb)
 
     -- if mocp is not running, then simply return here
     if trackinfo.state == "OFF" then
-        settings.iScroller = 1
+        iScroll = 1
         state()
         return
     else
-        -- this sets the symbolic prefix based on where moc is playing | (stopped or paused)
+        -- this sets the symbolic prefix based on if moc is playing/stopped/paused
         if trackinfo.state == "PAUSE" then
             prefix = "|| "
-            settings.interval = 2
+            config.interval = 2
         elseif trackinfo.state == "STOP" then
-            settings.iScroller = 1
-            settings.widget.width = 20
-            settings.widget.text = "⬣"
+            iScroll = 1
+            config.widget.width = 20
+            config.widget.text = "⬣"
             return
         else
             prefix = "▶ "
-            settings.interval = 0.75
+            config.interval = 0.75
         end
 
         -- extract a substring, putting it after the 
         np.strng = title()
-        np.rtn = string.sub(np.strng,settings.iScroller,settings.MAXCH+settings.iScroller-1) 
+        np.rtn = string.sub(np.strng,iScroll,config.MAXCH+iScroll-1) 
 
-        -- if our index and settings.MAXCH count are bigger than the string, wrap around to the beginning and
+        -- if our index and config.MAXCH count are bigger than the string, wrap around to the beginning and
         -- add enough to make it look circular
-        if settings.MAXCH+settings.iScroller > (np.strng):len() then
-            np.rtn = np.rtn .. string.sub(np.strng,1,(settings.MAXCH+settings.iScroller-1)-np.strng:len())
+        if config.MAXCH+iScroll > (np.strng):len() then
+            np.rtn = np.rtn .. string.sub(np.strng,1,(config.MAXCH+iScroll-1)-np.strng:len())
         end
 
         np.rtn = awful.util.escape(np.rtn)
-        settings.widget.text = markup.fg(beautiful.fg_normal,prefix) .. markup.fg( (beautiful.fg_sb_hi or beautiful.fg_focus),np.rtn) 
+        config.widget.text =    markup.fg( beautiful.fg_normal,prefix) ..
+                                markup.fg((beautiful.fg_sb_hi or beautiful.fg_focus),np.rtn) 
 
-        if settings.iScroller <= np.strng:len() then
-            settings.iScroller = settings.iScroller +1
+        if iScroll <= np.strng:len() then
+            iScroll = iScroll +1
         else
-            settings.iScroller = 1
+            iScroll = 1
         end
     end
 end
 -- }}}
 
----{{{ local popup
+-- {{{ local popup
 -- displays a naughty notificaiton of the current track
 local function popup()
-    -- awful.hooks.timer.unregister(popup)
     setTitle()
     notdestroy()
 
@@ -222,19 +229,27 @@ local function popup()
         "Album:  "..markup.fg(beautiful.fg_normal,string.gsub(trackinfo.album,".*Soundt","Soundtrack")).."\n"
         np.strng = np.strng..markup.fg(beautiful.fg_normal,getTime())
     end
-    np.strng = markup.fg( beautiful.fg_focus, markup.font("monospace", np.strng.."  "))  
+
+    -- destroy the tooltip
+    moctip(false)
+
+    -- np.strng = markup.fg( beautiful.fg_focus, markup.font("monospace", np.strng.."  "))  
     mocbox = naughty.notify({ 
-        title = markup.font("monospace","Now Playing:"),
-        text = np.strng, hover_timeout = ( settings.hovertime or 3 ), timeout = 3,
-        border_width = 1,
-        width = 200,
-        -- icon = "/usr/share/icons/gnome/24x24/actions/edia-playback-start.png", icon_size = 24,
+        title = markup.italic(markup.bold("Now Playing:")),
+        text = np.strng,
+        hover_timeout = ( config.hovertime or 3 ),
+        timeout = 3,
+        border_width = 2,
+        width = 300,
+        icon = config.icon or nil,
+        icon_size = 48,
+        margin = 10,
         run = function() play(); popup() end
     })
 end
 ---}}}
 
----{{{ mocplay() 
+-- {{{ mocplay 
 -- easier way to check|run mocp
 function play(plyrCmd) 
 
@@ -259,45 +274,64 @@ function play(plyrCmd)
     popup()
 
 end
----}}}
+--}}}
 
---{{{ setwidget
-function setwidget(w)
+-- {{{ moctip
+local function moctip(toggle)
+    if toggle and config.tooltip == nil then
+        config.tooltip = awful.tooltip({
+            objects = {config.widget},
+            timer_function = function()
+                -- if mocbox ~= nil then 
+                -- config.tooltip:remove_from_object(config.widget)
+                -- config.tooltip.visible =false
+                -- end
+                return "\r\t"..markup.heading(trackinfo.artist)..": "..markup.italic(trackinfo.songtitle).."\t\r"
+            end})
+    else
+        print("destroying tooltip")
+        config.tooltip:remove_from_object(config.widget)
+        config.tooltip=nil
+    end
+end
+--}}}
 
-    settings.widget = w
+-- {{{ setwidget
+local function setwidget()
 
-    -- assign buttons
-    settings.widget:buttons({
+    config.widget = widget({type="textbox",align = "right"})
+
+    config.widget.width = 120
+
+    --{{{ assign buttons
+    config.widget:buttons(awful.util.table.join(
         awful.button({}, 1, function() play("FWD")    end),
         awful.button({}, 2, function() play("PAUSE")  end),
         awful.button({}, 4, function() play("FWD")    end),
         awful.button({}, 3, function() play("REV")    end),
         awful.button({}, 5, function() play("REV")    end)
-    })
+    ))
+    --}}}
 
-    moctimer = timer { timeout = settings.interval }
+    moctimer = timer { timeout = config.interval }
     moctimer:add_signal("timeout", scroller)
     moctimer:start()
 
-    mocpoptimer = timer { timeout = 1 }
+    mocpoptimer = timer { timeout = 2 }
     mocpoptimer:add_signal("timeout", popup)
 
     -- what to do when mouse over
-    settings.widget.mouse_enter = mocpoptimer:start()
-    --[[function() 
-                awful.hooks.timer.register(1,popup) 
-            end --]]--
-    settings.widget.mouse_leave = mocpoptimer:stop()
-    --[[function()
-                awful.hooks.timer.unregister(popup)
-            end --]]--
+    config.widget:add_signal("mouse::enter", function() mocpoptimer:start() end)
+    config.widget:add_signal("mouse::leave", function() 
+            -- re-add the tooltip
+            moctip(true)
+            mocpoptimer:stop() 
+        end)
 
-    -- awful.hooks.timer.register (settings.interval,scroller)
-    state()
 end
 --}}}
 
----{{{ function update ( k, v)
+-- {{{ function update ( k, v)
 -- called by any kind of external script to trigger widget text update
 function update ( k, v )
     if #k == 0 or #v == 0 then return end
@@ -306,7 +340,16 @@ function update ( k, v )
     end
     state()
 end
----}}}
+--}}}
+
+function init(icon)
+    print("init mocp.lua")
+    config.icon = icon
+    setwidget()
+    state()
+    moctip(true)
+    return config.widget
+end
+
 
 -- vim: filetype=lua fdm=marker tabstop=4 shiftwidth=4 expandtab smarttab autoindent smartindent:
-
