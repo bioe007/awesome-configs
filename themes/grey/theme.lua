@@ -37,11 +37,12 @@ theme.border_width  = 2
 theme.border_normal = "#000000"
 theme.border_focus  = "#3accc5"
 theme.border_marked = "#0000f0"
+theme.tooltip_border_color = theme.fg_focus
 
 -- calendar settings
 theme.calendar_w         = 160
-theme.calendar_fg        = "#cfcfcf"
-theme.calendar_bg        = "#6d6d6d"
+theme.calendar_fg        = theme.bg_normal
+theme.calendar_bg        = theme.fg_normal
 
 theme.menu_height        = 15
 theme.menu_width         = 100
