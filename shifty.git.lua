@@ -107,8 +107,8 @@ function rename(tag, prefix, no_selectall)
 
   awful.prompt.run( { 
     fg_cursor = fg, bg_cursor = bg, ul_cursor = "single",
-    text = text, selectall = not no_selectall, prompt = " "  },
-    taglist[scr][tag2index(scr,t)*2],
+    text = text, selectall = not no_selectall },
+    taglist[scr][tag2index(scr,t)],
     function (name) if name:len() > 0 then t.name = name; end end, 
     completion,
     awful.util.getdir("cache") .. "/history_tags", nil,
@@ -120,7 +120,8 @@ function rename(tag, prefix, no_selectall)
         set(t)
       end
       tagkeys(screen[scr])
-      screen[scr]:emit_signal("tag::detach")
+      -- screen[scr]:emit_signal("tag::detach")
+      t:emit_signal("property::name")
     end
     )
 end
@@ -449,7 +450,6 @@ function match(c, startup)
           if a.dockable ~= nil then awful.client.dockable.set(c, a.dockable) end
           if a.urgent ~= nil then c.urgent = a.urgent end
           if a.opacity ~= nil then c.opacity = a.opacity end
-          if a.titlebar ~= nil then awful.titlebar.add(c, { modkey = modkey }) end
           if a.run ~= nil then run = a.run end
           if a.sticky ~= nil then c.sticky = a.sticky end
           if a.wfact ~= nil then wfact = a.wfact end
@@ -469,9 +469,6 @@ function match(c, startup)
   -- set properties of floating clients
   if float ~= nil then
     awful.client.floating.set(c, float) 
-    if config.defaults.floatBars then       -- add a titlebar if requested in config.defaults
-      awful.titlebar.add( c, { modkey = modkey } )
-    end
     awful.placement.centered(c, c.transient_for)
     awful.placement.no_offscreen(c) -- this always seems to stick the client at 0,0 (incl titlebar)
   end
