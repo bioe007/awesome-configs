@@ -27,38 +27,38 @@ beautiful.init(settings.theme_path.."/theme.lua")
 
 -- {{{ Variable definitions
 settings = {
-  ["modkey"] = "Mod4",
-  ["theme_path"] = os.getenv("HOME").."/.config/awesome/themes/grey",
-  ["icon_path"] = beautiful.iconpath,
+  modkey = "Mod4",
+  theme_path = os.getenv("HOME").."/.config/awesome/themes/grey",
+  icon_path = beautiful.iconpath,
 
   --{{{ apps
-  ["apps"] = {
-    ["terminal"]  = "urxvt",
-    ["browser"]   = "firefox",
-    ["mail"]      = "/home/perry/.bin/mutt-start.sh",
-    ["filemgr"]   = "thunar",
-    ["music"]     = "mocp --server",
-    ["editor"]    = "/home/perry/.bin/vim-start.sh"
+  apps = {
+    terminal  = "urxvt",
+    browser   = "firefox",
+    mail      = "/home/perry/.bin/mutt-start.sh",
+    filemgr   = "thunar",
+    music     = "mocp --server",
+    editor    = "/home/perry/.bin/vim-start.sh"
   },
   --}}}
 
   --{{{ settings.layouts
-  ["layouts"] = {
-    awful.layout.suit.tile,
+  layouts = {
     awful.layout.suit.tile.left,
-    awful.layout.suit.tile.bottom,
+    awful.layout.suit.tile,
     awful.layout.suit.max,
+    awful.layout.suit.tile.bottom,
     awful.layout.suit.floating
   },
   --}}}
 
   -- {{{ opacity
-  ["opacity"] = { 
-    ["default"] = { focus = 1.0, unfocus = 0.8 },
-    ["Easytag"] = { focus = 1.0, unfocus = 0.9 },
-    ["Gschem"]  = { focus = 1.0, unfocus = 1.0 },
-    ["Gimp"]    = { focus = 1.0, unfocus = 1.0 },
-    ["MPlayer"] = { focus = 1.0, unfocus = 1.0 },
+  opacity = { 
+    default = { focus = 1.0, unfocus = 0.8 },
+    Easytag = { focus = 1.0, unfocus = 0.9 },
+    Gschem  = { focus = 1.0, unfocus = 1.0 },
+    Gimp    = { focus = 1.0, unfocus = 1.0 },
+    MPlayer = { focus = 1.0, unfocus = 1.0 },
   },
   -- }}}
 }
@@ -66,44 +66,44 @@ settings = {
 --{{{ SHIFTY configuration
 --{{{ configured tags
 shifty.config.tags = {
-  ["w2"]     =  { layout = awful.layout.suit.tile.bottom, mwfact = 0.62,
+  w2     =  { layout = awful.layout.suit.tile.bottom, mwfact = 0.62,
                 exclusive = false, solitary = false, position = 1, init = true,
                 screen = 2 }, 
 
-  ["vim"]     =  { layout = awful.layout.suit.tile, mwfact = 0.62,
+  vim     =  { layout = awful.layout.suit.tile, mwfact = 0.62,
                 exclusive = false, solitary = false, position = 1, init = true,
                 screen = 1, slave = true, spawn = settings.apps.editor  }, 
 
-  ["ds"]     =  { layout = awful.layout.suit.max        , mwfact = 0.70,
+  ds     =  { layout = awful.layout.suit.max        , mwfact = 0.70,
                 exclusive = false, solitary = false, position = 2, init = false,
                 persist = false, nopopup = false , slave = false }, 
 
-  ["dz"]     =  { layout = awful.layout.suit.tile       , mwfact = 0.70,
+  dz     =  { layout = awful.layout.suit.tile       , mwfact = 0.70,
                 exclusive = false, solitary = false, position = 3, init = false,
                 nopopup = true, leave_kills = true }, 
 
-  ["web"]    =  { layout = awful.layout.suit.tile.bottom, mwfact = 0.65,
+  web    =  { layout = awful.layout.suit.tile.bottom, mwfact = 0.65,
                 exclusive = true, solitary = true, position = 4,  init = false,
                 spawn   = settings.apps.browser }, 
 
-  ["mail"]   =  { layout = awful.layout.suit.tile        , mwfact = 0.55,
+  mail   =  { layout = awful.layout.suit.tile        , mwfact = 0.55,
                 exclusive = false, solitary = false, position = 5, init = false,
                 spawn   = settings.apps.mail, slave       = true  }, 
 
-  ["vbx"]    =  { layout = awful.layout.suit.tile.bottom , mwfact = 0.75,
+  vbx    =  { layout = awful.layout.suit.tile.bottom , mwfact = 0.75,
                 exclusive = true, solitary = true, position = 6, init = false,
                 spawn = 'VBoxSDL -vm xp2' }, 
 
 
-  ["media"]  =  { layout = awful.layout.suit.floating    , exclusive = false , 
+  media  =  { layout = awful.layout.suit.floating    , exclusive = false , 
                 solitary  = false, position = 8     }, 
 
-  ["gimp"]  =  { layout = awful.layout.suit.tile    , exclusive = false , 
+  gimp  =  { layout = awful.layout.suit.tile    , exclusive = false , 
                 solitary  = false, position = 8, ncol = 3, mwfact = 0.75,
                 nmaster=1,
                 spawn = 'gimp-2.6', slave = true                                    }, 
 
-  ["office"] =  { layout = awful.layout.suit.tile        , position  = 9 }
+  office =  { layout = awful.layout.suit.tile        , position  = 9 }
 }
 --}}}
 
@@ -182,7 +182,7 @@ shifty.config.sloppy = true
 shifty.modkey = settings.modkey
 -- }}}
 
--- {{{ tag run or raise... needed?
+-- {{{ tag run or raise
 function tagSearch(name)
   for s = 1, screen.count() do
     t = shifty.name2tag(name,s)
@@ -238,68 +238,70 @@ end
 -- {{{ widgets
 widgets = {}
 
-widgets["systray"] = widget({ type = "systray" }) 
+widgets.systray = widget({ type = "systray" }) 
 
 -- {{{ -- SPACERS
-widgets["lspace"]       = widget({ type = "textbox", align = "left" }) 
-widgets["lspace"].text  = " "
-widgets["lspace"].width = 5
-widgets["rspace"]       = widget({type = "textbox", align = "right" }) 
-widgets["rspace"].text  = " "
-widgets["rspace"].width = 5
+widgets.lspace       = widget({ type = "textbox", align = "left" }) 
+widgets.lspace.text  = " "
+widgets.lspace.width = 5
+widgets.rspace       = widget({type = "textbox", align = "right" }) 
+widgets.rspace.text  = " "
+widgets.rspace.width = 5
 --}}}
 
--- MOCP 
-widgets["mocp"] = mocp.init(settings.theme_path.."/music/sonata.png")
-widgets["mocp"].width = 120 
 
 -- {{{ -- DATE 
-widgets["date"] = widget({type="textbox", align = 'right' })
-widgets["date"]:add_signal("mouse::enter",function() calendar.add(0) end)
-widgets["date"]:add_signal("mouse::leave",calendar.remove) 
-widgets["date"]:buttons(awful.util.table.join(
+widgets.date = widget({type="textbox", align = 'right' })
+widgets.date:add_signal("mouse::enter",function() calendar.add(0) end)
+widgets.date:add_signal("mouse::leave",calendar.remove) 
+widgets.date:buttons(awful.util.table.join(
   awful.button({}, 1, function() print("calendar add"); calendar.add(-1) end),
   awful.button({}, 4, function() print("calendar add"); calendar.add(-1) end),
   awful.button({}, 5, function() calendar.add(1) end)
 ))
 vicious.register(
-    widgets["date"],
+    widgets.date,
     vicious.widgets.date,
     markup.fg(beautiful.fg_sb_hi, '%k:%M'),
     59)
 -- }}}
 
 -- {{{ -- CPU
-widgets["cpu"] = widget({type = "textbox", align = 'right' })
-widgets["cpu"].width = 40
+widgets.cpu = widget({type = "textbox", align = 'right' })
+widgets.cpu.width = 40
 vicious.register(
-    widgets["cpu"],
+    widgets.cpu,
     vicious.widgets.cpu,
     'cpu:' .. markup.fg(beautiful.fg_sb_hi, '$2')
     )
 -- }}}
 
 -- {{{ MEMORY
-widgets["memory"] = widget({type = "textbox", align = 'right' })
-widgets["memory"].width = 45
+widgets.memory = widget({type = "textbox", align = 'right' })
+widgets.memory.width = 45
 vicious.register(
-    widgets["memory"],
+    widgets.memory,
     vicious.widgets.mem,
-    'mem:' ..  markup.fg(beautiful.fg_sb_hi,'$2')
+    'mem:' ..  markup.fg(beautiful.fg_sb_hi,'$1')
     )
 -- }}}
 
-widgets["diskspace"] = fs.init({interval = 59,
+--{{{ MOCP, FS and BATTERY
+widgets.mocp = mocp.init(settings.theme_path.."/music/sonata.png")
+widgets.mocp.width = 120 
+
+widgets.diskspace = fs.init({interval = 59,
                                 parts = { ['sda7'] = {label = "/"},
                                           ['sda5'] = {label = "d"} } }) 
-widgets["battery"] = battery.init()
+widgets.battery = battery.init()
 
 -- VOLUME :: FIXME :: my buttons are broke
-widgets["volume"] = volume.init()
+widgets.volume = volume.init()
+--}}}
 
 -- {{{ -- TAGLIST
-widgets["taglist"] = {}
-widgets["taglist"].buttons = awful.util.table.join(
+widgets.taglist = {}
+widgets.taglist.buttons = awful.util.table.join(
         awful.button({                } , 1, awful.tag.viewonly    ) , 
         awful.button({ settings.modkey} , 1, awful.client.movetotag) , 
         awful.button({                } , 3, awful.tag.viewtoggle  ) , 
@@ -310,8 +312,8 @@ widgets["taglist"].buttons = awful.util.table.join(
 --}}}
 
 -- {{{ -- TASKLIST
-widgets["tasklist"] = {}
-widgets["tasklist"].buttons = awful.util.table.join(
+widgets.tasklist = {}
+widgets.tasklist.buttons = awful.util.table.join(
   awful.button({ }, 1, function (c)
         if not c:isvisible() then awful.tag.viewonly(c:tags()[1]) end
         client.focus = c
@@ -335,32 +337,31 @@ widgets["tasklist"].buttons = awful.util.table.join(
 
 --}}}
 
-widgets["promptbox"] = {}
-widgets["layoutbox"] = {}
-widgets["wibox"] = {}
+widgets.promptbox = {}
+widgets.layoutbox = {}
+widgets.wibox = {}
 
 -- {{{ -- STATUSBAR 
 widget_table1 = {
-    widgets["rspace"]    , 
-    widgets["date"]      , widgets["rspace"] , 
-    widgets["systray"]   , widgets["rspace"] , 
-    widgets["volume"]    , widgets["rspace"] , 
-    widgets["mocp"]      , widgets["rspace"] , 
-    widgets["cpu"]       , widgets["rspace"] , 
-    widgets["memory"]    , widgets["rspace"] , 
-    widgets["battery"]   , widgets["rspace"] , 
-    widgets["diskspace"] , widgets["rspace"] , 
-
-    ["layout"] = awful.widget.layout.horizontal.rightleft
+    widgets.rspace   , 
+    widgets.cpu      , widgets.rspace, 
+    widgets.memory   , widgets.rspace, 
+    widgets.battery  , widgets.rspace, 
+    widgets.diskspace, widgets.rspace, 
+    widgets.volume   , widgets.rspace, 
+    widgets.mocp     , widgets.rspace, 
+    widgets.systray  , widgets.rspace, 
+    widgets.date     , widgets.rspace, 
+    layout = awful.widget.layout.horizontal.rightleft
 }
 
 for s = 1, screen.count() do
 
-    widgets["promptbox"][s] = awful.widget.prompt({ layout = awful.widget.layout.horizontal.leftright })
+    widgets.promptbox[s] = awful.widget.prompt({ layout = awful.widget.layout.horizontal.leftright })
 
-    widgets["layoutbox"][s] = awful.widget.layoutbox(s)
+    widgets.layoutbox[s] = awful.widget.layoutbox(s)
 
-    widgets["layoutbox"][s]:buttons(awful.util.table.join(
+    widgets.layoutbox[s]:buttons(awful.util.table.join(
             awful.button({}, 1, function () awful.layout.inc(settings.layouts, 1 ) end),
             awful.button({}, 3, function () awful.layout.inc(settings.layouts, -1) end),
             awful.button({}, 4, function () awful.layout.inc(settings.layouts, 1 ) end),
@@ -368,41 +369,33 @@ for s = 1, screen.count() do
         )
 
     -- Create a taglist widget
-    widgets["taglist"][s] = awful.widget.taglist(s, awful.widget.taglist.label.all, widgets["taglist"].buttons)
+    widgets.taglist[s] = awful.widget.taglist(s, awful.widget.taglist.filter.all, widgets.taglist.buttons)
 
     -- Create a tasklist widget
-    widgets["tasklist"][s] = awful.widget.tasklist(function(c)
-                return awful.widget.tasklist.label.currenttags(c, s)
-            end, widgets["tasklist"].buttons)
+    widgets.tasklist[s] = awful.widget.tasklist(s, awful.widget.tasklist.filter.currenttags, widgets.tasklist.buttons)
 
     -- add widgets to the 'statusbar' wibox
-    widgets["wibox"][s] = awful.wibox({ position = "top", screen = s })
-    widgets["wibox"][s].widgets = { 
+    widgets.wibox[s] = awful.wibox({ position = "top", screen = s })
+    widgets.wibox[s].widgets = { 
 
         -- {{{ always have a taglist, promptbox and layoutbox
         { 
-            widgets["lspace"] , widgets["layoutbox"][s]        , 
-            widgets["lspace"] , widgets["taglist"][s] , 
-            widgets["promptbox"][s]    , widgets["lspace"]     , 
-
-            ["layout"] = awful.widget.layout.horizontal.leftright
+            layout = awful.widget.layout.horizontal.leftright,
+            widgets.lspace      , widgets.layoutbox[s], 
+            widgets.lspace      , widgets.taglist[s]  , 
+            widgets.promptbox[s], widgets.lspace      , 
         },
         -- }}}
         
         (s==1 and widget_table1) or 
-            { 
-                widgets["rspace"], widgets["date"], widgets["rspace"],
-                ["layout"] = awful.widget.layout.horizontal.rightleft
-            },
-
-        -- {{{ always put the tasklist on
-        {
-            widgets["tasklist"][s], widgets["rspace"],
-            ["layout"]= awful.widget.layout.horizontal.flex
+        { 
+            widgets.rspace, widgets.date, widgets.rspace,
+            layout = awful.widget.layout.horizontal.rightleft
         },
-        -- }}}
-        
-        ["layout"]= awful.widget.layout.horizontal.leftright
+
+        widgets.tasklist[s], widgets.rspace,
+        layout = awful.widget.layout.horizontal.leftright,
+        height = widgets.wibox[s].height
     }
 end
 
@@ -529,7 +522,7 @@ globalkeys = awful.util.table.join(
     awful.key({ settings.modkey, "Mod1", "Shift"   }, "l", function () awful.layout.inc(settings.layouts, -1) end),
 
     -- Prompt
-    awful.key({ settings.modkey },            "F1",     function () widgets["promptbox"][mouse.screen]:run() end),
+    awful.key({ settings.modkey },            "F1",     function () widgets.promptbox[mouse.screen]:run() end),
     -- }}}
 
     -- {{{ - POWER
@@ -586,7 +579,7 @@ end
 root.keys(globalkeys)
 -- }}}
 
-shifty.taglist = widgets["taglist"]
+shifty.taglist = widgets.taglist
 shifty.init()
 
 -- {{{ signals
@@ -597,7 +590,7 @@ client.add_signal("focus", function (c)
     if settings.opacity[c.class] then 
        c.opacity = settings.opacity[c.class].focus
     else
-        c.opacity = settings.opacity["default"].focus or 1
+        c.opacity = settings.opacity.default.focus or 1
     end
 end) 
 
@@ -609,7 +602,7 @@ client.add_signal("unfocus", function (c)
     if settings.opacity[c.class] then 
         c.opacity = settings.opacity[c.class].unfocus
     else
-        c.opacity = settings.opacity["default"].unfocus or 0.7
+        c.opacity = settings.opacity.default.unfocus or 0.7
     end
 end)
 -- }}}
