@@ -126,7 +126,7 @@ local function info()
 end
 ---}}}
 
---{{{ 
+--{{{ initialize this widget
 function init(...)
 
     bwidget = widget({ type = "textbox", align = "right" })
