@@ -46,7 +46,7 @@ shifty.config.tags = {
                 exclusive = false, solitary = false, position = 1, init = true,
                 screen = 2 }, 
 
-  vim     =  { layout = awful.layout.suit.tile, mwfact = 0.62,
+  vim     =  { layout = awful.layout.suit.tile, mwfact = 0.61,
                 exclusive = false, solitary = false, position = 1, init = true,
                 screen = 1, slave = true, spawn = settings.apps.editor  }, 
 
@@ -62,7 +62,7 @@ shifty.config.tags = {
                 exclusive = true, solitary = true, position = 4,  init = false,
                 spawn   = settings.apps.browser }, 
 
-  mail   =  { layout = awful.layout.suit.tile        , mwfact = 0.55,
+  mail   =  { layout = awful.layout.suit.tile        , mwfact = 0.61,
                 exclusive = false, solitary = false, position = 5, init = false,
                 spawn   = settings.apps.mail, slave       = true  }, 
 
