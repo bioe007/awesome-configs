@@ -51,7 +51,7 @@ vicious.register(
 
 --{{{ MOCP, FS and BATTERY
 widgets.mocp = mocp.init(settings.theme_path.."/music/sonata.png")
-widgets.mocp.width = 120 
+widgets.mocp.width = 100 
 
 widgets.diskspace = fs.init({interval = 59,
                                 parts = { ['sda7'] = {label = "/"},
@@ -111,8 +111,8 @@ widget_table1 = {
     widgets.memory   , widgets.rspace, 
     widgets.battery  , widgets.rspace, 
     widgets.diskspace, widgets.rspace, 
-    widgets.volume   , widgets.rspace, 
     widgets.mocp     , widgets.rspace, 
+    widgets.volume   , widgets.rspace, 
     widgets.systray  , widgets.rspace, 
     widgets.date     , widgets.rspace, 
     layout = awful.widget.layout.horizontal.rightleft
