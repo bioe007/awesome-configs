@@ -6,11 +6,13 @@
 --
 --}}}
 
-local io = io
-local awful = require("awful")
-local string = string
+local io        = io
+local awful     = require("awful")
+local string    = string
 local beautiful = require("beautiful")
-local timer = timer
+local timer     = timer
+
+local print = print
 
 -- local variables
 local config = {}
@@ -61,26 +63,24 @@ end
 function init(args) --- cardid, channel, colors, layout)
     local args = args or {}
 
-
     -- initialize widget then set its properties
-    config.widget = awful.widget.progressbar({ ["layout"] = args.layout or 
-                                    awful.widget.layout.horizontal.rightleft })
-
+    config.widget = awful.widget.progressbar({
+        layout   = args.layout or awful.widget.layout.horizontal.leftright,
+        width    = args.width  or 13,
+        height   = args.height or 18,
+        vertical = true
+    })
     config.widget:set_vertical(true)
-    config.widget:set_width(args.width or 13)
-    config.widget:set_height(args.height or 18)
     config.widget:set_border_color(args.border_color or beautiful.bg_focus)
 
-    config.widget:set_background_color( args.background_color or 
-                                        beautiful.vol_bg or "#000000")
+    config.widget:set_background_color( args.background_color or beautiful.vol_bg or "#000000" )
 
-    config.widget:set_color(    args.foreground_color or 
-                                beautiful.fg_focus or "#ffffff")
+    config.widget:set_color( args.foreground_color or beautiful.fg_focus or "#ffffff" )
 
-    config.widget:set_gradient_colors(
-                {   args.gradient_start or beautiful.fg_focus,
-                    args.gradient_stop or beautiful.fg_focus }
-            )
+    config.widget:set_gradient_colors( {
+        args.gradient_start or beautiful.fg_focus,
+        args.gradient_stop  or beautiful.fg_focus
+    })
 
             -- FIXME : these are broken
     config.widget.buttons = awful.util.table.join(
@@ -100,6 +100,7 @@ function init(args) --- cardid, channel, colors, layout)
     voltimer = timer { timeout = 10 }
     voltimer:add_signal("timeout", function () vol("update") end )
     voltimer:start()
+
     return config.widget
 end
 --}}}
