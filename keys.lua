@@ -120,8 +120,13 @@ globalkeys = awful.util.table.join(
         awful.util.spawn('slock',false)
         os.execute('sudo pm-suspend')
     end),
-    awful.key({ settings.modkey, "Mod1" },"r", function () awful.util.spawn('sudo reboot',false) end)
+    awful.key({ settings.modkey, "Mod1" },"r", function () awful.util.spawn('sudo reboot',false) end),
     -- }}} 
+
+    awful.key({ settings.modkey         }, "F4", function() awful.util.spawn('/home/perry/.bin/stupid.sh --soyo') end),
+    awful.key({ settings.modkey         }, "F5", function() awful.util.spawn('/home/perry/.bin/stupid.sh --sync') end),
+    awful.key({ settings.modkey         }, "F6", function() 
+        awful.util.spawn('/home/perry/.bin/stupid.sh --off') end)
     
     )
     -- }}}
