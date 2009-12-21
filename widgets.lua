@@ -74,18 +74,77 @@ widgets.taglist.buttons = awful.util.table.join(
     )
 --}}}
 
+function myclientsmenu(menu,c)
+
+    -- {{{ list of other clients
+    local cls = client.get()
+    local cls_t = {}
+    for k, clnt in pairs(cls) do
+        cls_t[#cls_t + 1] = { awful.util.escape(clnt.name) or "",
+                              function ()
+                                  if not clnt:isvisible() then
+                                      awful.tag.viewmore(clnt:tags(), clnt.screen)
+                                  end
+                                  client.focus = clnt
+                              end,
+                              clnt.icon }
+    end
+    -- }}}
+    
+    -- {{{ list of tags can send to
+    -- local tgs = screen[mouse.screen]:tags()
+    tgs_m = {}
+    for s = 1, screen.count() do
+        skey='Screen '..s
+        print("setting tags_t for s="..s)
+
+        local tgs_t = {}
+        for i, t in ipairs(screen[s]:tags()) do
+            print("adding "..t.name.." to key list "..skey)
+            tgs_t[i] = { awful.util.escape(t.name) or "",
+                                function ()
+                                    c:tags({t})
+                                    c.screen = t.screen
+                                end
+                            }
+        end
+
+        tgs_m[s] = {skey,tgs_t}
+    end
+
+    -- }}}
+    
+    if not menu then
+        menu = {}
+    end
+
+    menu.items = { 
+        { "Close", function() c:kill() end },
+        { "Stick", function (c) c.sticky=not c.sticky end},
+        { "Move to tag \t>>", tgs_m },
+        { "Clients \t>>", cls_t }
+    }
+    local m = awful.menu.new(menu)
+    m:show()
+    return m
+end
+
 -- {{{ -- TASKLIST
 widgets.tasklist = {}
 widgets.tasklist.buttons = awful.util.table.join(
   awful.button({ }, 1, function (c)
-        if not c:isvisible() then awful.tag.viewonly(c:tags()[1]) end
-        client.focus = c
-        c:raise()
+      c.minimized = not c.minimized
+      if c:isvisible() then
+          client.focus = c
+          c:raise()
+      else
+          awful.client.focus.history.previous()
+        end
   end),
 
-  awful.button({ }, 3, function ()
-    if instance then instance:hide(); instance = nil
-    else instance = awful.menu.clients({ width=250 }) end
+  awful.button({ }, 3, function (c)
+        if instance then instance:hide(); instance = nil
+        else instance = myclientsmenu({width = 250},c) end -- awful.menu.clients({ width=250 }) end
   end),
 
   awful.button({ }, 4, function ()
