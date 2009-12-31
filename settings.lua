@@ -91,8 +91,16 @@ shifty.config.apps = {
   { match   = { "Navigator","Vimperator","Gran Paradiso" }, 
     tag     = "web"                                         },
 
-  { match   = { "mutt", "Shredder.*" },
+  { match   = { "mutt", "claws","compose" },
     tag     = "mail"                                        },
+  { match = { "clawsed" },
+    honorsizehints = false                                  },
+
+   -- stuff to match other claws-mail dialogs 
+  { match = { "icon_legend", "prefswindow", "addressbook",
+                "addressadd","editaddress"                  },
+    tag = "mail",
+    float = true, honorsizehints = true                     },
 
   { match   = { "OpenOffice.*" },
     tag     = "office"                                      },
@@ -122,7 +130,8 @@ shifty.config.apps = {
     tag     = "gimp",                                     
     slave   = true, dockable = true, honorsizehints=false   },
 
-  { match   = { "dialog", "Gnuplot", "galculator","R Graphics" }, 
+  { match   = { "dialog", "Gnuplot", "galculator",
+                "R Graphics", "Figure"                    }, 
     float   = true, honorsizehints = true                   },
 
   { match   = { "MPlayer" }, 
