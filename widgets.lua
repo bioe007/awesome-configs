@@ -18,8 +18,8 @@ widgets.date = widget({type="textbox", align = 'right' })
 widgets.date:add_signal("mouse::enter",function() calendar.add(0) end)
 widgets.date:add_signal("mouse::leave",calendar.remove) 
 widgets.date:buttons(awful.util.table.join(
-  awful.button({}, 1, function() print("calendar add"); calendar.add(-1) end),
-  awful.button({}, 4, function() print("calendar add"); calendar.add(-1) end),
+  awful.button({}, 1, function() calendar.add(-1) end),
+  awful.button({}, 4, function() calendar.add(-1) end),
   awful.button({}, 5, function() calendar.add(1) end)
 ))
 vicious.register(
@@ -96,11 +96,9 @@ function myclientsmenu(menu,c)
     tgs_m = {}
     for s = 1, screen.count() do
         skey='Screen '..s
-        print("setting tags_t for s="..s)
 
         local tgs_t = {}
         for i, t in ipairs(screen[s]:tags()) do
-            print("adding "..t.name.." to key list "..skey)
             tgs_t[i] = { awful.util.escape(t.name) or "",
                                 function ()
                                     c:tags({t})
@@ -120,6 +118,13 @@ function myclientsmenu(menu,c)
 
     menu.items = { 
         { "Close", function() c:kill() end },
+        { (c.maximized_horizontal and c.maximized_vertical and "Unmaximize") or "Maximize",
+            function() 
+                c.maximized_horizontal = not c.maximized_horizontal
+                c.maximized_vertical   = not c.maximized_vertical
+                c:raise()
+            end},
+        { (c.minimized and "Restore") or "Minimize", function() c.minimized = not c.minimized end },
         { "Stick", function (c) c.sticky=not c.sticky end},
         { "Move to tag \t>>", tgs_m },
         { "Clients \t>>", cls_t }
@@ -129,18 +134,25 @@ function myclientsmenu(menu,c)
     return m
 end
 
+function focus_min_or_restore(c)
+    if c == client.focus then
+        c.minimized = not c.minimized
+        if c:isvisible() then
+            client.focus = c
+            c:raise()
+        else
+            awful.client.focus.history.previous()
+        end
+    else
+        client.focus = c
+        c:raise()
+    end
+end
+
 -- {{{ -- TASKLIST
 widgets.tasklist = {}
 widgets.tasklist.buttons = awful.util.table.join(
-  awful.button({ }, 1, function (c)
-      c.minimized = not c.minimized
-      if c:isvisible() then
-          client.focus = c
-          c:raise()
-      else
-          awful.client.focus.history.previous()
-        end
-  end),
+  awful.button({ }, 1, focus_min_or_restore ),
 
   awful.button({ }, 3, function (c)
         if instance then instance:hide(); instance = nil
@@ -194,7 +206,11 @@ for s = 1, screen.count() do
     widgets.taglist[s] = awful.widget.taglist(s, awful.widget.taglist.filter.all, widgets.taglist.buttons)
 
     -- Create a tasklist widget
-    widgets.tasklist[s] = awful.widget.tasklist(s, awful.widget.tasklist.filter.currenttags, widgets.tasklist.buttons)
+    widgets.tasklist[s] = awful.widget.tasklist(s, function(c)
+        local text, bg, status_image = awful.widget.tasklist.filter.currenttags(c,s)
+        return text, bg, status_image
+    end,
+    widgets.tasklist.buttons)
 
     -- add widgets to the 'statusbar' wibox
     widgets.wibox[s] = awful.wibox({ position = "top", screen = s })
