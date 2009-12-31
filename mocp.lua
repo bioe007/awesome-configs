@@ -14,7 +14,6 @@ local button    = button
 local timer     = timer
 local widget    = widget
 
-local print = print -- debug
 
 module("mocp")
 
@@ -289,7 +288,6 @@ local function moctip(toggle)
                 return "\r\t"..markup.heading(trackinfo.artist)..": "..markup.italic(trackinfo.songtitle).."\t\r"
             end})
     else
-        print("destroying tooltip")
         config.tooltip:remove_from_object(config.widget)
         config.tooltip=nil
     end
@@ -343,7 +341,6 @@ end
 --}}}
 
 function init(icon)
-    print("init mocp.lua")
     config.icon = icon
     setwidget()
     state()

@@ -9,7 +9,6 @@ local select    = select
 local type    = type
 local tonumber  = tonumber
 local pairs     = pairs
-local print     = print
 local beautiful = require("beautiful")
 local naughty   = require("naughty")
 local markup    = require("markup")

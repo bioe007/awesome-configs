@@ -12,8 +12,6 @@ local string    = string
 local beautiful = require("beautiful")
 local timer     = timer
 
-local print = print
-
 -- local variables
 local config = {}
 
