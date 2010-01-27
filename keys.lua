@@ -144,7 +144,7 @@ for i = 1, 9 do
                     local c = client.focus
                     slave = not ( client.focus == awful.client.getmaster(mouse.screen))
                     t = shifty.getpos(i)
-                    awful.client.movetotag(t)
+                    awful.client.movetotag(t,c)
                     awful.tag.viewonly(t)
                     if slave then awful.client.setslave(c) end
                 end 
