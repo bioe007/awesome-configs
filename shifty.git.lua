@@ -108,7 +108,8 @@ function rename(tag, prefix, no_selectall)
   awful.prompt.run( { 
     fg_cursor = fg, bg_cursor = bg, ul_cursor = "single",
     text = text, selectall = not no_selectall },
-    taglist[scr][tag2index(scr,t)],
+    -- taglist[scr][tag2index(scr,t)],
+    taglist[scr][tag2index(scr,t)][2],
     function (name) if name:len() > 0 then t.name = name; end end, 
     completion,
     awful.util.getdir("cache") .. "/history_tags", nil,
@@ -230,9 +231,16 @@ function set(t, args)
     if num then guessed_position = tonumber(t.name:sub(1,1)) end
   end
 
+  -- allow preset.layout to be a table to provide a different layout per screen
+  -- for a given tag
+  local preset_layout = preset.layout
+  if preset_layout and preset_layout[scr] then
+    preset_layout = preset.layout[scr]
+  end
+
   -- select from args, preset, getproperty, config.defaults.configs or defaults
   local props = {
-    layout = select{ args.layout, preset.layout, awful.tag.getproperty(t,"layout"), config.defaults.layout, awful.layout.suit.tile },
+    layout = select{ args.layout, preset_layout, awful.tag.getproperty(t,"layout"), config.defaults.layout, awful.layout.suit.tile },
     mwfact = select{ args.mwfact, preset.mwfact, awful.tag.getproperty(t,"mwfact"), config.defaults.mwfact, 0.55 },
     nmaster = select{ args.nmaster, preset.nmaster, awful.tag.getproperty(t,"nmaster"), config.defaults.nmaster, 1 },
     ncol = select{ args.ncol, preset.ncol, awful.tag.getproperty(t,"ncol"), config.defaults.ncol, 1 },
@@ -430,7 +438,12 @@ function match(c, startup)
             end
           end
           if a.startup and startup then a = awful.util.table.join(a, a.startup) end
-          if a.geometry ~=nil then geom = { x = a.geometry[1], y = a.geometry[2], width = a.geometry[3], height = a.geometry[4] } end
+          if a.geometry ~=nil then
+            geom = { x = a.geometry[1],
+                      y = a.geometry[2],
+                      width = a.geometry[3],
+                      height = a.geometry[4] }
+          end
           if a.float ~= nil then float = a.float end
           if a.slave ~=nil then slave = a.slave end
           if a.border_width ~= nil then c.border_width = a.border_width end
@@ -609,9 +622,6 @@ end
 --}}}
 
 --{{{ getpos : returns a tag to match position
---      * originally this function did a lot of client stuff, i think its
---      * better to leave what can be done by awful to be done by awful
---      *           -perry
 -- @param pos : the index to find
 -- @return v : the tag (found or created) at position == 'pos'
 function getpos(pos)
@@ -621,11 +631,10 @@ function getpos(pos)
   local scr = mouse.screen or 1
   -- search for existing tag assigned to pos
   for i = 1, screen.count() do
-    local s = awful.util.cycle(screen.count(), scr + i - 1)
-    for j, t in ipairs(screen[s]:tags()) do
+    for j, t in ipairs(screen[i]:tags()) do
       if awful.tag.getproperty(t,"position") == pos then
         table.insert(existing, t)
-        if t.selected and s == scr then selected = #existing end
+        if t.selected and i == scr then selected = #existing end
       end
     end
   end
