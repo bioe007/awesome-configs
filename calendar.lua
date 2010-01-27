@@ -32,8 +32,8 @@ function add(inc_offset)
     text = markup.heading(markup.font("monospace", os.date("%a, %d %B %Y") .. "\n" .. cal)),
     timeout = 0, hover_timeout = 0.5,
     width = beautiful.calendar_w or 160,
-    bg = beautiful.calendar_bg or beautiful.bg_focus or #000000,
-    fg = beautiful.calendar_fg or beautiful.fg_focus or #ffffff,
+    bg = beautiful.calendar_bg or beautiful.fg_focus or #000000,
+    fg = beautiful.calendar_fg or beautiful.bg_focus or #ffffff,
     screen = mouse.screen})
 end
 

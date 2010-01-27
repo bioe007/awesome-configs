@@ -113,13 +113,13 @@ local function info()
     -- decide which and where to put the charging state indicator
     local adapter = state()
     if adapter:match("charged") then
-        -- bwidget.text = "⚡"..battery.."↯"
         bwidget.text = "↯"
         bwidget.width = config.width_small
     elseif adapter:match("discharging") then
-        bwidget.width = config.width or 48
+        bwidget.width = config.width
         bwidget.text = "⚡"..battery.."▼"
     else
+        bwidget.width = config.width
         bwidget.text = "⚡"..battery.."▲"
     end
 end
