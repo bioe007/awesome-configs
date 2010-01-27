@@ -401,6 +401,17 @@ function del(tag)
 end
 --}}}
 
+--{{{ is_client_tagged : replicate behavior in tag.c - returns true if the given
+--                       client is tagged with the given tag
+function is_client_tagged( tag, client )
+  for i, c in ipairs(tag:clients()) do
+    if c == client then
+      return true
+    end
+  end
+  return false
+end
+
 --{{{ match : handles app->tag matching, a replacement for the manage hook in
 --            rc.lua
 --@param c : client to be matched
@@ -516,7 +527,9 @@ function match(c, startup)
       local res = {}
       for j, t in ipairs(name2tags(tn, target_screen) or name2tags(tn) or {}) do
         local mc = awful.tag.getproperty(t,"max_clients")
-        if not (mc and (#t:clients() >= mc)) or intrusive then
+        local tagged = is_client_tagged( t, c )
+        if not (mc and (((#t:clients() >= mc) and not tagged ) or (#t:clients() > mc))) 
+          or intrusive then
           table.insert(res, t)
         end
       end
