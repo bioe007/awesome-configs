@@ -90,7 +90,7 @@ clientkeys = awful.util.table.join(
     awful.key({ settings.modkey,           }, "f",      function (c) c.fullscreen = not c.fullscreen  end),
     awful.key({ settings.modkey, "Shift"   }, "c",      function (c) c:kill()                         end),
     awful.key({ settings.modkey, "Shift"   }, "0",      function (c) c.sticky=not c.sticky            end),
-    awful.key({ settings.modkey, "Control" }, "space",  awful.client.floating.toggle                     ),
+    awful.key({ settings.modkey, "Mod1" }, "space",  awful.client.floating.toggle                     ),
     awful.key({ settings.modkey, "Control" }, "Return", function (c) c:swap(awful.client.getmaster()) end),
     awful.key({ settings.modkey,           }, "o",      awful.client.movetoscreen                        ),
     awful.key({ settings.modkey, "Mod1"    }, "n",      function (c) c.minimized = not c.minimized    end),
