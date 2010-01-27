@@ -1,11 +1,11 @@
 -- awesome rc variables
 settings = {}
-settings.theme_path = os.getenv("HOME").."/.config/awesome/themes/grey"
+settings.theme_path = os.getenv("HOME").."/.config/awesome/themes/dk_grey"
 beautiful.init(settings.theme_path.."/theme.lua")
 
 settings = {
   modkey     = "Mod4",
-  theme_path = os.getenv("HOME").."/.config/awesome/themes/grey",
+  theme_path = os.getenv("HOME").."/.config/awesome/themes/dk_grey",
   icon_path  = beautiful.iconpath,
 
   --{{{ apps
@@ -36,17 +36,15 @@ settings = {
     Gschem  = { focus = 1.0, unfocus = 1.0 },
     Gimp    = { focus = 1.0, unfocus = 1.0 },
     MPlayer = { focus = 1.0, unfocus = 1.0 },
+    Ipython = { focus = 1.0, unfocus = 1.0 },
   },
   -- }}}
 }
 
 --{{{ shifty configured tags
 shifty.config.tags = {
-  w2     =  { layout = awful.layout.suit.tile.bottom, mwfact = 0.62,
-                exclusive = false, solitary = false, position = 1, init = true,
-                screen = 2 }, 
 
-  vim     =  { layout = awful.layout.suit.tile, mwfact = 0.61,
+  vim     =  { layout = awful.layout.suit.tile, mwfact = 0.52,
                 exclusive = false, solitary = false, position = 1, init = true,
                 screen = 1, slave = true, spawn = settings.apps.editor  }, 
 
@@ -69,7 +67,6 @@ shifty.config.tags = {
   vbx    =  { layout = awful.layout.suit.tile.bottom , mwfact = 0.75,
                 exclusive = true, solitary = true, position = 6, init = false,
                 spawn = 'VBoxSDL -vm xp2' }, 
-
 
   media  =  { layout = awful.layout.suit.floating    , exclusive = false , 
                 solitary  = false, position = 8     }, 
@@ -132,7 +129,7 @@ shifty.config.apps = {
 
   { match   = { "dialog", "Gnuplot", "galculator",
                 "R Graphics", "Figure"                    }, 
-    float   = true, honorsizehints = true                   },
+    float   = true, honorsizehints = true, opacity = 1.0    },
 
   { match   = { "MPlayer" }, 
     float   = true, honorsizehints = true, ontop=true       },
