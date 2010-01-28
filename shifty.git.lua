@@ -674,9 +674,14 @@ function init()
   local numscr = screen.count()
 
   for i, j in pairs(config.tags) do
-    local scr = j.screen or 1
-    if j.init and ( scr <= numscr ) then
-        add({ name = i, persist = true, screen = scr, layout = j.layout, mwfact = j.mwfact }) 
+    local scr = j.screen or { 1 }
+    if type(scr) ~= 'table' then
+      scr = { scr }
+    end
+    for _, s in pairs(scr) do 
+      if j.init and ( s <= numscr ) then
+        add({ name = i, persist = true, screen = s, layout = j.layout, mwfact = j.mwfact }) 
+      end
     end
   end
 end
