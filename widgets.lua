@@ -13,6 +13,7 @@ widgets.rspace.text  = " "
 widgets.rspace.width = 5
 --}}}
 
+
 -- {{{ -- DATE 
 widgets.date = widget({type="textbox", align = 'right' })
 widgets.date:add_signal("mouse::enter",function() calendar.add(0) end)
@@ -29,15 +30,17 @@ vicious.register(
     59)
 -- }}}
 
+
 -- {{{ -- CPU
 widgets.cpu = widget({type = "textbox", align = 'right' })
-widgets.cpu.width = 40
+widgets.cpu.width = 43
 vicious.register(
     widgets.cpu,
     vicious.widgets.cpu,
     'cpu:' .. markup.fg(beautiful.fg_sb_hi, '$2')
     )
 -- }}}
+
 
 -- {{{ MEMORY
 widgets.memory = widget({type = "textbox", align = 'right' })
@@ -48,6 +51,7 @@ vicious.register(
     'mem:' ..  markup.fg(beautiful.fg_sb_hi,'$1')
     )
 -- }}}
+
 
 --{{{ MOCP, FS and BATTERY
 widgets.mocp = mocp.init(settings.theme_path.."/music/sonata.png")
@@ -62,79 +66,99 @@ widgets.battery = battery.init()
 widgets.volume = volume.init()
 --}}}
 
+function tag_restore_defaults(t)
+    local t_defaults = shifty.config.tags[t.name] or shifty.config.defaults
+
+    for k,v in pairs(t_defaults) do
+        print('applying',k,v)
+        awful.tag.setproperty(t, k, v)
+    end
+end
+
+function menu_taglist(menu, t)
+    -- {{{1
+    if not menu then
+        menu = {}
+    end
+    num_screens = screen.count()
+    next_screen = nil
+    prev_screen = nil
+
+    menu.items = {}
+    menu.items = { 
+        { "Rename", function() shifty.rename(t) end },
+        { "Restore", function() tag_restore_defaults(t) end },
+        { "Delete", function() shifty.del(t) end },
+    }
+
+    if num_screens > 1 then
+        -- {{{2 decide to show 'move next' only or also prev screen 
+        next_screen = awful.util.cycle(num_screens, t.screen + 1)
+        table.insert(menu.items, 2, { "Move to screen " .. next_screen, 
+                function() tag_to_screen(t, next_screen) end })
+
+        if num_screens > 2 then
+            prev_screen = awful.util.cycle(num_screens, t.screen + 1)
+            table.insert(menu.items, 3, { "Move to screen " .. prev_screen,
+                    function() tag_to_screen(t, prev_screen) end })
+        end
+    end
+    -- 2}}}
+
+    local m = awful.menu.new(menu)
+    m:show()
+    return m
+end
+-- 1}}}
+
+
 -- {{{ -- TAGLIST
 widgets.taglist = {}
 widgets.taglist.buttons = awful.util.table.join(
         awful.button({                } , 1, awful.tag.viewonly    ) , 
         awful.button({ settings.modkey} , 1, awful.client.movetotag) , 
-        awful.button({                } , 3, awful.tag.viewtoggle  ) , 
+        awful.button({                } , 2, awful.tag.viewtoggle  ) , 
         awful.button({ settings.modkey} , 3, awful.client.toggletag) , 
+        awful.button({ } , 3, function(t)
+            if instance then instance:hide(); instance = nil
+            else instance = menu_taglist({width = 125}, t) end
+        end),
         awful.button({                } , 4, awful.tag.viewnext    ) , 
         awful.button({                } , 5, awful.tag.viewprev    ) 
     )
 --}}}
 
-function myclientsmenu(menu,c)
 
-    -- {{{ list of other clients
-    local cls = client.get()
-    local cls_t = {}
-    for k, clnt in pairs(cls) do
-        cls_t[#cls_t + 1] = { awful.util.escape(clnt.name) or "",
-                              function ()
-                                  if not clnt:isvisible() then
-                                      awful.tag.viewmore(clnt:tags(), clnt.screen)
-                                  end
-                                  client.focus = clnt
-                              end,
-                              clnt.icon }
-    end
-    -- }}}
-    
-    -- {{{ list of tags can send to
-    -- local tgs = screen[mouse.screen]:tags()
-    tgs_m = {}
-    for s = 1, screen.count() do
-        skey='Screen '..s
-
-        local tgs_t = {}
-        for i, t in ipairs(screen[s]:tags()) do
-            tgs_t[i] = { awful.util.escape(t.name) or "",
-                                function ()
-                                    c:tags({t})
-                                    c.screen = t.screen
-                                end
-                            }
-        end
-
-        tgs_m[s] = {skey,tgs_t}
-    end
-
-    -- }}}
-    
-    if not menu then
-        menu = {}
-    end
-
-    menu.items = { 
-        { "Close", function() c:kill() end },
-        { (c.maximized_horizontal and c.maximized_vertical and "Unmaximize") or "Maximize",
-            function() 
-                c.maximized_horizontal = not c.maximized_horizontal
-                c.maximized_vertical   = not c.maximized_vertical
-                c:raise()
-            end},
-        { (c.minimized and "Restore") or "Minimize", function() c.minimized = not c.minimized end },
-        { "Stick", function (c) c.sticky=not c.sticky end},
-        { "Move to tag \t>>", tgs_m },
-        { "Clients \t>>", cls_t }
-    }
-    local m = awful.menu.new(menu)
-    m:show()
-    return m
+-- {{{1 some helper functions
+function toggle_maximized(c) 
+    -- {{{2
+    c.maximized_horizontal = not c.maximized_horizontal
+    c.maximized_vertical   = not c.maximized_vertical
+    c:raise()
 end
+-- 2}}}
+
+function client_is_maximized(c)
+    -- {{{2
+    if c.maximized_horizontal and c.maximized_vertical then
+        return true
+    else
+        return false
+    end
+end
+-- 2}}}
+
+function float_or_restore(c)
+    -- {{{2
+    if awful.client.floating.get(c) then
+        awful.client.floating.set(c)
+    end
+
+end
+-- 2}}}
 
 function focus_min_or_restore(c)
+    -- {{{2
     if c == client.focus then
         c.minimized = not c.minimized
         if c:isvisible() then
@@ -148,6 +172,87 @@ function focus_min_or_restore(c)
         c:raise()
     end
 end
+-- 2}}}
+
+-- 1}}}
+
+
+-- {{{1 menu_clients(menu, c)
+function menu_clients(menu, c)
+    -- {{{2
+
+    -- {{{3 list of other clients
+    local cls = client.get()
+    local cls_t = {}
+    for k, clnt in pairs(cls) do
+        cls_t[#cls_t + 1] = { awful.util.escape(clnt.name) or "",
+                              function ()
+                                  if not clnt:isvisible() then
+                                      awful.tag.viewmore(clnt:tags(), clnt.screen)
+                                  end
+                                  client.focus = clnt
+                              end,
+                              clnt.icon }
+    end
+    -- 3}}}
+    
+    -- {{{3 list of tags can send to
+    tgs_m = {}
+    for s = 1, screen.count() do
+        skey='Screen '..s
+
+        local tgs_t = {}
+        for i, t in ipairs(screen[s]:tags()) do
+            tgs_t[i] = { awful.util.escape(t.name) or "",
+                                function ()
+                                    c:tags({t})
+                                    c.screen = t.screen
+                                end
+                            }
+        end
+        table.insert(tgs_t, #tgs_t + 1, { "New tag", function()
+            new_tag_name = (c.instance and c.instance:gsub("%s.+$", "")) or nil
+            t = shifty.add( { name = new_tag_name, screen = s })
+            awful.client.movetotag(t, c)
+            awful.tag.viewonly(t)
+            client.focus = c
+            c:raise()
+
+        end })
+
+        tgs_m[s] = {skey,tgs_t}
+    end
+
+    -- 3}}}
+    
+    if not menu then
+        menu = {}
+    end
+
+
+    menu.items = { 
+        { "Close", function() c:kill() end },
+        { (client_is_maximized(c) and "Un-Maximize") or "Maximize", function()
+            toggle_maximized(c) 
+        end },
+        { (c.minimized and "Restore") or "Minimize", function()
+            c.minimized = not c.minimized
+        end },
+        { (c.sticky and "Un-Stick") or "Stick", function()
+            c.sticky = not c.sticky
+        end },
+        { ((awful.client.floating.get(c) and "Tile") or "Float"), function()
+            awful.client.floating.toggle(c)
+        end },
+        { "Move to tag >>", tgs_m },
+        { "Clients     >>", cls_t }
+    }
+    local m = awful.menu.new(menu)
+    m:show()
+    return m
+end
+-- 2}}} 1}}}
+
 
 -- {{{ -- TASKLIST
 widgets.tasklist = {}
@@ -156,7 +261,7 @@ widgets.tasklist.buttons = awful.util.table.join(
 
   awful.button({ }, 3, function (c)
         if instance then instance:hide(); instance = nil
-        else instance = myclientsmenu({width = 250},c) end -- awful.menu.clients({ width=250 }) end
+        else instance = menu_clients({width = 125},c) end
   end),
 
   awful.button({ }, 4, function ()
@@ -171,9 +276,11 @@ widgets.tasklist.buttons = awful.util.table.join(
 
 --}}}
 
+
 widgets.promptbox = {}
 widgets.layoutbox = {}
 widgets.wibox = {}
+
 
 -- {{{ -- STATUSBAR 
 widget_table1 = {
