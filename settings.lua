@@ -48,11 +48,11 @@ shifty.config.tags = {
                 exclusive = false, solitary = false, position = 1, init = true,
                 screen = 1, slave = true, spawn = settings.apps.editor  }, 
 
-  ds     =  { layout = awful.layout.suit.max        , mwfact = 0.70,
+  ds     =  { layout = awful.layout.suit.max, mwfact = 0.70,
                 exclusive = false, solitary = false, position = 2, init = false,
-                persist = false, nopopup = false , slave = false }, 
+                persist = false, nopopup = false, slave = false }, 
 
-  dz     =  { layout = awful.layout.suit.tile       , mwfact = 0.70,
+  dz     =  { layout = awful.layout.suit.tile, mwfact = 0.70,
                 exclusive = false, solitary = false, position = 3, init = false,
                 nopopup = true, leave_kills = true }, 
 
@@ -60,23 +60,23 @@ shifty.config.tags = {
                 exclusive = true, solitary = true, position = 4,  init = false,
                 spawn   = settings.apps.browser }, 
 
-  mail   =  { layout = awful.layout.suit.tile        , mwfact = 0.61,
-                exclusive = false, solitary = false, position = 5, init = false,
-                spawn   = settings.apps.mail, slave       = true  }, 
+  mail   =  { layout = awful.layout.suit.tile, mwfact = 0.61,
+                exclusive = false, solitary = false, position = 1, init = false,
+                spawn = settings.apps.mail, slave = true, screen = 2  }, 
 
-  vbx    =  { layout = awful.layout.suit.tile.bottom , mwfact = 0.75,
+  vbx    =  { layout = awful.layout.suit.tile.bottom, mwfact = 0.75,
                 exclusive = true, solitary = true, position = 6, init = false,
                 spawn = 'VBoxSDL -vm xp2' }, 
 
-  media  =  { layout = awful.layout.suit.floating    , exclusive = false , 
+  media  =  { layout = awful.layout.suit.floating, exclusive = false, 
                 solitary  = false, position = 8     }, 
 
-  gimp  =  { layout = awful.layout.suit.tile    , exclusive = false , 
+  gimp  =  { layout = awful.layout.suit.tile, exclusive = false, 
                 solitary  = false, position = 8, ncol = 3, mwfact = 0.75,
                 nmaster=1,
                 spawn = 'gimp-2.6', slave = true                                    }, 
 
-  office =  { layout = awful.layout.suit.tile        , position  = 9 }
+  office =  { layout = awful.layout.suit.tile, position  = 9 }
 }
 --}}}
 
@@ -88,18 +88,10 @@ shifty.config.apps = {
   { match   = { "Navigator","Vimperator","Gran Paradiso" }, 
     tag     = "web"                                         },
 
-  { match   = { "mutt", "claws","compose" },
+  { match   = { "mutt" } 
     tag     = "mail"                                        },
-  { match = { "clawsed" },
-    honorsizehints = false                                  },
 
-   -- stuff to match other claws-mail dialogs 
-  { match = { "icon_legend", "prefswindow", "addressbook",
-                "addressadd","editaddress"                  },
-    tag = "mail",
-    float = true, honorsizehints = true                     },
-
-  { match   = { "OpenOffice.*" },
+  { match   = { "gnumeric", "abiword" },
     tag     = "office"                                      },
 
   { match   = { "pcb","gschem", "eagle" },
@@ -141,7 +133,11 @@ shifty.config.apps = {
   { match = { "" }, 
     buttons = awful.util.table.join(
         awful.button({ }, 1, function (c) client.focus = c; c:raise() end),
-        awful.button({ settings.modkey }, 1, awful.mouse.client.move),
+        awful.button({ settings.modkey }, 1, function(c)
+            client.focus = c
+            c:raise()
+            awful.mouse.client.move(c)
+        end),
         awful.button({ settings.modkey }, 3, awful.mouse.client.resize),
         awful.button({ settings.modkey }, 8, awful.mouse.client.resize))
   }
@@ -154,12 +150,15 @@ shifty.config.defaults={
     nmaster = 1,
     floatBars=true, 
     run = function(tag)
-            number=awful.tag.getproperty(tag,"position") or shifty.tag2index(tag.screen, tag)
+            number=awful.tag.getproperty(tag,"position") or
+                shifty.tag2index(tag.screen, tag)
             naughty.notify({
-                text = markup.fg(beautiful.fg_normal, markup.fg( beautiful.fg_sb_hi,
-                        "Shifty Created: ".. number .." : "..  (tag.name or "foo")))
-            })
-        end, 
+                text =  markup.fg(beautiful.fg_normal,
+                        markup.fg(beautiful.fg_sb_hi,
+                        "Shifty Created: " .. number .. " : " .. 
+                        (tag.name or "foo")))
+                })
+            end 
 }
 
 shifty.config.sloppy = false
@@ -168,4 +167,4 @@ shifty.modkey = settings.modkey
 
 -- the shifty stuff is setting things in the module, so no need to export that here
 return settings
--- vim:set filetype=lua textwidth=120 fdm=marker tabstop=4 shiftwidth=4 expandtab smarttab autoindent smartindent: --
+-- vim:set filetype=lua textwidth=80 fdm=marker ts=4 sw=4 expandtab smarttab autoindent smartindent: --
