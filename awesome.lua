@@ -21,6 +21,23 @@ require("vicious")
 require("revelation")
 print("Modules loaded: " .. os.time())
 
+-- {{{function tag_to_screen(t, scr)
+function tag_to_screen(t, scr)
+    local ts = t or awful.tag.selected()
+    awful.tag.history.restore(ts.screen,1)
+    shifty.set(ts, { screen = scr or
+                    awful.util.cycle(screen.count(), ts.screen + 1)})
+    awful.tag.viewonly(ts)
+    mouse.screen = ts.screen
+
+    if #ts:clients() > 0 then
+        local c = ts:clients()[1]
+        client.focus = c
+        c:raise()
+    end
+end
+-- }}}
+
 -- {{{ tag run or raise
 function tagSearch(name)
   for s = 1, screen.count() do
