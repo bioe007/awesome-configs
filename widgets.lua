@@ -70,7 +70,6 @@ function tag_restore_defaults(t)
     local t_defaults = shifty.config.tags[t.name] or shifty.config.defaults
 
     for k,v in pairs(t_defaults) do
-        print('applying',k,v)
         awful.tag.setproperty(t, k, v)
     end
 end
