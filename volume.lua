@@ -31,15 +31,9 @@ function vol(mode, percent)
 
         config.widget:set_value(volume/100)
         if string.find(status, "on", 1, true) then
-            -- volume = volume .. "%"
-            config.widget:set_gradient_colors({ beautiful.fg_focus, beautiful.fg_focus })
-            -- config.widget:bar_properties_set("vol", {["bg"] = beautiful.vol_bg,
-            -- ["border_color"] = beautiful.bg_focus, })
+            config.widget:set_gradient_colors({ beautiful.fg_sb_hi or beautiful.fg_focus, beautiful.fg_focus })
         else
-            -- volume = volume .. "M"
             config.widget:set_gradient_colors({ beautiful.fg_normal, beautiful.fg_normal })
-            -- config.widget:bar_properties_set("vol", {["bg"] = beautiful.bg_normal,
-            -- ["border_color"] = beautiful.bg_normal, })
         end
         -- config.widget.text = volume
         config.widget:set_value(volume/100)
