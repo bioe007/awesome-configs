@@ -21,20 +21,42 @@ require("vicious")
 require("revelation")
 print("Modules loaded: " .. os.time())
 
--- {{{function tag_to_screen(t, scr)
-function tag_to_screen(t, scr)
+function tag_move(t, scr)
+    -- {{{
     local ts = t or awful.tag.selected()
+    local screen_target = scr or awful.util.cycle(screen.count(), ts.screen + 1)
+
+    shifty.set(ts, { screen = screen_target })
+end
+-- }}}
+
+function tag_to_screen(t, scr)
+    -- {{{
+    local ts = t or awful.tag.selected()
+    local screen_origin = ts.screen
+    local screen_target = scr or awful.util.cycle(screen.count(), ts.screen + 1)
+
     awful.tag.history.restore(ts.screen,1)
-    shifty.set(ts, { screen = scr or
-                    awful.util.cycle(screen.count(), ts.screen + 1)})
+    tag_move(ts, screen_target)
+
+    -- never waste a screen
+    if #(screen[screen_origin]:tags()) == 0 then
+        for _, tag in pairs(screen[screen_target]:tags()) do
+            if not tag.selected then
+                tag_move(tag, screen_origin) 
+                tag.selected = true
+                break
+            end
+        end
+    end
+
     awful.tag.viewonly(ts)
     mouse.screen = ts.screen
-
     if #ts:clients() > 0 then
         local c = ts:clients()[1]
         client.focus = c
-        c:raise()
     end
+
 end
 -- }}}
 
@@ -50,8 +72,8 @@ function workspace_prev()
     end
 end
 
--- {{{ tag run or raise
 function tagSearch(name)
+    -- {{{
   for s = 1, screen.count() do
     t = shifty.name2tag(name,s)
     if t ~= nil then
@@ -82,12 +104,12 @@ function tagScreenless()
 end
 -- }}}
 
--- {{{ tagPop() 
 -- Called externally and just pops to or merges with my active vim server when 
 -- new files are dumped to it. (vim-start.sh) 
 -- though it could easily be used with any tag by passing a different 'name'
 -- parameter
 function tagPop(name)
+    -- {{{ tagPop() 
     for s = 1, screen.count() do
         t = shifty.name2tag(name,s)
         if t ~= nil then
