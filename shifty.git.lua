@@ -637,11 +637,11 @@ end
 --{{{ getpos : returns a tag to match position
 -- @param pos : the index to find
 -- @return v : the tag (found or created) at position == 'pos'
-function getpos(pos)
+function getpos(pos, scr_arg)
   local v = nil
   local existing = {}
   local selected = nil
-  local scr = mouse.screen or 1
+  local scr = scr_arg or mouse.screen or 1
   -- search for existing tag assigned to pos
   for i = 1, screen.count() do
     for j, t in ipairs(screen[i]:tags()) do
@@ -652,8 +652,19 @@ function getpos(pos)
     end
   end
   if #existing > 0 then
-    -- if makeing another of an existing tag, return the end of the list
-    if selected then v = existing[awful.util.cycle(#existing, selected + 1)] else v = existing[1] end
+    -- if making another of an existing tag, return the end of the list
+    -- the optional 2nd argument decides if we return only 
+    if scr_arg ~= nil then 
+      for _, tag in pairs(existing) do
+        if tag.screen == scr_arg then return tag end
+      end
+      -- no tag with a position and scr_arg match found, clear v and
+      -- allow the subseqeunt conditions to be evaluated
+      v = nil
+    else
+      v = (selected and existing[awful.util.cycle(#existing, selected + 1)]) or existing[1]
+    end
+
   end
   if not v then
     -- search for preconf with 'pos' and create it

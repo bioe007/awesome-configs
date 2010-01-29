@@ -1,51 +1,21 @@
 -- {{{ global keys
 globalkeys = awful.util.table.join(
-
-    awful.key({ settings.modkey }, "space", awful.tag.viewnext),  -- move to next tag
-    awful.key({ settings.modkey, "Control"}, "space", function()  -- move to next tag on all screens
-        for s=1,screen.count() do
-            awful.tag.viewnext(screen[s])
-        end
-        end ),  
-    awful.key({ settings.modkey, "Shift" }, "space", awful.tag.viewprev), -- move to previous tag
-    awful.key({ settings.modkey, "Control", "Shift"}, "space", function()  -- move to previous tag on all screens
-        for s=1,screen.count() do
-            awful.tag.viewprev(screen[s])
-        end
-        end ),  
-    awful.key({ settings.modkey,           }, "j",
-        function ()
-            awful.client.focus.byidx( 1)
-            if client.focus then client.focus:raise() end
-    end),
-    awful.key({ settings.modkey,           }, "k",
-        function ()
-            awful.client.focus.byidx(-1)
-            if client.focus then client.focus:raise() end
-    end),
-    awful.key({ settings.modkey,    }, "e",  revelation.revelation),
+    awful.key({settings.modkey}, "space", awful.tag.viewnext),                -- move to next tag
+    awful.key({settings.modkey, "Control"}, "space", workspace_next),          -- move to next tag on all screens
+    awful.key({settings.modkey, "Shift" }, "space", awful.tag.viewprev),       -- move to previous tag
+    awful.key({settings.modkey, "Control", "Shift"}, "space", workspace_prev), -- move to previous tag on all screens
+    awful.key({settings.modkey}, "j", function() awful.client.focus.byidx( 1) end),
+    awful.key({settings.modkey}, "k", function() awful.client.focus.byidx(-1) end),
+    awful.key({settings.modkey}, "e",  revelation.revelation),
 
     -- {{{ shiftycentric
-    awful.key({ settings.modkey            }, "Escape",  function() awful.tag.history.restore() end), -- move to prev tag by history
-    awful.key({ settings.modkey, "Shift"   }, "n",       shifty.send_prev),          -- move client to prev tag
-    awful.key({ settings.modkey            }, "n",       shifty.send_next),          -- move client to next tag
-    awful.key({ settings.modkey, "Control" }, "n",       function ()                 -- move a tag to next screen
-        local ts = awful.tag.selected()
-        awful.tag.history.restore(ts.screen,1)
-        shifty.set(ts,{ screen = awful.util.cycle(screen.count(), ts.screen +1)})
-        awful.tag.viewonly(ts)
-        mouse.screen = ts.screen
-
-        if #ts:clients() > 0 then
-            local c = ts:clients()[1]
-            client.focus = c
-            c:raise()
-        end
-        
-    end),
-    awful.key({ settings.modkey, "Shift"   }, "r",       shifty.rename),             -- rename a tag
-    awful.key({ settings.modkey            }, "d",       shifty.del),                -- delete a tag
-    awful.key({ settings.modkey, "Shift"   }, "a",       shifty.add),                -- creat a new tag
+    awful.key({ settings.modkey            }, "Escape", awful.tag.history.restore), -- move to prev tag by history
+    awful.key({ settings.modkey, "Shift"   }, "n",      shifty.send_prev),          -- move client to prev tag
+    awful.key({ settings.modkey            }, "n",      shifty.send_next),          -- move client to next tag
+    awful.key({ settings.modkey, "Control" }, "n",      tag_to_screen ),            -- move a tag to next screen
+    awful.key({ settings.modkey, "Shift"   }, "r",      shifty.rename),             -- rename a tag
+    awful.key({ settings.modkey            }, "d",      shifty.del),                -- delete a tag
+    awful.key({ settings.modkey, "Shift"   }, "a",      shifty.add),                -- creat a new tag
     -- }}}
 
     -- {{{ Layout manipulation
@@ -123,33 +93,32 @@ globalkeys = awful.util.table.join(
     awful.key({ settings.modkey, "Mod1" },"r", function () awful.util.spawn('sudo reboot',false) end),
     -- }}} 
 
-    awful.key({ settings.modkey         }, "F4", function() awful.util.spawn('/home/perry/.bin/stupid.sh --soyo') end),
-    awful.key({ settings.modkey         }, "F5", function() awful.util.spawn('/home/perry/.bin/stupid.sh --sync') end),
-    awful.key({ settings.modkey         }, "F6", function() 
-        awful.util.spawn('/home/perry/.bin/stupid.sh --off') end)
-    
+    awful.key({ settings.modkey }, "F4", function() awful.util.spawn('/home/perry/.bin/stupid.sh --soyo') end),
+    awful.key({ settings.modkey }, "F5", function() awful.util.spawn('/home/perry/.bin/stupid.sh --sync') end),
+    awful.key({ settings.modkey }, "F6", function() awful.util.spawn('/home/perry/.bin/stupid.sh --off') end)
     )
     -- }}}
 
 -- Compute the maximum number of digit we need, limited to 9
 for i = 1, 9 do
     globalkeys = awful.util.table.join(globalkeys,
-        awful.key({ settings.modkey }, i,
-            function () awful.tag.viewonly(shifty.getpos(i)) end),
-        awful.key({ settings.modkey, "Control" }, i,
-            function ()t = shifty.getpos(i); t.selected = not t.selected end),
-        awful.key({ settings.modkey, "Shift" }, i,
-            function ()
-                if client.focus then 
-                    local c = client.focus
-                    slave = not ( client.focus == awful.client.getmaster(mouse.screen))
-                    t = shifty.getpos(i)
-                    awful.client.movetotag(t,c)
-                    awful.tag.viewonly(t)
-                    if slave then awful.client.setslave(c) end
-                end 
-            end
-        )
+    awful.key({ settings.modkey }, i, function()
+        awful.tag.viewonly(shifty.getpos(i)) end),
+    awful.key({ settings.modkey, "Control" }, i, function()
+        this_screen = awful.tag.selected().screen
+        t = shifty.getpos(i, this_screen) 
+        t.selected = not t.selected
+    end),
+    awful.key({ settings.modkey, "Shift" }, i, function ()
+        if client.focus then 
+            local c = client.focus
+            slave = not ( client.focus == awful.client.getmaster(mouse.screen))
+            t = shifty.getpos(i)
+            awful.client.movetotag(t,c)
+            awful.tag.viewonly(t)
+            if slave then awful.client.setslave(c) end
+        end 
+    end)
     )
 end
 
