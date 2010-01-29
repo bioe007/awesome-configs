@@ -85,6 +85,8 @@ function menu_taglist(menu, t)
 
     menu.items = {}
     menu.items = { 
+        { (t.selected and "Hide") or "Merge", function()
+            t.selected = not t.selected end },
         { "Rename", function() shifty.rename(t) end },
         { "Restore", function() tag_restore_defaults(t) end },
         { "Delete", function() shifty.del(t) end },
