@@ -88,7 +88,7 @@ shifty.config.apps = {
   { match   = { "Navigator","Vimperator","Gran Paradiso" }, 
     tag     = "web"                                         },
 
-  { match   = { "mutt" } 
+  { match   = { "mutt" }, 
     tag     = "mail"                                        },
 
   { match   = { "gnumeric", "abiword" },
