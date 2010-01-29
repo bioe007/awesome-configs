@@ -38,6 +38,18 @@ function tag_to_screen(t, scr)
 end
 -- }}}
 
+function workspace_next()
+    for s=1,screen.count() do
+        awful.tag.viewnext(screen[s])
+    end
+end
+
+function workspace_prev()
+    for s=1,screen.count() do
+        awful.tag.viewprev(screen[s])
+    end
+end
+
 -- {{{ tag run or raise
 function tagSearch(name)
   for s = 1, screen.count() do
@@ -137,6 +149,7 @@ client.add_signal("focus", function (c)
     else
         c.opacity = settings.opacity.default.focus or 1
     end
+    c:raise()
 end) 
 
 -- Hook function to execute when unfocusing a client.
