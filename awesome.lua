@@ -21,6 +21,16 @@ require("vicious")
 require("revelation")
 print("Modules loaded: " .. os.time())
 
+function tag_restore_defaults(t)
+    -- {{{
+    local t_defaults = shifty.config.tags[t.name] or shifty.config.defaults
+
+    for k,v in pairs(t_defaults) do
+        awful.tag.setproperty(t, k, v)
+    end
+end
+-- }}}
+
 function tag_move(t, scr)
     -- {{{
     local ts = t or awful.tag.selected()
@@ -138,10 +148,19 @@ root.buttons(awful.util.table.join(
 
 --{{{ clientkeys
 clientkeys = awful.util.table.join(
-    awful.key({ settings.modkey,           }, "f",      function (c) c.fullscreen = not c.fullscreen  end),
-    awful.key({ settings.modkey, "Shift"   }, "c",      function (c) c:kill()                         end),
-    awful.key({ settings.modkey, "Shift"   }, "0",      function (c) c.sticky=not c.sticky            end),
-    awful.key({ settings.modkey, "Mod1" }, "space",  awful.client.floating.toggle                     ),
+    awful.key({ settings.modkey,           }, "f", function (c) c.fullscreen = not c.fullscreen  end),
+    awful.key({ settings.modkey, "Shift"   }, "c", function (c) c:kill()                         end),
+    awful.key({ settings.modkey, "Shift"   }, "0", function (c) c.sticky = not c.sticky          end),
+    awful.key({ settings.modkey, "Mod1" }, "space",function(c)
+        awful.client.floating.toggle(c)
+        if awful.client.floating.get(c) then
+            awful.placement.centered(c)
+            client.focus = c
+            client.focus:raise()
+        else
+            awful.client.setslave(c)
+        end
+    end),
     awful.key({ settings.modkey, "Control" }, "Return", function (c) c:swap(awful.client.getmaster()) end),
     awful.key({ settings.modkey,           }, "o",      awful.client.movetoscreen                        ),
     awful.key({ settings.modkey, "Mod1"    }, "n",      function (c) c.minimized = not c.minimized    end),
@@ -187,4 +206,4 @@ client.add_signal("unfocus", function (c)
 end)
 -- }}}
 
--- vim:set filetype=lua textwidth=120 fdm=marker tabstop=4 shiftwidth=4 expandtab smarttab autoindent smartindent: --
+-- vim:set ft=lua tw=80 fdm=marker ts=4 sw=4 et sta ai sti: --
