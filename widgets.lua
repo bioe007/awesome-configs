@@ -66,14 +66,6 @@ widgets.battery = battery.init()
 widgets.volume = volume.init()
 --}}}
 
-function tag_restore_defaults(t)
-    local t_defaults = shifty.config.tags[t.name] or shifty.config.defaults
-
-    for k,v in pairs(t_defaults) do
-        awful.tag.setproperty(t, k, v)
-    end
-end
-
 function menu_taglist(menu, t)
     -- {{{1
     if not menu then
@@ -178,11 +170,10 @@ end
 -- 1}}}
 
 
--- {{{1 menu_clients(menu, c)
 function menu_clients(menu, c)
-    -- {{{2
+    -- {{{1
 
-    -- {{{3 list of other clients
+    -- {{{ list of other clients
     local cls = client.get()
     local cls_t = {}
     for k, clnt in pairs(cls) do
@@ -195,9 +186,9 @@ function menu_clients(menu, c)
                               end,
                               clnt.icon }
     end
-    -- 3}}}
+    -- }}}
     
-    -- {{{3 list of tags can send to
+    -- {{{ list of tags can send to
     tgs_m = {}
     for s = 1, screen.count() do
         skey='Screen '..s
@@ -224,7 +215,7 @@ function menu_clients(menu, c)
         tgs_m[s] = {skey,tgs_t}
     end
 
-    -- 3}}}
+    -- }}}
     
     if not menu then
         menu = {}
@@ -252,7 +243,7 @@ function menu_clients(menu, c)
     m:show()
     return m
 end
--- 2}}} 1}}}
+-- 1}}}
 
 
 -- {{{ -- TASKLIST
