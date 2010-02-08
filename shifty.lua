@@ -571,9 +571,14 @@ function match(c, startup)
       end
     end
     if #showtags > 0 then
-      local ident = true
+      local ident = false
+      -- iterate selected tags and and see if any targets currently selected
       for kk,vv in pairs(showtags) do
-        if sel[kk] ~= vv then ident = false; break end
+        for _, tag in pairs(sel) do
+          if tag == vv then
+            ident = true
+          end
+        end
       end
       if not ident then
         awful.tag.viewmore(showtags, c.screen)
