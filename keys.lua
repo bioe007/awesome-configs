@@ -1,5 +1,8 @@
 -- {{{ global keys
 globalkeys = awful.util.table.join(
+    awful.key({settings.modkey, "Control", "Shift" }, "t", function() print('called kb')
+        keygrabber.run(tag_strmatch())
+        end),                -- move to next tag
     awful.key({settings.modkey}, "space", awful.tag.viewnext),                -- move to next tag
     awful.key({settings.modkey, "Control"}, "space", workspace_next),          -- move to next tag on all screens
     awful.key({settings.modkey, "Shift" }, "space", awful.tag.viewprev),       -- move to previous tag
@@ -57,11 +60,8 @@ globalkeys = awful.util.table.join(
     awful.key({},"XF86AudioPrev",               function() mocp.play("REV") end),
     awful.key({},"XF86AudioNext",               function() mocp.play("FWD") end ),
     awful.key({},"XF86AudioStop",               function() mocp.play("STOP") end),
-
     awful.key({},"XF86AudioRaiseVolume", function() volume.vol("up","5") end),
     awful.key({},"XF86AudioLowerVolume", function() volume.vol("down","5") end),
-    awful.key({ settings.modkey },"XF86AudioRaiseVolume",function() volume.vol("up","2")end),
-    awful.key({ settings.modkey },"XF86AudioLowerVolume", function() volume.vol("down","2")end),
     awful.key({},"XF86AudioMute", function() volume.vol() end),
     -- }}} 
     
@@ -94,7 +94,7 @@ globalkeys = awful.util.table.join(
     -- }}} 
 
     awful.key({ settings.modkey }, "F4", function() awful.util.spawn('/home/perry/.bin/stupid.sh --soyo') end),
-    awful.key({ settings.modkey }, "F5", function() awful.util.spawn('/home/perry/.bin/stupid.sh --sync') end),
+    awful.key({ settings.modkey }, "F5", function() awful.util.spawn('/home/perry/.bin/stupid.sh --sync --pos left-of') end),
     awful.key({ settings.modkey }, "F6", function() awful.util.spawn('/home/perry/.bin/stupid.sh --off') end)
     )
     -- }}}
