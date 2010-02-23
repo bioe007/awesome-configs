@@ -1,7 +1,7 @@
 -- awesome rc variables
 settings = {}
 settings.theme_path = os.getenv("HOME").."/.config/awesome/themes/dk_grey"
-beautiful.init(settings.theme_path.."/theme.lua")
+-- beautiful.init(settings.theme_path.."/theme.lua")
 
 settings = {
   modkey     = "Mod4",
@@ -31,8 +31,9 @@ settings = {
 
   -- {{{ opacity
   opacity = { 
-    default = { focus = 1.0, unfocus = 0.8 },
-    Easytag = { focus = 1.0, unfocus = 0.9 },
+    default = { focus = 1.0, unfocus = 0.90 },
+    Easytag = { focus = 1.0, unfocus = 0.95 },
+    mutt = { focus = 1.0, unfocus = 0.95 },
     Gschem  = { focus = 1.0, unfocus = 1.0 },
     Gimp    = { focus = 1.0, unfocus = 1.0 },
     MPlayer = { focus = 1.0, unfocus = 1.0 },
@@ -45,34 +46,34 @@ settings = {
 shifty.config.tags = {
 
   vim     =  { layout = awful.layout.suit.tile, mwfact = 0.52,
-                exclusive = false, solitary = false, position = 1, init = true,
+                exclusive = false, position = 1, init = true,
                 screen = 1, slave = true, spawn = settings.apps.editor  }, 
 
   ds     =  { layout = awful.layout.suit.max, mwfact = 0.70,
-                exclusive = false, solitary = false, position = 2, init = false,
+                exclusive = false, position = 2, init = false,
                 persist = false, nopopup = false, slave = false }, 
 
   dz     =  { layout = awful.layout.suit.tile, mwfact = 0.70,
-                exclusive = false, solitary = false, position = 3, init = false,
+                exclusive = false, position = 3, init = false,
                 nopopup = true, leave_kills = true }, 
 
   web    =  { layout = awful.layout.suit.tile.bottom, mwfact = 0.65,
-                exclusive = true, solitary = true, position = 4,  init = false,
+                exclusive = true, max_clients = 1, position = 4,  init = false,
                 spawn   = settings.apps.browser }, 
 
   mail   =  { layout = awful.layout.suit.tile, mwfact = 0.61,
-                exclusive = false, solitary = false, position = 1, init = false,
+                exclusive = false, position = 1, init = false,
                 spawn = settings.apps.mail, slave = true, screen = 2  }, 
 
   vbx    =  { layout = awful.layout.suit.tile.bottom, mwfact = 0.75,
-                exclusive = true, solitary = true, position = 6, init = false,
+                exclusive = true, max_clients = 1, position = 6, init = false,
                 spawn = 'VBoxSDL -vm xp2' }, 
 
   media  =  { layout = awful.layout.suit.floating, exclusive = false, 
-                solitary  = false, position = 8     }, 
+                position = 8     }, 
 
   gimp  =  { layout = awful.layout.suit.tile, exclusive = false, 
-                solitary  = false, position = 8, ncol = 3, mwfact = 0.75,
+                position = 8, ncol = 3, mwfact = 0.75,
                 nmaster=1,
                 spawn = 'gimp-2.6', slave = true                                    }, 
 
@@ -124,7 +125,7 @@ shifty.config.apps = {
     float   = true, honorsizehints = true, opacity = 1.0    },
 
   { match   = { "MPlayer" }, 
-    float   = true, honorsizehints = true, ontop=true       },
+    float   = true, honorsizehints = true, ontop=true, intrusive=true       },
 
   { match   = { "urxvt","vim","mutt" },
     honorsizehints = false, 
