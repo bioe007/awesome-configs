@@ -6,32 +6,40 @@
 -- ]]--
 
 theme          = {}
-theme.font     = "HeldustryFTVBasic Black 8"
+-- theme.font     = "HeldustryFTVBasic Black 8"
+-- theme.font     = "Terminus 9"
+-- theme.font     = "Profont 9"
+-- theme.font     = "Inconsolata 10"
+-- theme.font     = "Helvetica 8"
+theme.font     = "Nimbus Mono 9"
+
 
 theme.path     = os.getenv("HOME").."/.config/awesome/themes/dk_grey"
 theme.iconpath = theme.path
 
 theme.wallpaper_cmd = { [1] = "nitrogen --restore" }
 
-theme.fg_normal          = "#abbfab"
-theme.bg_normal          = "#555555"
-theme.fg_focus           = "#bdedbe"
 -- theme.fg_focus           = "#9dcd9e"
-theme.bg_focus           = "#3f3034"
-theme.bg_urgent          = "#288ef6"
-theme.fg_urgent          = "#ffaaaa"
+theme.fg_normal     = "#abbfab"
+theme.bg_normal     = "#555555"
+theme.fg_focus      = "#bdedbe"
+theme.bg_focus      = "#3f3034"
+theme.bg_urgent     = "#288ef6"
+theme.fg_urgent     = "#ffaaaa"
 
 -- specific
-theme.fg_sb_hi           = "#9dcd9e"
-theme.fg_batt_mid        = "#008600"
-theme.fg_batt_low        = "#e4f01b"
-theme.fg_batt_crit       = "#a84007"
-theme.vol_bg             = "#000000"
+theme.fg_sb_hi      = "#9dcd9e"
+theme.fg_batt_warn  = "#880000"
+theme.fg_batt_mid   = "#008600"
+theme.fg_batt_low   = "#e4f01b"
+theme.fg_batt_crit  = "#a84007"
+theme.vol_bg        = "#000000"
 
 theme.border_width  = 2
 theme.border_normal = "#000000"
 theme.border_focus  = "#3accc5"
-theme.border_marked = "#0000f0"
+theme.border_marked = "#000080"
+
 theme.tooltip_border_color = theme.fg_focus
 
 -- calendar settings
@@ -74,4 +82,4 @@ return theme
 
 
 
--- vim:set filetype=lua textwidth=80 fdm=marker tabstop=4 shiftwidth=4 expandtab smarttab autoindent smartindent: --
+-- vim:set ft=lua tw=80 fdm=marker ts=4 sw=4 et sta ai si:
