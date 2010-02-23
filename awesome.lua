@@ -24,6 +24,40 @@ require("vicious")
 require("revelation")
 print("Modules loaded: " .. os.time())
 
+function client_restore(c)
+    -- {{{ 
+    c.minimized = false
+    awful.tag.viewmore(c:tags(), c.screen)
+    client.focus = c
+    client.focus:raise()
+end
+-- }}}
+
+function client_filtermenu(filter, value, f)
+    -- {{{
+
+    if not filter then return end
+    clients = client.get()
+
+    m = {}
+    m.items = {}
+    for i, c in ipairs(clients) do
+        if c[filter] and c[filter] == value then
+            m.items[#m.items +1] = {
+                awful.util.escape(c.name),
+                function() f(c) end,
+                c.icon
+            }
+            print(#m.items)
+        end
+    end
+    if #m.items >= 1 then
+        local menu = awful.menu.new(m)
+        menu:show(true)
+        return menu
+    end
+end
+-- }}}
 
 function tag_restore_defaults(t)
     -- {{{
@@ -180,7 +214,6 @@ local keymodifiers = {
     Super_R = 1,
 }
 
--- Returns keyboardhandler.
 function tag_strmatch()
 --{{{ dynamically select tags that match keyboard input
 
@@ -190,8 +223,8 @@ function tag_strmatch()
     return function (mod, key, event)
         -- key release events
         if event == "release" then
-            -- only grab whilst modkey down?
-            if key == 'Super_L' then
+            -- break when return is received
+            if key == 'Return' then
                 if pil ~= nil then
                     naughty.destroy(pil)
                 end
@@ -341,12 +374,24 @@ clientkeys = awful.util.table.join(
         end
     end), --}}}
     awful.key({ settings.modkey, "Control" }, "Return", function (c) c:swap(awful.client.getmaster()) end),
-    awful.key({ settings.modkey, "Mod1"    }, "n",      function (c) c.minimized = not c.minimized    end),
+    awful.key({ settings.modkey, "Mod1"    }, "n", function (c)
+        client_filtermenu('minimized',true, client_restore)
+    end),
     awful.key({ settings.modkey, "Control"}, "m",
         function (c)
-            c.maximized_horizontal = not c.maximized_horizontal
-            c.maximized_vertical   = not c.maximized_vertical
-            c:raise()
+            if c.maximized_horizontal then
+                c.maximized_horizontal = false
+                c.maximized_vertical = false
+                c.minimized = true
+            elseif c.minimized then
+                c.minimized = false
+                client.focus = c
+                c:raise()
+            else
+                c.maximized_horizontal = not c.maximized_horizontal
+                c.maximized_vertical   = not c.maximized_vertical
+                c:raise()
+            end
         end)
     )
 -- }}}
