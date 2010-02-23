@@ -120,7 +120,6 @@ function rename(tag, prefix, no_selectall)
         set(t)
       end
       tagkeys(screen[scr])
-      -- screen[scr]:emit_signal("tag::detach")
       t:emit_signal("property::name")
     end
     )
