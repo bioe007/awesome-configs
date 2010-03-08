@@ -1,49 +1,87 @@
 -- useful markup functions for awesome
 -- found somewhere (wiki maybe?) modularized and current:
 -- by bioe007 perrydothargraveatgmaildotcom
+
 local beautiful = require("beautiful")
+local err = io.stderr
+local autil = require("awful.util")
 
 -- Markup helper functions
 module("markup")
 
-function italic(text) return '<i>'..text..'</i>' end
+-- sometimes we get nil text or an undefined color from a widgets behavior
+-- its very aggravating to think a crappy mp3 tag can ruin your day so i
+-- try and catch these things here
+local function werror(...)
+    args = { n = select('#', ...), ... }
 
-function bold(text) return '<b>'..text..'</b>' end
+    err:write(table.concat(args, ' '))
+    
+    return autil.escape(table.concat(args, ' '))
+end
+
+function italic(text)
+    if text == nil then
+        return werror("markup: received nil text")
+    else
+        return '<i>'..text..'</i>'
+    end
+end
+
+function bold(text)
+    if text == nil then
+        return werror("markup: received nil text")
+    else
+        return '<b>'..text..'</b>'
+    end
+end
 
 function bg(color, text)
-    if text ~= nil then
-        return '<bg color="'..color..'" />'..text
+    if color == nil or text == nil then
+        return werror("markup: received nil text or color", text, color)
     else
-        return "niltexthere"
+        return '<bg color="'..color..'" />'..text
     end
 end
 
 function fg(color, text)
-    if text ~= nil then
-        return '<span color="'..color..'">'..text..'</span>'
+    if color == nil or text == nil then
+        return werror("markup: received nil text or color", text, color)
     else
-        return "niltexthere"
+        return '<span color="'..color..'">'..text..'</span>'
     end
 end
 
 function font(font, text)
-    if text ~= nil then
-        return '<span font_desc="'..font..'">'..text..'</span>'
+    if font == nil or text == nil then
+        return werror("markup: received nil text or color", text, font)
     else
-        return "niltexthere"
+        return '<span font_desc="'..font..'">'..text..'</span>'
     end
 end
 
 function title_focus(t)
-    return bg(beautiful.bg_focus, fg(beautiful.fg_focus, title(t)))
+    if t == nil or beautiful.bg_focus == nil or beautiful.fg_focus == nil then
+        return werror("markup: received nil text or color", t)
+    else
+        return bg(beautiful.bg_focus, fg(beautiful.fg_focus, title(t)))
+    end
 end
 
 function title_urgent(t)
-    return bg(beautiful.bg_urgent, fg(beautiful.fg_urgent, title(t)))
+    if t == nil or beautiful.bg_urgent == nil or beautiful.fg_urgent == nil then
+        return werror("markup: received nil text", t)
+    else
+        return bg(beautiful.bg_urgent, fg(beautiful.fg_urgent, title(t)))
+    end
 end
 
 function heading(text)
-    return fg(beautiful.fg_focus, bold(text))
+    if text == nil or beautiful.fg_focus == nil then
+        return werror("markup: received nil text", text)
+    else
+        return fg(beautiful.fg_focus, bold(text))
+    end
 end
 
--- vim:set filetype=lua fdm=marker tabstop=4 shiftwidth=4 expandtab smarttab autoindent smartindent: --
+-- vim:set ft=lua fdm=indent tw=80 ts=4 sw=4 et sta ai si: --
