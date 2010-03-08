@@ -149,7 +149,6 @@ shifty.config.defaults={
     layout = awful.layout.suit.tile.bottom,
     ncol = 1,
     nmaster = 1,
-    floatBars=true, 
     run = function(tag)
             number=awful.tag.getproperty(tag,"position") or
                 shifty.tag2index(tag.screen, tag)
