@@ -7,7 +7,7 @@
 -- where args is a table of configuration parameters
 -- see below the 'config' table for possible values
 --
--- perrydothargraveatgmaildotcom 
+-- perrydothargraveatgmaildotcom
 -- bioe007
 --
 --
@@ -63,7 +63,7 @@ local config = {
     iScroller = 1,
     max_chars = 15,
     tooltip = nil,
-    popup = { 
+    popup = {
         timeout = 3,
         border_width = 2,
         width = 300,
@@ -82,21 +82,21 @@ local function state()
 
     local fd = {}
     local tmp = nil
-    local state ="" 
+    local state =""
 
     fd = io.popen('pgrep -fx \'mocp\'')
 
     tmp = fd:read()
-    if tmp == nil then 
+    if tmp == nil then
         fd = io.popen('pgrep -fx \'mocp --server\'')
         tmp = fd:read()
     end
 
-    if tmp ~= nil then 
+    if tmp ~= nil then
         fd:close()
 
         fd = io.popen('mocp -i')
-        trackinfo.state = string.gsub(fd:read(),"State:%s*","")
+        trackinfo.state = string.gsub(fd:read(), "State:%s*", "")
         fd:close()
 
         if trackinfo.state == "STOP" then
@@ -107,7 +107,7 @@ local function state()
         end
     else
         trackinfo.state = "OFF"
-        config.widget.text = "" 
+        config.widget.text = ""
         config.widget.width = 0
     end
 
@@ -122,15 +122,15 @@ local function setTitle()
 
     local fd = {}
 
-    if not (trackinfo.state == "OFF" or trackinfo.state == "STOP") then 
+    if not (trackinfo.state == "OFF" or trackinfo.state == "STOP") then
         fd = io.popen('mocp -i')
 
         -- read to end of mocp -i
         for line in fd:lines() do
-            key = string.match(line,"^%w+")
+            key = string.match(line, "^%w+")
             if trackinfo[key:lower()] ~= nil then
                 trackinfo[key:lower()] = awful.util.escape(
-                string.gsub(string.gsub(line,key..":%s*",""),"%b()",""))
+                string.gsub(string.gsub(line, key .. ":%s*", ""), "%b()", ""))
             end
         end
         fd:close()
@@ -147,10 +147,11 @@ local function title(delim)
     local np = {}
 
     if trackinfo.artist == "" and state() then setTitle() end
-    np.song = string.gsub( string.gsub(trackinfo.songtitle,"^%d*",""),"%(.*","") .. eol
+    np.song = string.gsub(string.gsub(trackinfo.songtitle, "^%d*", ""),
+                          "%(.*", "") .. eol
 
     -- return for widget text
-    return trackinfo.artist.." : "..np.song
+    return trackinfo.artist .. " : " .. np.song
 
 end
 --}}}
@@ -174,14 +175,16 @@ local function getTime()
     fd = io.popen('mocp -i')
 
     for line in fd:lines() do
-        key = string.match(line,"^%w+")
+        key = string.match(line, "^%w+")
         if key == "TotalTime" then
-            tstring = " [ "..markup.fg(config.colors.focus,
-            awful.util.escape(string.gsub(string.gsub(line,key..":%s*",""),"%b()",""))).." ]"
+            tstring = " [ " .. markup.fg(config.colors.focus,
+            awful.util.escape(string.gsub(string.gsub(line, key .. ":%s*", ""),
+                              "%b()", ""))) .. " ]"
         elseif key == "CurrentTime" then
-            tstring = markup.fg(config.colors.normal,"Time:   ")..
+            tstring = markup.fg(config.colors.normal, "Time:   ")..
             markup.fg(config.colors.focus,
-            awful.util.escape(string.gsub(string.gsub(line,key..":%s*",""),"%b()","")))..tstring
+            awful.util.escape(string.gsub(string.gsub(line, key .. ":%s*", ""),
+                              "%b()", ""))) .. tstring
         end
     end
 
@@ -202,7 +205,8 @@ local function scroller(tb)
         state()
         return
     else
-        -- this sets the symbolic prefix based on if moc is playing/stopped/paused
+        -- this sets the symbolic prefix based on if moc is
+        -- playing/stopped/paused
         if trackinfo.state == "PAUSE" then
             prefix = "|| "
             config.interval.cur = config.interval.paused
@@ -217,14 +221,14 @@ local function scroller(tb)
             config.interval.cur = config.interval.run
         end
 
-        -- extract a substring, putting it after the 
+        -- extract a substring, putting it after the
         np.strng = title()
-        np.rtn = string.sub(np.strng, iScroll, config.max_chars + iScroll -1) 
+        np.rtn = string.sub(np.strng, iScroll, config.max_chars + iScroll -1)
 
         -- if our index and config.max_chars count are bigger than the string,
         -- wrap around to the beginning and add enough to make it look circular
         if config.max_chars + iScroll > (np.strng):len() then
-            np.rtn = np.rtn..string.sub(np.strng, 1,
+            np.rtn = np.rtn .. string.sub(np.strng, 1,
                             (config.max_chars + iScroll -1) - np.strng:len())
         end
 
@@ -254,17 +258,20 @@ local function popup()
     if not state() then
         return
     else
-        np.strng = "Artist: "..markup.fg(config.colors.focus, trackinfo.artist)..
-                    "\n"..
-                    "Song:   "..markup.fg(config.colors.focus, trackinfo.songtitle)..
-                    "\n"..
-                    "Album:  "..markup.fg(config.colors.focus,
-                        string.gsub(trackinfo.album, ".*Sound", "Soundtrack"))..
-                    "\n"..
+        np.strng = "Artist: " .. markup.fg(config.colors.focus,
+                                            trackinfo.artist) ..
+                    "\n" ..
+                    "Song:   " .. markup.fg(config.colors.focus,
+                                            trackinfo.songtitle) ..
+                    "\n" ..
+                    "Album:  " .. markup.fg(config.colors.focus,
+                                string.gsub(trackinfo.album, ".*Sound",
+                                            "Soundtrack")) ..
+                    "\n" ..
                     markup.fg(config.colors.focus, getTime())
     end
 
-    mocbox = naughty.notify({ 
+    mocbox = naughty.notify({
         title = markup.italic(markup.bold("Now Playing:")),
         text = np.strng,
         hover_timeout = ( config.hovertime or 3 ),
@@ -280,26 +287,27 @@ end
 ---}}}
 
 
-function play(plyrCmd) 
+function play(plyrCmd)
     -- {{{ easier way to check|run mocp
 
     -- break on unknown commands
     if not COMMANDS[plyrCmd] then return end
 
     -- start server if not running
-    if trackinfo.state == "OFF" and not ( COMMANDS[plyrCmd] == COMMANDS["STOP"] ) then
-        awful.util.spawn('\"mocp --server\"',false)
+    if trackinfo.state == "OFF" and
+        not ( COMMANDS[plyrCmd] == COMMANDS["STOP"] ) then
+        awful.util.spawn('\"mocp --server\"', false)
 
         -- if starting, then turn most commands to play
-        if COMMANDS[plyrCmd] == COMMANDS["FWD"] or 
+        if COMMANDS[plyrCmd] == COMMANDS["FWD"] or
             COMMANDS[plyrCmd] == COMMANDS["REV"] or
             COMMANDS[plyrCmd] == COMMANDS["PAUSE"] then
 
-            plyrCmd = COMMANDS["PLAY"] 
+            plyrCmd = COMMANDS["PLAY"]
         end
     end
 
-    awful.util.spawn(COMMANDS[plyrCmd],false)
+    awful.util.spawn(COMMANDS[plyrCmd], false)
     state()
     popup()
 
@@ -319,13 +327,13 @@ end
 
 
 function init(args)
-    -- {{{1 init() 
+    -- {{{1 init()
 
     -- assign configuration params
     args = args or {}
     for k, v in pairs(args) do
         if k == "iconpath" then
-            config.iconpath = args.iconpath 
+            config.iconpath = args.iconpath
         elseif config[k] ~= nil then
             config[k] = v
         end

@@ -29,7 +29,8 @@ function add(inc_offset)
   local cal = awful.util.pread("cal -m " .. datespec)
   cal = string.gsub(cal, "^%s*(.-)%s*$", "%1")
   calendar = naughty.notify({
-    text = markup.heading(markup.font("monospace", os.date("%a, %d %B %Y") .. "\n" .. cal)),
+    text = markup.heading(markup.font("monospace",
+                                    os.date("%a, %d %B %Y") .. "\n" .. cal)),
     timeout = 0, hover_timeout = 0.5,
     width = beautiful.calendar_w or 160,
     bg = beautiful.calendar_bg or beautiful.fg_focus or #000000,
@@ -37,4 +38,4 @@ function add(inc_offset)
     screen = mouse.screen})
 end
 
--- vim:set filetype=lua fdm=marker tabstop=4 shiftwidth=4 expandtab smarttab autoindent smartindent: --
+-- vim:set ft=lua fdm=marker ts=4 sw=4 et ai si: --

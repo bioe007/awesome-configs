@@ -16,7 +16,7 @@ local function werror(...)
     args = { n = select('#', ...), ... }
 
     err:write(table.concat(args, ' '))
-    
+
     return autil.escape(table.concat(args, ' '))
 end
 
