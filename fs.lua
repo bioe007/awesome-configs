@@ -13,13 +13,13 @@ local fs = {}
 fs.config = {}
 fs.config.parts = {}
 
--- {{{ add 
+-- {{{ add
 -- @param args - table partitions and labels
 local function add(part)
 
   if not part then return false end
 
-  for k,v in pairs(part) do
+  for k, v in pairs(part) do
     fs.config.parts[k] = v
   end
 
@@ -34,10 +34,14 @@ local function stats()
   for line in fd:lines() do
     key = line:match("^/%w+/%w+")
     if key then
-      key = string.gsub(key,"^/%w+/","")
+      key = string.gsub(key, "^/%w+/", "")
       if fs.config.parts[key] then
-        fs.config.parts[key].use = string.format('%3d',string.gsub(line:match("%d+%%.*$"),"%%%s.*$",""))
-        tmp = tmp..markup.fg(beautiful.fg_normal,fs.config.parts[key].label..":")..markup.fg(beautiful.fg_sb_hi,fs.config.parts[key].use).." "
+        fs.config.parts[key].use = string.format('%3d',
+                                      string.gsub(line:match("%d+%%.*$"),
+                                                  "%%%s.*$", ""))
+        tmp = tmp .. markup.fg(beautiful.fg_normal,
+                              fs.config.parts[key].label..":") ..
+              markup.fg(beautiful.fg_sb_hi, fs.config.parts[key].use).." "
       end
     end
   end
@@ -59,11 +63,11 @@ function init(args)
   fs.widget = widget({ type = "textbox", align = "right" })
   stats()
   fstimer = timer { timeout = fs.config.interval }
-  fstimer:add_signal("timeout",stats)
+  fstimer:add_signal("timeout", stats)
   fstimer:start()
   return fs.widget
 
 end
--- }}} 
+-- }}}
 
--- vim: foldmethod=marker:filetype=lua:expandtab:shiftwidth=2:tabstop=4:softtabstop=4:encoding=utf-8:textwidth=80
+-- vim:set ft=lua fdm=marker ts=4 sw=4 et ai si: --
