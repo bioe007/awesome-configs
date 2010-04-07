@@ -1,4 +1,4 @@
--- nice battery widget for awesome. 
+-- nice battery widget for awesome.
 --
 -- hal checking stolen from Kooky's battery widget
 --
@@ -9,6 +9,7 @@ local select    = select
 local type    = type
 local tonumber  = tonumber
 local pairs     = pairs
+local ipairs     = ipairs
 local beautiful = require("beautiful")
 local naughty   = require("naughty")
 local markup    = require("markup")
@@ -16,25 +17,41 @@ local timer     = timer
 local widget = widget
 
 module("battery")
-local battwarn 
+local battwarn
 local bwidget = {}
 local device
 
 config = {
+    -- {{{
     bwidget = nil,
     width = 48,
     width_small = 10,
     width_warning = 200,
-    timeout = 50
+    timeout = 50,
+    colors = {
+        warn = "#ff0000",
+        crit = "#f8700a",
+        low  = "#e6f21d",
+        mid  = "#00cb00",
+        norm = "#cfcfff"
+    },
+    limits = {
+        warn = 10,
+        crit = 25,
+        low  = 50,
+        mid  = 75,
+        norm = 100,
+    },
 }
+-- }}}
 
 --{{{ popup when battery level gets low
 local function showWarning(s)
 
-    naughty.notify({ 
+    naughty.notify({
         text = markup.font("DejaVu Sans 8",
             markup.bold(
-                markup.fg(beautiful.fg_batt_oshi or "#ff2233", 
+                markup.fg(beautiful.fg_batt_oshi or "#ff2233",
                                 "Warning, low battery! ".. s ))),
         timeout = 0,
         hover_timeout = 0.5,
@@ -88,27 +105,18 @@ local function info()
     -- calculate remaining %
     local battery = tonumber(charge())
 
-    -- colorize based on remaining battery charge
-    if battery < 10 then
-        battery = markup.fg(beautiful.fg_batt_oshi or "#ff0000", battery)
-
-        -- check that we arent continuosly issue the battery warning
-        if battwarn == false then
-            showWarning(battery)
-            battwarn = true
+    for k, v in pairs(config.limits) do
+        --{{{2 colorize and warn based on charge percent
+        if battery < v then
+            battery = markup.fg(config.colors[k], battery)
+            if k == 'warn' then
+                showWarning(battery)
+                battWarn = true
+            end
+            break
         end
-    elseif battery < 25 then
-        battwarn = false
-        battery = markup.fg( beautiful.fg_batt_crit or "#f8700a", battery)
-    elseif battery < 50 then
-        battwarn = false
-        battery = markup.fg( beautiful.fg_batt_low or "#e6f21d", battery)
-    elseif battery < 75 then
-        battwarn = false
-        battery = markup.fg( beautiful.fg_batt_mid or "#00cb00", battery)
-    else
-        battery = markup.fg( beautiful.fg_sb_hi or "#cfcfff", battery)
     end
+    --2}}}
 
     -- decide which and where to put the charging state indicator
     local adapter = state()
@@ -156,8 +164,8 @@ function init(...)
     end
 
     info()
-    return bwidget 
+    return bwidget
 end
 --}}}
 
--- vim: filetype=lua fdm=marker tabstop=4 shiftwidth=4 expandtab smarttab autoindent smartindent:
+-- vim:set ft=lua fdm=marker ts=4 sw=4 et ai si: --
