@@ -120,19 +120,25 @@ function workspace_prev()
     end
 end
 
-function tagSearch(name)
+function tag_search(name, merge)
     -- {{{
-  for s = 1, screen.count() do
-    t = shifty.name2tag(name,s)
-    if t ~= nil then
-        if t.screen ~= mouse.screen then
-            awful.screen.focus(t.screen)
+    local merge = merge or false
+
+    for s = 1, screen.count() do
+        t = shifty.name2tag(name,s)
+        if t ~= nil then
+            if t.screen ~= mouse.screen then
+                awful.screen.focus(t.screen)
+            end
+            if merge then
+                t.selected = not t.selected
+            else
+                awful.tag.viewonly(t)
+            end
+            return true
         end
-      awful.tag.viewonly(t)
-      return true
     end
-  end
-  return false
+    return false
 end
 --}}}
 
