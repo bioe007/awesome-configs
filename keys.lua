@@ -39,7 +39,6 @@ function key_gen(args, ...)
 end
 --}}}
 
-
 function key_app(args, ...)
     --{{{ applications that are started by util.spawn...
     -- i add "Mod1" to application starting
@@ -52,7 +51,6 @@ function key_app(args, ...)
 
 end
 -- }}}
-
 
 globalkeys = awful.util.table.join(
     --{{{ global keys
@@ -97,33 +95,6 @@ globalkeys = awful.util.table.join(
     key_app({key="c"}, "galculator"),
     key_app({modifiers = {"Shift"}, key = "g"}, "gimp"),
     key_app({key = "v"}, "/home/perry/.bin/vim-start.sh"),
-
-    -- run or raise type behavior but with benefits of shifty
-    key_gen({key = "w"}, function()
-        if not tagSearch("web") then
-            awful.util.spawn(settings.apps.browser)
-        end
-    end),
-    key_gen({key = "m"}, function()
-        if not tagSearch("mail") then
-            awful.util.spawn(settings.apps.mail)
-        end
-    end),
-    key_gen({modifiers = {"Mod1", "Shift"}, key = "v"}, function()
-        if not tagSearch("vbx") then
-            awful.util.spawn('VBoxSDL -vm xp2')
-        end
-    end),
-    key_gen({key = "g"}, function()
-        if not tagSearch("dz") then
-            awful.util.spawn('gschem')
-        end
-    end),
-    key_gen({key = "p"}, function()
-        if not tagSearch("dz") then
-            awful.util.spawn('pcb')
-        end
-    end),
     --}}}
 
     -- {{{- MEDIA
@@ -181,6 +152,47 @@ globalkeys = awful.util.table.join(
     key_app({key = "F5"}, '/home/perry/.bin/stupid.sh --sync --pos left-of'),
     key_app({key = "F6"}, '/home/perry/.bin/stupid.sh --off')
 )
+--}}}
+
+tag_searches = {
+    --{{{table of tag/key pairs to appy to tag_search() function
+    dz = {key = "g", spawn = 'gschem'},
+    web = {key = "w" , spawn = settings.apps.browser},
+    mail = {key = "m", spawn = settings.apps.mail},
+    vbx = {key = "v",
+            modifiers = {"Mod1", "Shift"},
+            spawn = 'VBoxSDL -vm xp2'},
+}
+
+for tag, search_table in pairs(tag_searches) do
+    --{{{bind searches to tag_search functionality
+    -- for view exclusive
+    globalkeys = awful.util.table.join(globalkeys,
+                    key_gen(search_table, function()
+                        if not tag_search(tag, false) then
+                            awful.util.spawn(search_table.spawn, false)
+                        end
+                    end))
+
+    -- for view merged
+    if search_table.modifiers then
+        mod_table = search_table.modifiers
+        table.insert(mod_table, "Control")
+    else
+        mod_table = {"Control"}
+    end
+    k_table = { key = search_table.key, modifiers = mod_table}
+    for k,v in pairs(k_table) do
+        print('k_table', k, v)
+    end
+
+    globalkeys = awful.util.table.join(globalkeys,
+                    key_gen(k_table, function()
+                        if not tag_search(tag, true) then
+                            awful.util.spawn(search_table.spawn, false)
+                        end
+                    end))
+end
 --}}}
 
 for i = 1, 9 do
