@@ -266,22 +266,24 @@ end
 -- {{{-- TASKLIST
 widgets.tasklist = {}
 widgets.tasklist.buttons = awful.util.table.join(
-  awful.button({}, 1, focus_min_or_restore),
+    awful.button({}, 1, focus_min_or_restore),
 
-  awful.button({}, 3, function (c)
+    awful.button({}, 2, function(c) c:kill() end),
+
+    awful.button({}, 3, function(c)
         if instance then instance:hide(); instance = nil
         else instance = menu_clients({width = 125}, c) end
-  end),
+    end),
 
-  awful.button({}, 4, function ()
-    awful.client.focus.byidx(1)
-    if client.focus then client.focus:raise() end
-  end),
+    awful.button({}, 4, function()
+        awful.client.focus.byidx(1)
+        if client.focus then client.focus:raise() end
+    end),
 
-  awful.button({}, 5, function ()
-    awful.client.focus.byidx(-1)
-    if client.focus then client.focus:raise() end
-  end))
+    awful.button({}, 5, function()
+        awful.client.focus.byidx(-1)
+        if client.focus then client.focus:raise() end
+    end))
 
 --}}}
 
