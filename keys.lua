@@ -163,6 +163,7 @@ tag_searches = {
             modifiers = {"Mod1", "Shift"},
             spawn = 'VBoxSDL -vm xp2'},
 }
+--}}}
 
 for tag, search_table in pairs(tag_searches) do
     --{{{bind searches to tag_search functionality
