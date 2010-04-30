@@ -52,7 +52,7 @@ shifty.config.tags = {
                 mwfact = settings.mwfact80,
                 spawn = settings.apps.editor},
 
-  ds     =  {layout = awful.layout.suit.max, mwfact = 0.70,
+  ds     =  {layout = awful.layout.suit.max, mwfact = 0.70, screen = 2,
                 exclusive = false, position = 2, init = false,
                 persist = false, nopopup = false, slave = false},
 
@@ -73,10 +73,10 @@ shifty.config.tags = {
                 spawn = 'VBoxSDL -vm xp2'},
 
   media  =  {layout = awful.layout.suit.floating, exclusive = false,
-                position = 8},
+                screen = 2, position = 8},
 
   gimp  =  {layout = awful.layout.suit.tile, exclusive = false,
-                position = 8, ncol = 3, mwfact = 0.75,
+                position = 9, ncol = 3, mwfact = 0.75,
                 nmaster=1,
                 spawn = 'gimp-2.6', slave = true},
 
@@ -86,8 +86,8 @@ shifty.config.tags = {
 
 shifty.config.apps = {
 --{{{
-  {match   = {"vim", "gvim"},
-    tag     = "vim"},
+  {match   = {"vim"},
+    tag     = "vim", honorsizehints = false, master = true},
 
   {match   = {"Navigator", "Vimperator", "Gran Paradiso"},
     tag     = "web"},
@@ -121,16 +121,19 @@ shifty.config.apps = {
 
   {match   = {"gimp%-dock", "gimp%-toolbox"},
     tag     = "gimp",
-    slave   = true, dockable = true, honorsizehints=false},
+    slave   = true, dockable = true, honorsizehints = false},
 
   {match   = {"dialog", "Gnuplot", "galculator",
-                "R Graphics", "Figure", "Skype"},
+                "R Graphics", "Figure" },
     float   = true, honorsizehints = true, opacity = 1.0},
 
-  {match   = {"MPlayer"},
-    float   = true, honorsizehints = true, ontop=true, intrusive=true},
+    {match = {"Skype"},
+    sticky = true, tag = "media", honorsizehints = truei, float = true},
 
-  {match   = {"urxvt", "vim", "mutt"},
+  {match = {"MPlayer"},
+    float = true, honorsizehints = true, ontop = true, intrusive = true},
+
+  {match   = {"urxvt", "mutt"},
     honorsizehints = false,
     slave   = true},
 
