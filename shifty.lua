@@ -105,10 +105,19 @@ function rename(tag, prefix, no_selectall)
         fg = theme.fg_urgent or '#ffffff'
     end
 
+    twdgt = taglist[scr][tag2index(scr, t)]
+    print("on screen: ", scr)
+    print("Have to rename in.", taglist[scr], twdgt)
+    print("have this many tagwidets", #taglist[scr])
+
+    for k, v in pairs(taglist[scr]) do
+        print (k, v)
+    end
+
     awful.prompt.run({
         fg_cursor = fg, bg_cursor = bg, ul_cursor = "single",
         text = text, selectall = not no_selectall},
-        taglist[scr][tag2index(scr, t)][2],
+        taglist[scr][tag2index(scr, t) + 1],
         function (name) if name:len() > 0 then t.name = name; end end,
         completion,
         awful.util.getdir("cache") .. "/history_tags",
