@@ -57,7 +57,7 @@ function init(args) --- cardid, channel, colors, layout)
 
     -- initialize widget then set its properties
     config.widget = awful.widget.progressbar({
-        layout   = args.layout or awful.widget.layout.horizontal.leftright,
+        layout   = args.layout or awful.widget.layout.horizontal.rightleft,
         width    = args.width  or 13,
         height   = args.height or 18,
         vertical = true
@@ -74,7 +74,7 @@ function init(args) --- cardid, channel, colors, layout)
         args.gradient_stop  or beautiful.fg_focus
     })
 
-            -- FIXME : these are broken
+    -- FIXME : these are broken
     config.widget.buttons = awful.util.table.join(
                 awful.button({ }, 1, function () volume.vol("up","5") end),
                 awful.button({ }, 4, function () volume.vol("up","1") end),
@@ -96,6 +96,3 @@ function init(args) --- cardid, channel, colors, layout)
     return config.widget
 end
 --}}}
-
-
--- vim: filetype=lua fdm=marker tabstop=4 shiftwidth=4 expandtab smarttab autoindent smartindent:
