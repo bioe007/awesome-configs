@@ -2,11 +2,11 @@
 --
 --  *check that path, wp command and font is appropriate
 --
--- by: bioe007 perrydothargraveatgmaildotcom
+-- by: resixianatgmail.com
 -- ]]--
 
 theme          = {}
-theme.font     = "HeldustryFTVBasic Black 8"
+theme.font     = "Terminus 10"
 
 theme.path     = os.getenv("HOME").."/.config/awesome/themes/dk_grey"
 theme.iconpath = theme.path
@@ -16,7 +16,6 @@ theme.wallpaper_cmd = { [1] = "nitrogen --restore" }
 theme.fg_normal          = "#abbfab"
 theme.bg_normal          = "#555555"
 theme.fg_focus           = "#bdedbe"
--- theme.fg_focus           = "#9dcd9e"
 theme.bg_focus           = "#3f3034"
 theme.bg_urgent          = "#288ef6"
 theme.fg_urgent          = "#ffaaaa"
@@ -71,7 +70,3 @@ theme.layout_tiletop    = theme.path.."/layouts/tiletop.png"
 
 
 return theme
-
-
-
--- vim:set filetype=lua textwidth=80 fdm=marker tabstop=4 shiftwidth=4 expandtab smarttab autoindent smartindent: --
