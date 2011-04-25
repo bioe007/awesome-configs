@@ -131,11 +131,11 @@ globalkeys = awful.util.table.join(
     --}}}
 
     awful.key({settings.modkey}, "F4",
-        function() awful.util.spawn('/home/perry/.bin/stupid.sh --soyo') end),
+        function() awful.util.spawn('/home/perry/.bin/stupid --soyo') end),
     awful.key({settings.modkey}, "F5",
-        function() awful.util.spawn('/home/perry/.bin/stupid.sh --sync') end),
+        function() awful.util.spawn('/home/perry/.bin/stupid --sync') end),
     awful.key({settings.modkey}, "F6",
-        function() awful.util.spawn('/home/perry/.bin/stupid.sh --off') end)
+        function() awful.util.spawn('/home/perry/.bin/stupid --off') end)
     )
     --}}}
 
