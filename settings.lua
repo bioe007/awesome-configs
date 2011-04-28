@@ -89,7 +89,7 @@ shifty.config.apps = {
     {match = {"gimp%-dock", "gimp%-toolbox"},
      tag = "gimp", slave = true, dockable = true, honorsizehints = true},
     {match = {"dialog", "Gnuplot", "galculator", "sonata",
-              "R Graphics", "Figure"},
+              "R Graphics", "Figure", "Thunar"},
      float = true, honorsizehints = true, opacity = 1.0},
     {match = {"MPlayer"}, float = true, honorsizehints = true, ontop = true},
     {match = {"urxvt", "mutt"}, honorsizehints = false, slave = true},
