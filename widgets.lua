@@ -65,16 +65,24 @@ vicious.register(widgets.date,
                  59)
 
 widgets.cpu = widget({type = "textbox", align = 'right'})
-widgets.cpu.width = 63
+widgets.cpu.width = 60
 vicious.register(widgets.cpu,
                  vicious.widgets.cpu,
-                 'cpu:' .. markup.fg(beautiful.fg_sb_hi, '$2'))
+                 function (w, args)
+                     return 'cpu:' ..
+                            markup.fg(beautiful.fg_sb_hi,
+                                      string.format("%3.0d", args[2]))
+                     end)
 
 widgets.memory = widget({type = "textbox", align = 'right'})
-widgets.memory.width = 55
+widgets.memory.width = 60
 vicious.register(widgets.memory,
                  vicious.widgets.mem,
-                 'mem:' ..  markup.fg(beautiful.fg_sb_hi, '$1'))
+                 function (w, args)
+                     return 'mem:' ..
+                            markup.fg(beautiful.fg_sb_hi,
+                                      string.format("%3.0d", args[1]))
+                     end)
 
 widgets.diskspace = fs.init({interval = 59,
                              parts = {
@@ -185,14 +193,11 @@ end
 
 function focus_min_or_restore(c)
     if c == client.focus then
-        c.minimized = not c.minimized
-        if c:isvisible() then
-            client.focus = c
-            c:raise()
-        else
-            awful.client.focus.history.previous()
-        end
+        c.minimized = true
     else
+        if not c:isvisible() then
+            awful.tag.viewonly(c:tags()[1])
+        end
         client.focus = c
         c:raise()
     end
