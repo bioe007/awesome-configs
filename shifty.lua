@@ -1,6 +1,6 @@
 --- Shifty: Dynamic tagging library for awesome3-git
 -- @author koniu &lt;gkusnierz@gmail.com&gt;
--- @author bioe007 &lt;perry.hargrave@gmail.com&gt;
+-- @author resixian (aka bioe007) &lt;resixian@gmail.com&gt;
 --
 -- http://awesome.naquadah.org/wiki/index.php?title=Shifty
 
