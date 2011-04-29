@@ -109,20 +109,10 @@ shifty.config.defaults = {
     layout = awful.layout.suit.tile.bottom,
     ncol = 1,
     nmaster = 1,
-    floatBars = true,
-    run = function(tag)
-        number = awful.tag.getproperty(tag, "position") or
-                                        shifty.tag2index(tag.screen, tag)
-            naughty.notify({
-                text = markup.fg(beautiful.fg_normal,
-                        markup.fg(beautiful.fg_sb_hi,
-                        "Shifty Created: " .. number .. " : " ..
-                        (tag.name or "foo")))
-                })
-            end
     }
 
 shifty.config.sloppy = false
+shifty.config.float_bars = true
 
 shifty.modkey = settings.modkey
 
