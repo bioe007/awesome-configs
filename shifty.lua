@@ -33,6 +33,7 @@ config = {}
 config.tags = {}
 config.apps = {}
 config.defaults = {}
+config.float_bars = false
 config.guess_name = true
 config.guess_position = true
 config.remember_index = true
@@ -566,8 +567,7 @@ function match(c, startup)
     if float ~= nil then
         -- {{{
         awful.client.floating.set(c, float)
-        -- if config.float_bars then
-        -- awful.titlebar.add(c, modkey)
+        if config.float_bars then awful.titlebar.add(c, {modkey=modkey}) end
         awful.placement.centered(c, c.transient_for)
         awful.placement.no_offscreen(c)
     end
