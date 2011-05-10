@@ -6,6 +6,7 @@ beautiful.init(settings.theme_path.."/theme.lua")
 settings = {
     modkey = "Mod4",
     theme_path = os.getenv("HOME").."/.config/awesome/themes/dk_grey",
+    mwfact80 = ((screen.count() - 1) > 0 and 0.4) or 0.52,
     icon_path = beautiful.iconpath,
 
     apps = {
@@ -42,7 +43,7 @@ settings = {
 
 -- shifty configured tags
 shifty.config.tags = {
-    vim = {layout = awful.layout.suit.tile, mwfact = 0.52,
+    vim = {layout = awful.layout.suit.tile, mwfact = settings.mwfact80,
            exclusive = not (screen.count() > 1), solitary = false, position = 1,
            init = true, screen = 1, slave = true, spawn = settings.apps.editor},
 
