@@ -43,8 +43,8 @@ settings = {
 -- shifty configured tags
 shifty.config.tags = {
     vim = {layout = awful.layout.suit.tile, mwfact = 0.52,
-           exclusive = false, solitary = false, position = 1, init = true,
-           screen = 1, slave = true, spawn = settings.apps.editor},
+           exclusive = not (screen.count() > 1), solitary = false, position = 1,
+           init = true, screen = 1, slave = true, spawn = settings.apps.editor},
 
     ds = {layout = awful.layout.suit.max, mwfact = 0.70,
           exclusive = false, solitary = false, position = 2, init = false,
