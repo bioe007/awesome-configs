@@ -31,7 +31,7 @@ globalkeys = awful.util.table.join(
         function() awful.screen.focus_relative(1) end),
     -- switch client to other screen
     awful.key({settings.modkey, "Shift"}, "s", awful.client.movetoscreen),
-    awful.key({settings.modkey,}, "u", awful.client.urgent.jumpto),
+    awful.key({settings.modkey,}, "u", awful.client.urgent.jumpto(true)),
     awful.key({settings.modkey,}, "Tab", function()
             awful.client.focus.history.previous()
             if client.focus then client.focus:raise() end
