@@ -18,6 +18,16 @@ require("vicious")
 require("revelation")
 print("Modules loaded: " .. os.time())
 
+-- All floating clients get titlebars
+function float_toggle(c, args)
+    awful.client.floating.toggle(c)
+    if awful.client.floating.get(c) then
+        awful.titlebar.add(c, {modkey=settings.modkey})
+    else
+        awful.titlebar.remove(c)
+    end
+end
+
 function tag_move(t, scr)
     local ts = t or awful.tag.selected()
     local screen_target = scr or awful.util.cycle(screen.count(), ts.screen + 1)
@@ -133,15 +143,7 @@ clientkeys = awful.util.table.join(
     awful.key({settings.modkey, "Shift"}, "c", function(c) c:kill() end),
     awful.key({settings.modkey, "Shift"}, "0",
         function(c) c.sticky = not c.sticky end),
-    awful.key({settings.modkey, "Mod1"}, "space", function(c)
-            awful.client.floating.toggle(c)
-            if awful.client.floating.get(c) then
-                awful.titlebar.add(c, {modkey=settings.modkey})
-            else
-                awful.titlebar.remove(c)
-            end
-        end
-        ),
+    awful.key({settings.modkey, "Mod1"}, "space", float_toggle),
     awful.key({settings.modkey, "Control"}, "Return",
         function(c) c:swap(awful.client.getmaster()) end),
     awful.key({settings.modkey,}, "o", awful.client.movetoscreen),
