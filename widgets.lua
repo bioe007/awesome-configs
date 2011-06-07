@@ -71,7 +71,7 @@ vicious.register(widgets.cpu,
                  function (w, args)
                      return 'cpu:' ..
                             markup.fg(beautiful.fg_sb_hi,
-                                      string.format("%3.0d", args[2]))
+                                      string.format("%2.0d", args[2]))
                      end)
 
 widgets.memory = widget({type = "textbox", align = 'right'})
@@ -112,6 +112,28 @@ mpdtimer = timer{timeout = 0.75}
 mpdtimer:add_signal("timeout", mpd_scroller)
 mpdtimer:start()
 
+widgets.net = widget({type = "textbox", align = 'right'})
+vicious.register(widgets.net,
+                 vicious.widgets.net,
+                 function(w, a)
+                     local net_in = a['{eth0 down_kb}'] + a['{wlan0 down_kb}']
+                     local net_out = a['{eth0 up_kb}'] + a['{wlan0 up_kb}']
+                     net_in = string.format("%2.0f", net_in)
+                     net_out = string.format("%2.0f", net_out)
+                     return 'net:' .. markup.fg(beautiful.fg_sb_hi, net_in) ..
+                            '/' .. markup.fg(beautiful.fg_sb_hi, net_out)
+                 end,
+                 1)
+
+mpd_scroller, mpd_update = scroller_create(widgets.mpd,
+                                           settings.mpd.format,
+                                           settings.mpd.pattern,
+                                           settings.mpd.length)
+vicious.register(widgets.mpd,
+                 vicious.widgets.mpd,
+                 mpd_update,
+                 17,
+                 passwords.mpd)
 widgets.volume = volume.init()
 
 function tag_restore_defaults(t)
@@ -303,6 +325,7 @@ widget_table1 = {
     widgets.cpu, widgets.rspace,
     widgets.memory, widgets.rspace,
     widgets.battery, widgets.rspace,
+    widgets.net, widgets.rspace,
     widgets.diskspace, widgets.rspace,
     layout = awful.widget.layout.horizontal.rightleft}
 
