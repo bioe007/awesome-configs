@@ -284,8 +284,12 @@ function menu_clients(menu, c)
         {(c.sticky and "Un-Stick") or "Stick", function()
             c.sticky = not c.sticky
         end},
+        {(c.ontop and "Offtop") or "Ontop", function()
+            c.ontop = not c.ontop
+            if c.ontop then c:raise() end
+        end},
         {((awful.client.floating.get(c) and "Tile") or "Float"), function()
-            awful.client.floating.toggle(c)
+            float_toggle(c)
         end},
         {"Move to tag >>", tgs_m},
         {"Clients     >>", cls_t}
