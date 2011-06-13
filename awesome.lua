@@ -4,10 +4,9 @@
 --
 print("Entered rc.lua: " .. os.time())
 require("awful")
-require("awful.autofocus")
-require("awful.rules")
 require("beautiful")
 require("naughty")
+
 -- custom modules
 require("markup")
 require("shifty")
