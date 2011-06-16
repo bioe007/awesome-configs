@@ -8,13 +8,15 @@ require("beautiful")
 require("naughty")
 
 -- custom modules
-require("markup")
-require("shifty")
 require("calendar")
 require("fs")
+require("markup")
+require("notifications")
+require("revelation")
+require("shifty")
 require("volume")
 require("vicious")
-require("revelation")
+
 print("Modules loaded: " .. os.time())
 
 -- All floating clients get titlebars

@@ -70,7 +70,6 @@ globalkeys = awful.util.table.join(
     --}}}
 
     -- {{{ Media
-    -- music player
     awful.key({settings.modkey, "Mod1"}, "p", function() player("pp") end),
     awful.key({}, "XF86AudioPlay", function() player("pp") end),
     awful.key({settings.modkey}, "Down", function() player("next") end ),
@@ -78,15 +77,9 @@ globalkeys = awful.util.table.join(
     awful.key({settings.modkey}, "Up", function() player("prev") end),
     awful.key({}, "XF86AudioPrev", function() player("prev") end),
     awful.key({}, "XF86AudioStop", function() player("stop") end),
-
-    awful.key({}, "XF86AudioRaiseVolume", function() volume.vol("up", "5") end),
-    awful.key({}, "XF86AudioLowerVolume",
-        function() volume.vol("down", "5") end),
-    awful.key({settings.modkey}, "XF86AudioRaiseVolume",
-        function() volume.vol("up", "2")end),
-    awful.key({settings.modkey}, "XF86AudioLowerVolume",
-        function() volume.vol("down", "2")end),
-    awful.key({}, "XF86AudioMute", function() volume.vol() end),
+    awful.key({}, "XF86AudioRaiseVolume", volume_up),
+    awful.key({}, "XF86AudioLowerVolume", volume_down),
+    awful.key({}, "XF86AudioMute", function() volume_mute() end),
     --}}}
 
     -- {{{WM
