@@ -225,13 +225,25 @@ function focus_min_or_restore(c)
     end
 end
 
+-- Accepts a client, returns a nice stringification of its class property.
+local function ctitle(c)
+    if not c then return "E: no client passed" end
+
+    title = awful.util.escape(c.class)
+
+    title = title:match('^([%w%s_-]+)')
+    title = title:gsub('[%s+_-]', ' ')
+    title = title:gsub('%s%l', string.upper)
+
+    return title
+end
+
 function menu_clients(menu, c)
     -- list of other clients
     local cls = client.get()
     local cls_t = {}
     for k, clnt in pairs(cls) do
-        cls_t[#cls_t + 1] = {
-            awful.util.escape(clnt.name) or "",
+        cls_t[#cls_t + 1] = {ctitle(clnt),
             function()
                 if not clnt:isvisible() then
                     awful.tag.viewmore(clnt:tags(), clnt.screen)
@@ -265,34 +277,34 @@ function menu_clients(menu, c)
 
         end})
 
-        tgs_m[s] = {skey, tgs_t}
+        tgs_m[s] = {skey .. "  ►", tgs_t}
     end
 
     if not menu then
         menu = {}
     end
 
-
     menu.items = {
-        {"Close", function() c:kill() end},
-        {(client_is_maximized(c) and "Un-Maximize") or "Maximize", function()
-            toggle_maximized(c)
-        end},
-        {(c.minimized and "Restore") or "Minimize", function()
+        {"⬛⬛⬛ " .. ctitle(c) .. " ⬛⬛⬛", function() end},
+        {"✖ Close", function() c:kill() end},
+        {(client_is_maximized(c) and "ⴿ  Restore") or "ⴽ  Maximize",
+         function()
+             toggle_maximized(c)
+         end},
+        {(c.minimized and "⇱  Restore") or "⇲  Minimize", function()
             c.minimized = not c.minimized
         end},
-        {(c.sticky and "Un-Stick") or "Stick", function()
+        {(c.sticky and "⚫  Un-Stick") or "⚪  Stick", function()
             c.sticky = not c.sticky
         end},
-        {(c.ontop and "Offtop") or "Ontop", function()
+        {(c.ontop and "⤼  Offtop") or "⤽  Ontop", function()
             c.ontop = not c.ontop
             if c.ontop then c:raise() end
         end},
-        {((awful.client.floating.get(c) and "Tile") or "Float"), function()
-            float_toggle(c)
-        end},
-        {"Move to tag >>", tgs_m},
-        {"Clients     >>", cls_t}
+        {((awful.client.floating.get(c) and "▦  Tile") or "☁  Float"),
+         function() float_toggle(c) end},
+        {"Move to tag  ►", tgs_m},
+        {"Clients      ►", cls_t}
     }
     local m = awful.menu.new(menu)
     m:show()
