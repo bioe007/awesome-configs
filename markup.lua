@@ -35,15 +35,13 @@ function font(font, text)
 end
 
 function title_focus(t)
-    return bg(beautiful.bg_focus, fg(beautiful.fg_focus, title(t)))
+    return bg(beautiful.bg_focus, fg(beautiful.fg_focus, bold(t)))
 end
 
 function title_urgent(t)
-    return bg(beautiful.bg_urgent, fg(beautiful.fg_urgent, title(t)))
+    return bg(beautiful.bg_urgent, fg(beautiful.fg_urgent, bold(t)))
 end
 
 function heading(text)
     return fg(beautiful.fg_focus, bold(text))
 end
-
--- vim:set filetype=lua fdm=marker tabstop=4 shiftwidth=4 expandtab smarttab autoindent smartindent: --
