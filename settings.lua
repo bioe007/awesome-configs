@@ -12,7 +12,7 @@ settings = {
     apps = {
         terminal = "urxvt",
         browser  = "firefox",
-        mail     = "/home/perry/.bin/mutt-start.sh",
+        mail     = "",
         filemgr  = "thunar",
         editor   = "gvim"
         },
@@ -79,7 +79,7 @@ shifty.config.tags = {
 shifty.config.apps = {
     {match = {"vim", "gvim"}, tag = "vim", honorsizehints = true,},
     {match = {"Navigator", "Vimperator", "Gran Paradiso"}, tag = "web"},
-    {match = {"mutt"}, tag = "mail"},
+    {match = {"Google%-chrome"}, tag = "mail"},
     {match = {"pcb", "gschem", "eagle"}, tag = "dz", slave = false},
     {match = {"PCB_Log", "Status", "Page Manager"}, tag = "dz", slave = true},
     {match = {"acroread", "Apvlv", "Evince"}, tag = "ds"},
@@ -89,11 +89,10 @@ shifty.config.apps = {
     {match = {"gimp%-image%-window", "Ufraw"}, tag = "gimp"},
     {match = {"gimp%-dock", "gimp%-toolbox"},
      tag = "gimp", slave = true, dockable = true, honorsizehints = true},
-    {match = {"dialog", "Gnuplot", "galculator", "sonata",
-              "R Graphics", "Figure", "Thunar"},
+    {match = {"dialog", "Gnuplot", "galculator", "sonata", "Wicd%-client.py",
+              "R Graphics", "Figure", "Thunar", "Pcmanfm", "MPlayer"},
      float = true, honorsizehints = true, opacity = 1.0},
-    {match = {"MPlayer"}, float = true, honorsizehints = true, ontop = true},
-    {match = {"urxvt", "mutt"}, honorsizehints = false, slave = true},
+    {match = {"urxvt"}, honorsizehints = false, slave = true},
     {match = {""},
         buttons = awful.util.table.join(
             awful.button({}, 1, function (c) client.focus = c; c:raise() end),
