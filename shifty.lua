@@ -563,11 +563,23 @@ function match(c, startup)
     -- set key bindings
     c:keys(keys)
 
+    -- Add titlebars to all clients when the float, remove when they are
+    -- tiled.
+    if config.float_bars then
+        c:add_signal("property::floating", function(c)
+            if awful.client.floating.get(c) then
+                awful.titlebar.add(c, {modkey=modkey})
+            else
+                awful.titlebar.remove(c)
+            end
+            awful.placement.no_offscreen(c)
+        end)
+    end
+
     -- set properties of floating clients
     if float ~= nil then
         -- {{{
         awful.client.floating.set(c, float)
-        if config.float_bars then awful.titlebar.add(c, {modkey=modkey}) end
         awful.placement.centered(c, c.transient_for)
         awful.placement.no_offscreen(c)
     end
