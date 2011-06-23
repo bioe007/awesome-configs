@@ -4,6 +4,7 @@
 --
 print("Entered rc.lua: " .. os.time())
 require("awful")
+require("awful.autofocus")
 require("beautiful")
 require("naughty")
 
