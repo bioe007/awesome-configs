@@ -41,8 +41,31 @@ theme.calendar_bg        = theme.bg_normal
 theme.menu_height        = 15
 theme.menu_width         = 100
 
+-- titlebar
 theme.titlebar_bg_focus  = "#6d6d6d"
 theme.titlebar_bg_normal = "#ababab"
+theme.titlebar_close_button_focus  = theme.path .. "/titlebar/close_focus.png"
+theme.titlebar_close_button_normal = theme.path .. "/titlebar/close_normal.png"
+
+theme.titlebar_ontop_button_focus_active  = theme.path .. "/titlebar/ontop_focus_active.png"
+theme.titlebar_ontop_button_normal_active = theme.path .. "/titlebar/ontop_normal_active.png"
+theme.titlebar_ontop_button_focus_inactive  = theme.path .. "/titlebar/ontop_focus_inactive.png"
+theme.titlebar_ontop_button_normal_inactive = theme.path .. "/titlebar/ontop_normal_inactive.png"
+
+theme.titlebar_sticky_button_focus_active  = theme.path .. "/titlebar/sticky_focus_active.png"
+theme.titlebar_sticky_button_normal_active = theme.path .. "/titlebar/sticky_normal_active.png"
+theme.titlebar_sticky_button_focus_inactive  = theme.path .. "/titlebar/sticky_focus_inactive.png"
+theme.titlebar_sticky_button_normal_inactive = theme.path .. "/titlebar/sticky_normal_inactive.png"
+
+theme.titlebar_floating_button_focus_active  = theme.path .. "/titlebar/floating_focus_active.png"
+theme.titlebar_floating_button_normal_active = theme.path .. "/titlebar/floating_normal_active.png"
+theme.titlebar_floating_button_focus_inactive  = theme.path .. "/titlebar/floating_focus_inactive.png"
+theme.titlebar_floating_button_normal_inactive = theme.path .. "/titlebar/floating_normal_inactive.png"
+
+theme.titlebar_maximized_button_focus_active  = theme.path .. "/titlebar/maximized_focus_active.png"
+theme.titlebar_maximized_button_normal_active = theme.path .. "/titlebar/maximized_normal_active.png"
+theme.titlebar_maximized_button_focus_inactive  = theme.path .. "/titlebar/maximized_focus_inactive.png"
+theme.titlebar_maximized_button_normal_inactive = theme.path .. "/titlebar/maximized_normal_inactive.png"
 
 -- taglist squares
 theme.taglist_squares       = true
@@ -50,10 +73,6 @@ theme.taglist_squares_sel   = theme.path.."/taglist/squarefw.png"
 theme.taglist_squares_unsel = theme.path.."/taglist/squarew.png"
 
 theme.tasklist_floating_icon = theme.path.."/tasklist/float.gif"
-
-theme.titlebar_close_button        = true
-theme.titlebar_close_button_normal = theme.path.."/titlebar/close-inactive.png"
-theme.titlebar_close_button_focus  = theme.path.."/titlebar/close-active.png"
 
 -- You can use your own layout icons like this:
 theme.layout_dwindle    = theme.path.."/layouts/dwindle.png"
