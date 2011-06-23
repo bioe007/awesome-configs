@@ -302,7 +302,7 @@ function menu_clients(menu, c)
             if c.ontop then c:raise() end
         end},
         {((awful.client.floating.get(c) and "▦  Tile") or "☁  Float"),
-         function() float_toggle(c) end},
+         function() awful.client.floating.toggle(c) end},
         {"Move to tag  ►", tgs_m},
         {"Clients      ►", cls_t}
     }
