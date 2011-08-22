@@ -1,0 +1,2 @@
+Awesome window manager configuration
+====================================
