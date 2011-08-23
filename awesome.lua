@@ -4,6 +4,7 @@ require("awful.rules")
 require("beautiful")
 require("naughty")
 
+
 dir = {}
 dir.config = awful.util.getdir('config')
 dir.cache = awful.util.getdir('cache')
@@ -26,7 +27,7 @@ layouts = {
 
 tags = {}
 for s = 1, screen.count() do
-    tags[s] = awful.tag({1, 2, 3, 4, 5}, s, layouts[2])
+    tags[s] = awful.tag({1, 2, 3, 4, 5}, s, layouts[1])
 end
 
 -- Mouse bindings
@@ -168,17 +169,60 @@ clientbuttons = awful.util.table.join(
 root.keys(globalkeys)
 
 awful.rules.rules = {
-    -- All clients will match this rule.
-    {rule ={},
-      properties = {border_width = beautiful.border_width,
-                     border_color = beautiful.border_normal,
-                     focus = true,
-                     keys = clientkeys,
-                     buttons = clientbuttons}},
-    {rule = {class = "Nautilus"},
-      properties = {floating = true}},
-    {rule = {class = "MPlayer"},
-      properties = {floating = true}},
+    {
+        rule = {},
+        properties = {
+            border_width = beautiful.border_width,
+            border_color = beautiful.border_normal,
+            buttons = clientbuttons,
+            floating = true,
+            focus = true,
+            keys = clientkeys,
+            honor_size_hints = true,
+        }
+    },
+    {
+        rule = {
+            class = 'Google-chrome'
+        },
+        properties = {
+            floating = false,
+            tag = tags[screen.count()][3],
+        }
+    },
+    {
+        rule = {
+            class = 'Gvim'
+        },
+        properties = {
+            floating = false,
+        }
+    },
+    {
+        rule = {
+            class = 'Firefox'
+        },
+        properties = {
+            floating = false,
+            tag = tags[1][2],
+        }
+    },
+    {
+        rule = {
+            class = 'Sonata'
+        },
+        properties = {
+            sticky = true,
+        }
+    },
+    {
+        rule = {
+            class = 'URxvt'
+        },
+        properties = {
+            floating = false,
+        }
+    },
 }
 
 function titlebar_toggle(c)
@@ -204,7 +248,6 @@ client.add_signal("manage", function(c, startup)
     end
     titlebar_toggle(c)
     c:add_signal("property::floating", titlebar_toggle)
-
 end)
 
 client.add_signal("focus",
