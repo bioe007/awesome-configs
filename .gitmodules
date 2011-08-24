@@ -1,0 +1,6 @@
+[submodule "shifty"]
+	path = shifty
+	url = git@github.com:bioe007/awesome-shifty.git
+[submodule "revelation"]
+	path = revelation
+	url = git@github.com:bioe007/awesome-revelation.git
