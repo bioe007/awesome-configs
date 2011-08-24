@@ -4,6 +4,9 @@ require("awful.rules")
 require("beautiful")
 require("naughty")
 
+-- custom modules
+require("revelation")
+
 
 dir = {}
 dir.config = awful.util.getdir('config')
@@ -93,8 +96,7 @@ globalkeys = awful.util.table.join(
     awful.key({modkey, "Control"}, "n", awful.client.restore),
 
     -- Prompt
-    awful.key({modkey}, "r", function() mypromptbox[mouse.screen]:run() end),
-
+    awful.key({modkey}, "e", revelation),
     awful.key({modkey}, "x",
               function()
                   awful.prompt.run({prompt = "Run Lua code: "},
