@@ -225,6 +225,14 @@ awful.rules.rules = {
             floating = false,
         }
     },
+    {
+        rule = {
+            type = 'dialog',
+        },
+        properties = {
+            floating = true,
+        }
+    },
 }
 
 function titlebar_toggle(c)
