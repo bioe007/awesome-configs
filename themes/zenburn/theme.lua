@@ -12,7 +12,7 @@ theme.wallpaper_cmd = { "awsetbg /usr/share/awesome/themes/zenburn/zenburn-backg
 -- }}}
 
 -- {{{ Styles
-theme.font      = "sans 8"
+theme.font      = "bitstream vera sans 10"
 
 -- {{{ Colors
 theme.fg_normal = "#DCDCCC"
