@@ -1,177 +1,266 @@
--- rc.lua for awesome-git'ish window manager
----------------------------
--- bioe007, perrydothargraveatgmaildotcom
---
-print("Entered rc.lua: " .. os.time())
 require("awful")
 require("awful.autofocus")
+require("awful.rules")
 require("beautiful")
 require("naughty")
 
 -- custom modules
-require("calendar")
-require("fs")
-require("markup")
-require("notifications")
 require("revelation")
-require("shifty")
-require("volume")
-require("vicious")
 
-print("Modules loaded: " .. os.time())
 
-function tag_move(t, scr)
-    local ts = t or awful.tag.selected()
-    local screen_target = scr or awful.util.cycle(screen.count(), ts.screen + 1)
+dir = {}
+dir.config = awful.util.getdir('config')
+dir.cache = awful.util.getdir('cache')
+dir.theme = dir.config .. "/themes/zenburn"
 
-    shifty.set(ts, {screen = screen_target})
+terminal = "urxvt"
+editor = os.getenv("EDITOR") or "vim"
+editor_cmd = terminal .. " -e " .. editor
+modkey = "Mod4"
+
+beautiful.init(dir.theme .. "/theme.lua")
+
+layouts = {
+    awful.layout.suit.tile,
+    awful.layout.suit.max,
+    awful.layout.suit.tile.left,
+    awful.layout.suit.fair,
+    awful.layout.suit.floating,
+}
+
+tags = {}
+for s = 1, screen.count() do
+    tags[s] = awful.tag({1, 2, 3, 4, 5}, s, layouts[1])
 end
 
-function tag_to_screen(t, scr)
-    local ts = t or awful.tag.selected()
-    local screen_origin = ts.screen
-    local screen_target = scr or awful.util.cycle(screen.count(), ts.screen + 1)
-
-    awful.tag.history.restore(ts.screen, 1)
-    tag_move(ts, screen_target)
-
-    -- never waste a screen
-    if #(screen[screen_origin]:tags()) == 0 then
-        for _, tag in pairs(screen[screen_target]:tags()) do
-            if not tag.selected then
-                tag_move(tag, screen_origin)
-                tag.selected = true
-                break
-            end
-        end
-    end
-
-    awful.tag.viewonly(ts)
-    mouse.screen = ts.screen
-    if #ts:clients() > 0 then
-        local c = ts:clients()[1]
-        client.focus = c
-    end
-end
-
-function workspace_next()
-    for s = 1, screen.count() do
-        awful.tag.viewnext(screen[s])
-    end
-end
-
-function workspace_prev()
-    for s = 1, screen.count() do
-        awful.tag.viewprev(screen[s])
-    end
-end
-
-function tagSearch(name)
-  for s = 1, screen.count() do
-    t = shifty.name2tag(name, s)
-    if t ~= nil then
-        if t.screen ~= mouse.screen then
-            awful.screen.focus(t.screen)
-        end
-      awful.tag.viewonly(t)
-      return true
-    end
-  end
-  return false
-end
-
-function player(command)
-    awful.util.spawn('/usr/bin/sonata ' .. command)
-end
-
-function tagScreenless()
-    local allTags = {}
-    local curTag = awful.tag.selected()
-    for s = 1, screen.count() do
-        t = shifty.name2tag(name, s)
-        if t ~= nil then
-            awful.tag.viewonly(t)
-            awful.screen.focus(awful.util.cycle(screen.count(),
-                                                s + mouse.screen))
-            return true
-        end
-    end
-    return false
-end
-
--- Called externally and just pops to or merges with my active vim server when
--- new files are dumped to it. (vim_start)
--- though it could easily be used with any tag by passing a different 'name'
--- parameter
-function tagPop(name)
-    for s = 1, screen.count() do
-        t = shifty.name2tag(name, s)
-        if t ~= nil then
-            if t.screen == awful.tag.selected().screen then
-                t.selected = true
-            else
-                awful.tag.viewonly(t)
-                awful.screen.focus(t.screen)
-            end
-        end
-    end
-end
-
-cdir = awful.util.getdir("config")
-passwords  = dofile(cdir .."/PASSWORDS.lua")
-settings   = dofile(cdir .."/settings.lua")
-widgets    = dofile(cdir .. "/widgets.lua")
-globalkeys = dofile(cdir .. "/keys.lua")
-
+-- Mouse bindings
 root.buttons(awful.util.table.join(
-    awful.button({}, 3, function() mymainmenu:toggle() end),
     awful.button({}, 4, awful.tag.viewnext),
     awful.button({}, 5, awful.tag.viewprev)
 ))
 
+-- Key bindings
+globalkeys = awful.util.table.join(
+    awful.key({modkey, "Shift"}, "space", awful.tag.viewprev),
+    awful.key({modkey,}, "space", awful.tag.viewnext),
+    awful.key({modkey,}, "Escape", awful.tag.history.restore),
+
+    awful.key({modkey,}, "j",
+        function()
+            awful.client.focus.byidx(1)
+            if client.focus then client.focus:raise() end
+        end),
+    awful.key({modkey,}, "k",
+        function()
+            awful.client.focus.byidx(-1)
+            if client.focus then client.focus:raise() end
+        end),
+
+    -- Layout manipulation
+    awful.key({modkey, "Shift"}, "j",
+              function() awful.client.swap.byidx(1) end),
+    awful.key({modkey, "Shift"}, "k",
+              function() awful.client.swap.byidx(-1) end),
+    awful.key({modkey}, "s",
+              function() awful.screen.focus_relative(1) end),
+    awful.key({modkey,}, "u", awful.client.urgent.jumpto),
+    awful.key({modkey,}, "Tab",
+        function()
+            awful.client.focus.history.previous()
+            if client.focus then
+                client.focus:raise()
+            end
+        end),
+
+    awful.key({modkey,}, "Return", function() awful.util.spawn(terminal) end),
+    awful.key({modkey}, "f",
+        function() awful.util.spawn('nautilus', true) end),
+    awful.key({modkey, "Control"}, "r", awesome.restart),
+    awful.key({modkey, "Shift"}, "q",
+              function() awful.util.spawn('gnome-session-quit', false) end),
+
+    awful.key({modkey,}, "l", function() awful.tag.incmwfact(0.05) end),
+    awful.key({modkey,}, "h", function() awful.tag.incmwfact(-0.05) end),
+    awful.key({modkey, "Shift"}, "h",
+              function() awful.tag.incnmaster(1) end),
+    awful.key({modkey, "Shift"}, "l",
+              function() awful.tag.incnmaster(-1) end),
+    -- awful.key({modkey, "Control"}, "h", function() awful.tag.incncol(1) end),
+    -- awful.key({modkey, "Control"}, "l",
+    --           function() awful.tag.incncol(-1) end),
+    awful.key({modkey, "Mod1"}, "l",
+              function() awful.layout.inc(layouts, 1) end),
+    awful.key({modkey, "Shift", "Mod1"}, "l",
+              function() awful.layout.inc(layouts, -1) end),
+
+    awful.key({modkey, "Control"}, "n", awful.client.restore),
+
+    -- Prompt
+    awful.key({modkey}, "e", revelation),
+    awful.key({modkey}, "x",
+              function()
+                  awful.prompt.run({prompt = "Run Lua code: "},
+                  mypromptbox[mouse.screen].widget,
+                  awful.util.eval, nil,
+                  awful.util.getdir("cache") .. "/history_eval")
+              end)
+)
+
 clientkeys = awful.util.table.join(
-    awful.key({settings.modkey,}, "f",
-        function(c) c.fullscreen = not c.fullscreen  end),
-    awful.key({settings.modkey, "Shift"}, "c", function(c) c:kill() end),
-    awful.key({settings.modkey, "Shift"}, "0",
-        function(c) c.sticky = not c.sticky end),
-    awful.key({settings.modkey, "Mod1"}, "space", awful.client.floating.toggle),
-    awful.key({settings.modkey, "Control"}, "Return",
-        function(c) c:swap(awful.client.getmaster()) end),
-    awful.key({settings.modkey,}, "o", awful.client.movetoscreen),
-    awful.key({settings.modkey, "Mod1"}, "n",
-        function(c) c.minimized = not c.minimized end),
-    awful.key({settings.modkey, "Control"}, "m",
+    awful.key({modkey, "Shift"}, "c", function(c) c:kill() end),
+    awful.key({modkey, "Control"}, "space", awful.client.floating.toggle),
+    awful.key({modkey, "Control"}, "Return",
+              function(c) c:swap(awful.client.getmaster()) end),
+    awful.key({modkey, "Shift"}, "s", awful.client.movetoscreen),
+    awful.key({modkey, "Shift"}, "r", function(c) c:redraw() end),
+    awful.key({modkey,}, "t", function(c) c.ontop = not c.ontop end),
+    awful.key({modkey,}, "n",
+        function(c)
+            -- The client currently has the input focus, so it cannot be
+            -- minimized, since minimized clients can't have the focus.
+            c.minimized = true
+        end),
+    awful.key({modkey,}, "m",
         function(c)
             c.maximized_horizontal = not c.maximized_horizontal
             c.maximized_vertical   = not c.maximized_vertical
-            c:raise()
         end)
-    )
+)
+
+-- Compute the maximum number of digit we need, limited to 9
+keynumber = 0
+for s = 1, screen.count() do
+   keynumber = math.min(9, math.max(#tags[s], keynumber));
+end
+
+for i = 1, keynumber do
+    globalkeys = awful.util.table.join(globalkeys,
+        awful.key({modkey}, "#" .. i + 9,
+                  function()
+                        local screen = mouse.screen
+                        if tags[screen][i] then
+                            awful.tag.viewonly(tags[screen][i])
+                        end
+                  end),
+        awful.key({modkey, "Control"}, "#" .. i + 9,
+                  function()
+                      local screen = mouse.screen
+                      if tags[screen][i] then
+                          awful.tag.viewtoggle(tags[screen][i])
+                      end
+                  end),
+        awful.key({modkey, "Shift"}, "#" .. i + 9,
+                  function()
+                      if client.focus and tags[client.focus.screen][i] then
+                          awful.client.movetotag(tags[client.focus.screen][i])
+                      end
+                  end),
+        awful.key({modkey, "Control", "Shift"}, "#" .. i + 9,
+                  function()
+                      if client.focus and tags[client.focus.screen][i] then
+                          awful.client.toggletag(tags[client.focus.screen][i])
+                      end
+                  end))
+end
+
+clientbuttons = awful.util.table.join(
+    awful.button({}, 1, function(c) client.focus = c; c:raise() end),
+    awful.button({modkey}, 1, awful.mouse.client.move),
+    awful.button({modkey}, 3, awful.mouse.client.resize))
 
 root.keys(globalkeys)
 
-shifty.config.clientkeys = clientkeys
-shifty.taglist = widgets.taglist
-shifty.init()
+awful.rules.rules = {
+    {
+        rule = {},
+        properties = {
+            border_width = beautiful.border_width,
+            border_color = beautiful.border_normal,
+            buttons = clientbuttons,
+            floating = true,
+            focus = true,
+            keys = clientkeys,
+            honor_size_hints = true,
+        }
+    },
+    {
+        rule = {
+            class = 'Google-chrome'
+        },
+        properties = {
+            floating = false,
+            tag = tags[screen.count()][3],
+        }
+    },
+    {
+        rule = {
+            class = 'Gvim'
+        },
+        properties = {
+            floating = false,
+        }
+    },
+    {
+        rule = {
+            class = 'Firefox'
+        },
+        properties = {
+            floating = false,
+            tag = tags[1][2],
+        }
+    },
+    {
+        rule = {
+            class = 'Sonata'
+        },
+        properties = {
+            sticky = true,
+        }
+    },
+    {
+        rule = {
+            class = 'URxvt'
+        },
+        properties = {
+            floating = false,
+        }
+    },
+    {
+        rule = {
+            type = 'dialog',
+        },
+        properties = {
+            floating = true,
+        }
+    },
+}
 
-client.add_signal("focus", function(c)
-    c.border_color = beautiful.border_focus
-
-    if settings.opacity[c.class] then
-       c.opacity = settings.opacity[c.class].focus
+function titlebar_toggle(c)
+    if awful.client.floating.get(c) then
+        awful.titlebar.add(c, {modkey = modkey })
     else
-        c.opacity = settings.opacity.default.focus or 1
+        awful.titlebar.remove(c)
     end
-    c:raise()
+    awful.placement.no_overlap(c)
+    awful.placement.no_offscreen(c)
+end
+
+-- Signal function to execute when a new client appears.
+client.add_signal("manage", function(c, startup)
+    if not startup then
+        awful.client.setslave(c)
+
+        if not c.size_hints.user_position and
+            not c.size_hints.program_position then
+            awful.placement.no_overlap(c)
+            awful.placement.no_offscreen(c)
+        end
+    end
+    titlebar_toggle(c)
+    c:add_signal("property::floating", titlebar_toggle)
 end)
 
-client.add_signal("unfocus", function(c)
-    c.border_color = beautiful.border_normal
-
-    if settings.opacity[c.class] then
-        c.opacity = settings.opacity[c.class].unfocus
-    else
-        c.opacity = settings.opacity.default.unfocus or 0.7
-    end
-end)
+client.add_signal("focus",
+                  function(c) c.border_color = beautiful.border_focus end)
+client.add_signal("unfocus",
+                  function(c) c.border_color = beautiful.border_normal end)
