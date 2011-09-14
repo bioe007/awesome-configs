@@ -58,7 +58,7 @@ shifty.config.tags = {
     web = {
         layout      = awful.layout.suit.tile.bottom,
         max_clients = 1,
-        solitary    = true,
+        exclusive   = true,
         position    = 4,
         spawn       = browser,
     },
@@ -111,6 +111,10 @@ shifty.config.apps = {
         float = false,
     },
     {
+        match = {"MPlayer"},
+        intrusive = true,
+    },
+    {
         match = {"Evince"},
         tag   = "ds",
         float = false,
@@ -124,6 +128,11 @@ shifty.config.apps = {
         match          = {"urxvt"},
         honorsizehints = false,
         float          = false,
+    },
+    {
+        match = {"dialog", "%-applet"},
+        intrusive = true,
+        float = true,
     },
 }
 
@@ -176,9 +185,12 @@ globalkeys = awful.util.table.join(
             end
         end),
 
+    -- Applications
     awful.key({modkey,}, "Return", function() awful.util.spawn(terminal) end),
-    awful.key({modkey}, "f",
+    awful.key({modkey, "Mod1"}, "e", function() awful.util.spawn(editor) end),
+    awful.key({modkey, "Mod1"}, "f",
         function() awful.util.spawn('nautilus', true) end),
+
     awful.key({modkey, "Control"}, "r", awesome.restart),
     awful.key({modkey, "Shift"}, "q",
               function() awful.util.spawn('gnome-session-quit', false) end),
