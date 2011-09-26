@@ -21,10 +21,8 @@ for s = 1,screen.count() do
     mypromptbox[s].text = awful.util.escape(err:match("[^\n]*"));
 end
 
-naughty.notify{text="Awesome crashed during startup on " ..
-                os.date("%d%/%m/%Y %T:\n\n")
-                .. err .. "\n", timeout = 0}
-
-
-
--- vim:set ft=lua fdm=marker ts=4 sw=4 et ai si: --
+naughty.notify(
+    {text="Awesome crashed during startup on " ..
+            os.date("%d%/%m/%Y %T:\n\n")
+            .. err .. "\n", timeout = 0}
+    )
