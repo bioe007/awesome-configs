@@ -6,6 +6,7 @@ require("naughty")
 -- custom modules
 require("revelation")
 require("shifty")
+require("panel")
 
 
 dir = {}
@@ -217,12 +218,21 @@ globalkeys = awful.util.table.join(
     awful.key({modkey}, "e", revelation),
 
     -- Prompt
+    awful.key({modkey},
+              "F1",
+              function()
+                  panel.prompt:get(mouse.screen):run()
+              end),
     awful.key({modkey}, "x",
               function()
-                  awful.prompt.run({prompt = "Run Lua code: "},
-                  mypromptbox[mouse.screen].widget,
-                  awful.util.eval, nil,
-                  awful.util.getdir("cache") .. "/history_eval")
+                  pb = panel.prompt:get(mouse.screen)
+                  awful.prompt.run({
+                                    prompt="Lua code: "},
+                                    panel.prompt:get(mouse.screen).widget,
+                                    awful.util.eval,
+                                    nil,
+                                    awful.util.getdir("cache").."/history_eval"
+                                    )
               end)
 )
 
@@ -274,6 +284,16 @@ for i = 1, 9 do
 end
 root.keys(globalkeys)
 
+for s = 1, screen.count() do
+    panel({
+            s = s,
+            position='bottom',
+            modkey=modkey,
+            layouts=shifty.config.layouts
+        })
+end
+
+shifty.taglist = panel.taglist
 shifty.init()
 
 client.add_signal("focus",
