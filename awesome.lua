@@ -21,7 +21,7 @@ editor   = "gvim"
 filemgr  = "thunar"
 mail     = ""
 terminal = "urxvt"
-modkey = "Mod4"
+modkey   = "Mod4"
 
 mwfact80 = ((screen.count() - 1) > 0 and 0.4) or 0.52
 
@@ -176,7 +176,11 @@ globalkeys = awful.util.table.join(
     awful.key({modkey, "Shift"}, "k",
               function() awful.client.swap.byidx(-1) end),
     awful.key({modkey}, "s",
-              function() awful.screen.focus_relative(1) end),
+              function()
+                  awful.screen.focus_relative(1)
+                  local mc = mouse.coords()
+                  mouse.coords({x=mc.x + 40, y=mc.y + 40}, true)
+              end),
     awful.key({modkey,}, "u", awful.client.urgent.jumpto),
     awful.key({modkey,}, "Tab",
         function()
