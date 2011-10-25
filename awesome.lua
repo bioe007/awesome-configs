@@ -219,7 +219,12 @@ globalkeys = awful.util.table.join(
     awful.key({modkey}, "d", shifty.del),
     awful.key({modkey, "Shift"}, "a", shifty.add),
 
-    awful.key({modkey}, "e", revelation),
+    -- Revelation
+    awful.key({modkey}, "e", revelation), -- all clients
+    awful.key({modkey, "Shift"},          -- only terminals
+              "e",
+              function() revelation({class="URxvt"}) end
+              ),
 
     -- Prompt
     awful.key({modkey},
