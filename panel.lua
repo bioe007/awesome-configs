@@ -15,6 +15,8 @@ local mouse = mouse
 local screen = screen
 local widget = widget
 
+local menu = require('menu')
+
 module('panel')
 
 local panels = {}
@@ -41,7 +43,6 @@ function clock:new(s, args)
     id(ck)
     return ck
 end
-
 setmetatable(clock,
              {
                  __call = function(t, ...) return clock:new(...) end
@@ -64,7 +65,6 @@ function layoutbox:new(s, args)
     id(lbox)
     return lbox
 end
-
 setmetatable(layoutbox,
              {
                  __call = function(t, ...) return layoutbox:new(...) end
@@ -77,7 +77,8 @@ function taglist:new(s, args)
         awful.button({}, 1, awful.tag.viewonly),
         awful.button({mk}, 1, awful.client.movetotag),
         awful.button({}, 3, awful.tag.viewtoggle),
-        awful.button({mk}, 3, awful.client.toggletag),
+        awful.button({mk}, 3, function(t) menu.create.tags(nil, t) end),
+        awful.button({}, 8, awful.client.toggletag),
         awful.button({}, 4, awful.tag.viewnext),
         awful.button({}, 5, awful.tag.viewprev)
     )
@@ -89,7 +90,6 @@ function taglist:new(s, args)
     id(tl)
     return tl
 end
-
 setmetatable(taglist,
              {
                  __call = function(t, ...) return taglist:new(...) end
@@ -133,13 +133,12 @@ function tasklist:new(s, args)
                                   end),
                      awful.button({},
                                   3,
-                                  function ()
+                                  function (c)
                                       if instance then
                                           instance:hide()
                                           instance = nil
                                       else
-                                          instance =
-                                                awful.menu.clients({width=250})
+                                          instance = menu.create.clients(nil, c)
                                       end
                                   end),
                      awful.button({},
