@@ -7,3 +7,6 @@
 [submodule "revelation"]
 	path = revelation
 	url = git@github.com:bioe007/awesome-revelation.git
+[submodule "toolbox"]
+	path = toolbox
+	url = git@github.com:bioe007/awesome-toolbox.git
