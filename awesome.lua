@@ -112,10 +112,6 @@ shifty.config.apps = {
         float = false,
     },
     {
-        match = {"MPlayer"},
-        intrusive = true,
-    },
-    {
         match = {"Evince"},
         tag   = "ds",
         float = false,
@@ -131,7 +127,7 @@ shifty.config.apps = {
         float          = false,
     },
     {
-        match = {"dialog", "%-applet"},
+        match = {"dialog", "%-applet", "MPlayer"},
         intrusive = true,
         float = true,
     },
@@ -194,11 +190,10 @@ globalkeys = awful.util.table.join(
     awful.key({modkey,}, "Return", function() awful.util.spawn(terminal) end),
     awful.key({modkey, "Mod1"}, "e", function() awful.util.spawn(editor) end),
     awful.key({modkey, "Mod1"}, "f",
-        function() awful.util.spawn('nautilus', true) end),
+        function() awful.util.spawn(filemgr, true) end),
 
     awful.key({modkey, "Control"}, "r", awesome.restart),
-    awful.key({modkey, "Shift"}, "q",
-              function() awful.util.spawn('gnome-session-quit', false) end),
+    awful.key({modkey, "Shift"}, "q", awesome.quit),
 
     awful.key({modkey,}, "l", function() awful.tag.incmwfact(0.05) end),
     awful.key({modkey,}, "h", function() awful.tag.incmwfact(-0.05) end),
