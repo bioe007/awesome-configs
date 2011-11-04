@@ -7,6 +7,7 @@ require("naughty")
 require("revelation")
 require("shifty")
 require("panel")
+require("volume")
 tb = require('toolbox')
 
 dir = {}
@@ -187,6 +188,17 @@ globalkeys = awful.util.table.join(
     awful.key({modkey,}, "Return", terminal),
     awful.key({modkey, "Mod1"}, "e", editor),
     awful.key({modkey, "Mod1"}, "f", filemgr),
+
+    -- Media controls
+    awful.key({modkey}, "XF86AudioLowerVolume", function() volume(-5) end),
+    awful.key({}, "XF86AudioLowerVolume", volume.lower),
+    awful.key({modkey}, "XF86AudioRaiseVolume", function() volume(5) end),
+    awful.key({}, "XF86AudioRaiseVolume", volume.raise),
+    awful.key({}, "XF86AudioMute", volume.mute),
+    awful.key({}, "XF86AudioPlay", function() music("pp") end),
+    awful.key({}, "XF86AudioStop", function() music("pause") end),
+    awful.key({}, "XF86AudioNext", function() music("next") end),
+    awful.key({}, "XF86AudioPrev", function() music("prev") end),
 
     awful.key({modkey, "Control"}, "r", awesome.restart),
     awful.key({modkey, "Shift"}, "q", awesome.quit),
