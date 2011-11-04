@@ -7,20 +7,21 @@ require("naughty")
 require("revelation")
 require("shifty")
 require("panel")
-
+tb = require('toolbox')
 
 dir = {}
 dir.config = awful.util.getdir('config')
 dir.cache = awful.util.getdir('cache')
-dir.theme = dir.config .. "/themes/zenburn"
+dir.theme = tb.path.join(dir.config, "/themes/zenburn")
 
 beautiful.init(dir.theme .. "/theme.lua")
 
-browser  = "firefox"
-editor   = "gvim"
-filemgr  = "thunar"
+browser  = tb.client.create_launcher("firefox", true)
+editor   = tb.client.create_launcher("gvim", true)
+filemgr  = tb.client.create_launcher("thunar", true)
 mail     = ""
-terminal = "urxvt"
+music    = tb.client.create_launcher("sonata", false)
+terminal = tb.client.create_launcher("urxvt")
 modkey   = "Mod4"
 
 mwfact80 = ((screen.count() - 1) > 0 and 0.4) or 0.52
@@ -41,10 +42,7 @@ shifty.config.tags = {
         mwfact      = mwfact80,
         position    = 1,
         screen      = 1,
-        run         = function()
-                awful.util.spawn(editor, false, 1)
-                awful.util.spawn_with_shell(terminal, false, 1)
-            end,
+        run         = editor,
     },
     mail = {
         init     = true,
@@ -61,7 +59,6 @@ shifty.config.tags = {
         max_clients = 1,
         exclusive   = true,
         position    = 4,
-        spawn       = browser,
     },
     vbx = {
         exclusive   = true,
@@ -127,7 +124,7 @@ shifty.config.apps = {
         float          = false,
     },
     {
-        match = {"dialog", "%-applet", "MPlayer"},
+        match = {"dialog", "%-applet", "MPlayer", "Sonata"},
         intrusive = true,
         float = true,
     },
@@ -187,10 +184,9 @@ globalkeys = awful.util.table.join(
         end),
 
     -- Applications
-    awful.key({modkey,}, "Return", function() awful.util.spawn(terminal) end),
-    awful.key({modkey, "Mod1"}, "e", function() awful.util.spawn(editor) end),
-    awful.key({modkey, "Mod1"}, "f",
-        function() awful.util.spawn(filemgr, true) end),
+    awful.key({modkey,}, "Return", terminal),
+    awful.key({modkey, "Mod1"}, "e", editor),
+    awful.key({modkey, "Mod1"}, "f", filemgr),
 
     awful.key({modkey, "Control"}, "r", awesome.restart),
     awful.key({modkey, "Shift"}, "q", awesome.quit),
