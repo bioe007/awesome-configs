@@ -10,19 +10,17 @@ local pairs = pairs
 local setmetatable = setmetatable
 
 local awful = require('awful')
-local client = client
-local mouse = mouse
-local screen = screen
-local widget = widget
+local capi = {
+    client = client,
+    mouse = mouse,
+    widget = widget
+}
 
 local menu = require('menu')
 
 module('panel')
 
 local panels = {}
-
-local data = { }
-
 
 local id = {}
 function id:new(t)
@@ -106,7 +104,7 @@ function prompt:new(s, args)
 end
 
 function prompt:get(s)
-    return prompt[s or mouse.screen]
+    return prompt[s or capi.mouse.screen]
 end
 setmetatable(prompt,
              {
@@ -119,7 +117,7 @@ function tasklist:new(s, args)
                      awful.button({},
                                   1,
                                   function (c)
-                                      if c == client.focus then
+                                      if c == capi.client.focus then
                                           c.minimized = true
                                       else
                                           if not c:isvisible() then
@@ -127,7 +125,7 @@ function tasklist:new(s, args)
                                           end
                                           -- This will also un-minimize
                                           -- the client, if needed
-                                          client.focus = c
+                                          capi.client.focus = c
                                           c:raise()
                                       end
                                   end),
@@ -145,16 +143,16 @@ function tasklist:new(s, args)
                                   4,
                                   function ()
                                       awful.client.focus.byidx(1)
-                                      if client.focus then
-                                          client.focus:raise()
+                                      if capi.client.focus then
+                                          capi.client.focus:raise()
                                       end
                                   end),
                      awful.button({},
                                   5,
                                   function ()
                                       awful.client.focus.byidx(-1)
-                                      if client.focus then
-                                          client.focus:raise()
+                                      if capi.client.focus then
+                                          capi.client.focus:raise()
                                       end
                                   end))
 
@@ -172,7 +170,7 @@ setmetatable(tasklist,
 
 systray = {}
 function systray:new(s, args)
-    local st = widget({type='systray'})
+    local st = capi.widget({type='systray'})
     id(st)
     return st
 end
@@ -183,7 +181,7 @@ setmetatable(systray,
 
 function new(t, args)
     local s = args.s or 1
-    args.position = args.position or 'bottom'
+    args.position = args.position or 'top'
     local p = {}
     if args.layouts then
         lb = layoutbox(s, args)
@@ -221,7 +219,7 @@ end
 DEFAULT = {
     s = 1,
     modkey = 'Mod4',
-    position = 'bottom'
+    position = 'top'
 }
 
 get = {}
@@ -234,7 +232,7 @@ function get.by_id(i)
 end
 
 function get.by_position(p, s)
-    local s = s or mouse.screen
+    local s = s or capi.mouse.screen
     local r = {}
     for k, v in pairs(panels[s]) do
         if p == v.position then table.insert(r, v) end
