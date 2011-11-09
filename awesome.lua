@@ -14,6 +14,7 @@ dir = {}
 dir.config = awful.util.getdir('config')
 dir.cache = awful.util.getdir('cache')
 dir.theme = tb.path.join(dir.config, "/themes/zenburn")
+-- dir.theme = "/usr/share/awesome/themes/zenburn"
 
 beautiful.init(dir.theme .. "/theme.lua")
 
@@ -56,14 +57,12 @@ shifty.config.tags = {
         position = 3,
     },
     web = {
-        layout      = awful.layout.suit.tile.bottom,
-        max_clients = 1,
         exclusive   = true,
+        max_clients = 1,
         position    = 4,
     },
     vbx = {
         exclusive   = true,
-        layout      = awful.layout.suit.tile.bottom,
         max_clients = 1,
         mwfact      = 0.75,
         position    = 6,
@@ -125,7 +124,7 @@ shifty.config.apps = {
         float          = false,
     },
     {
-        match = {"dialog", "%-applet", "MPlayer", "Sonata"},
+        match = {"dialog", "%-applet", "MPlayer", "Sonata", "Thunar"},
         intrusive = true,
         float = true,
     },
@@ -171,7 +170,7 @@ shifty.config.clientkeys = awful.util.table.join(
 for s = 1, screen.count() do
     panel({
             s = s,
-            position='bottom',
+            position='top',
             modkey=modkey,
             layouts=shifty.config.layouts
         })
