@@ -1,38 +1,41 @@
 --! @file   volume.lua
 --
--- @brief
+-- @brief Just for controlling volume.
 --
 -- @author  Perry Hargrave
 -- @date    2011-10-31
 --
+-- Requires sexy module.
 
-local pairs = pairs
+local pairs        = pairs
 local setmetatable = setmetatable
-local string = string
-local table = table
+local string       = string
+local table        = table
+local tonumber     = tonumber
 
 local aw_util = require('awful.util')
-local notify = require('notifications')
+local sexy    = require('sexy')
 
 module('volume')
 
 cmd = '/usr/bin/amixer'
 card = 0
 
-UNKNOWN = -1
-
 local quiet = '-q'
-local current_level = UNKNOWN
-local mute = UNKNOWN
+
+local function exec(s)
+    return aw_util.pread(s)
+end
+
+local function parse_stats(stats)
+    local vmuted = (string.find(stats, '%[on%]') == nil)
+    local vlevel = stats:match('%d+%%'):gsub("%%", "")
+    return tonumber(vlevel), vmuted
+end
 
 function get()
     local stats = aw_util.pread(cmd .. ' get Master')
-    current_level = stats:match('%d+%%'):gsub('%%', '')
-    return current_level
-end
-
-local function exec(s)
-    aw_util.spawn_with_shell(s)
+    return parse_stats(stats)
 end
 
 function change(value, card, channel)
@@ -49,28 +52,27 @@ function change(value, card, channel)
 
     s = table.concat({
                       cmd,
-                      quiet,
                       '-c',
                       (card or '0'),
                       'sset ',
                       (channel or 'Master'),
                       s_val},
                       " ")
-    exec(s)
+    stats = exec(s)
+    sexy.show.volume(parse_stats(stats))
 end
 
 function lower(i)
-    local increment = i or -1
-    change(increment) -- .. '-')
+    change(i or -1)
 end
 
 function raise(i)
-    local increment = i or 1
-    change(increment)
+    change(i or 1)
 end
 
 function mute()
-    exec(cmd .. ' -c ' .. card .. ' sset Master,0 toggle')
+    stats = exec(cmd .. ' -c ' .. card .. ' sset Master,0 toggle')
+    sexy.show.volume(parse_stats(stats))
 end
 
 setmetatable(_M,
