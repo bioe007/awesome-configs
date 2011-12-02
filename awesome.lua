@@ -17,6 +17,7 @@ dir.theme = tb.path.join(dir.config, "/themes/zenburn")
 -- dir.theme = "/usr/share/awesome/themes/zenburn"
 
 beautiful.init(dir.theme .. "/theme.lua")
+beautiful.iconpath = dir.theme
 
 browser  = tb.client.create_launcher("firefox", true)
 editor   = tb.client.create_launcher("gvim", true)
