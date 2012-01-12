@@ -14,7 +14,6 @@ dir = {}
 dir.config = awful.util.getdir('config')
 dir.cache = awful.util.getdir('cache')
 dir.theme = tb.path.join(dir.config, "/themes/zenburn")
--- dir.theme = "/usr/share/awesome/themes/zenburn"
 
 beautiful.init(dir.theme .. "/theme.lua")
 beautiful.iconpath = dir.theme
@@ -40,7 +39,6 @@ shifty.config.layouts = {
 -- Shifty configuration
 shifty.config.tags = {
     vim = {
-        exclusive   = (screen.count() == 1),
         init        = true,
         mwfact      = mwfact80,
         position    = 1,
