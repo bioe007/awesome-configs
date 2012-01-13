@@ -20,7 +20,6 @@ local capi = {
 local shifty = require('shifty')
 local tb = require('toolbox')
 
-local print = print
 module('menu')
 
 
@@ -88,9 +87,9 @@ local function client_items(clients, func)
     return data
 end
 
-local function tag_items_inner(c, func, add)
+local function tag_items_inner(c, s, func, add)
     local data = {}
-    for i, t in ipairs(capi.screen[c.screen]:tags()) do
+    for i, t in ipairs(capi.screen[s]:tags()) do
         data[i] = {
             awful.util.escape(t.name) or "",
             function() func(t, c) end,
@@ -117,7 +116,7 @@ local function tag_items(c, func)
     local tgs_m = {}
     for s = 1, capi.screen.count() do
         skey = 'Screen '..s
-        tgs_m[s] = {skey, tag_items_inner(c, func, true)}
+        tgs_m[s] = {skey, tag_items_inner(c, s, func, true)}
     end
     return tgs_m
 end
@@ -179,7 +178,7 @@ local function gen_clients_menu(menu, c, filter, func)
             function() awful.client.floating.toggle(c) end
         },
         {"Move to tag", tag_items(c, awful.client.movetotag)},
-        {"Toggle tags", tag_items_inner(c, awful.client.toggletag)},
+        {"Toggle tags", tag_items_inner(c, c.screen, awful.client.toggletag)},
         {"Clients", cls_t}
     }
     local m = awful.menu.new(menu)
