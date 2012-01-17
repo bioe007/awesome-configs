@@ -77,6 +77,15 @@ globalkeys = awful.util.table.join(
 
     awful.key({modkey, "Shift"}, "n", shifty.send_prev),
     awful.key({modkey}, "n", shifty.send_next),
+    awful.key({modkey, "Control"},
+              "n",
+              function()
+                  local t = awful.tag.selected()
+                  local s = awful.util.cycle(screen.count(), t.screen + 1)
+                  awful.tag.history.restore()
+                  t = shifty.tagtoscr(s, t)
+                  awful.tag.viewonly(t)
+              end),
     awful.key({modkey, "Shift"}, "r", shifty.rename),
     awful.key({modkey}, "d", shifty.del),
     awful.key({modkey, "Shift"}, "a", shifty.add),
