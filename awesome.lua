@@ -52,7 +52,6 @@ shifty.config.tags = {
         spawn    = mail,
     },
     office = {
-        layout   = awful.layout.suit.floating,
         position = 3,
     },
     web = {
@@ -90,6 +89,7 @@ shifty.config.apps = {
     },
     {
         match = {"libreoffice.*"},
+        float = false,
         tag   = "office",
     },
     {
