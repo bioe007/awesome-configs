@@ -177,8 +177,8 @@ end
 
 dofile(tb.path.join(dir.config, 'keys.lua'))
 
-shifty.taglist = panel.taglist
-shifty.init()
+shifty.config.taglist = panel.taglist
+shifty.tag.init()
 
 client.add_signal("focus",
                   function(c) c.border_color = beautiful.border_focus end)

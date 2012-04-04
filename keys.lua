@@ -76,20 +76,20 @@ globalkeys = awful.util.table.join(
     awful.key({modkey, "Shift", "Mod1"}, "l",
               function() awful.layout.inc(shifty.config.layouts, -1) end),
 
-    awful.key({modkey, "Shift"}, "n", shifty.send_prev),
-    awful.key({modkey}, "n", shifty.send_next),
+    awful.key({modkey, "Shift"}, "n", shifty.client.move.left),
+    awful.key({modkey}, "n", shifty.client.move.right),
     awful.key({modkey, "Control"},
               "n",
               function()
                   local t = awful.tag.selected()
                   local s = awful.util.cycle(screen.count(), t.screen + 1)
                   awful.tag.history.restore()
-                  t = shifty.tagtoscr(s, t)
+                  t = shifty.tag.move.screen(s, t)
                   awful.tag.viewonly(t)
               end),
-    awful.key({modkey, "Shift"}, "r", shifty.rename),
-    awful.key({modkey}, "d", shifty.del),
-    awful.key({modkey, "Shift"}, "a", shifty.add),
+    awful.key({modkey, "Shift"}, "r", shifty.tag.rename),
+    awful.key({modkey}, "d", shifty.tag.del),
+    awful.key({modkey, "Shift"}, "a", shifty.tag.add),
 
     -- Revelation
     awful.key({modkey}, "e", revelation), -- all clients
@@ -120,12 +120,12 @@ globalkeys = awful.util.table.join(
 for i = 1, 9 do
     globalkeys = awful.util.table.join(globalkeys,
         awful.key({modkey}, i, function()
-            awful.tag.viewonly(shifty.getpos(i))
+            awful.tag.viewonly(shifty.tag.get.by_position(i))
         end),
 
         awful.key({modkey, "Control"}, i, function()
             this_screen = awful.tag.selected().screen
-            t = shifty.getpos(i, this_screen)
+            t = shifty.tag.get.by_position(i)
             t.selected = not t.selected
         end),
 
@@ -134,7 +134,7 @@ for i = 1, 9 do
                 local c = client.focus
                 slave = not (client.focus ==
                                 awful.client.getmaster(mouse.screen))
-                t = shifty.getpos(i)
+                t = shifty.tag.get.by_position(i)
                 awful.client.movetotag(t,c)
                 awful.tag.viewonly(t)
                 if slave then awful.client.setslave(c) end

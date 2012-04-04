@@ -35,7 +35,7 @@ local function gen_tags_menu(menu, t)
         },
         {
             "Rename",
-            function() shifty.rename(t) end
+            function() shifty.tag.rename(t) end
         },
         {
             "Restore",
@@ -43,7 +43,7 @@ local function gen_tags_menu(menu, t)
         },
         {
             "Delete",
-            function() shifty.del(t) end
+            function() shifty.tag.del(t) end
         },
     }
 
@@ -98,7 +98,7 @@ local function tag_items_inner(c, s, func, add)
     end
 
     local addf = function()
-        t = shifty.add({screen = s})
+        t = shifty.tag.add({screen = s})
         awful.tag.viewonly(t)
         awful.client.movetotag(t, c)
         capi.client.focus = c
