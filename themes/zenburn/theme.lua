@@ -8,7 +8,9 @@
 
 -- {{{ Main
 theme = {}
--- theme.wallpaper_cmd = {}
+theme.wallpaper_cmd = {
+    "/usr/bin/nitrogen --restore"
+}
 -- }}}
 
 -- {{{ Styles
@@ -24,7 +26,7 @@ theme.bg_urgent = "#3F3F3F"
 -- }}}
 
 -- {{{ Borders
-theme.border_width  = "2"
+theme.border_width  = "4"
 theme.border_normal = "#3F3636"
 theme.border_focus  = "#6FAF6F"
 theme.border_marked = "#CC9393"
