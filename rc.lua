@@ -16,11 +16,17 @@ local naughty = require("naughty")
 local menubar = require("menubar")
 local hotkeys_popup = require("awful.hotkeys_popup")
 
+-- More efficient CPU/temp widgets from conky here:
+--                  https://github.com/varingst/awesome-conky
+-- Note that have to set nvidia_display in conkyrc and set output only to
+-- stderr.
+local conky = require("conky")
+
+
 -- Enable hotkeys help widget for VIM and other apps
 -- when client with a matching name is opened:
 require("awful.hotkeys_popup.keys")
 
-local cpu_widget = require("awesome-wm-widgets.cpu-widget.cpu-widget")
 
 -- {{{ Error handling
 -- Check if awesome encountered an error during startup and fell back to
@@ -228,15 +234,24 @@ awful.screen.connect_for_each_screen(function(s)
             s.mypromptbox,
         },
         s.mytasklist, -- Middle widget
-        { -- Right widgets
-            -- cpu_widget({
-                -- width = 140,
-                -- step_width = 2,
-                -- step_spacing = 0,
-                -- color = '#0f6fcf'
-            -- }),
+        {
             layout = wibox.layout.fixed.horizontal,
-            -- mykeyboardlayout,
+            conky.widget({
+                label = "CPU: ",
+                conky = "${cpu}%",
+            }),
+            conky.widget({
+                label = "MEM: ",
+                conky = "${memperc}%",
+            }),
+            conky.widget({
+                label = "T_CPU: ",
+                conky = "${hwmon 0 temp 1}",
+            }),
+            conky.widget({
+                label = "T_GPU: ",
+                conky = "${nvidia temp}",
+            }),
             -- wibox.widget.systray(),
             s.mylayoutbox,
         },
