@@ -15,6 +15,7 @@ local beautiful = require("beautiful")
 local naughty = require("naughty")
 local menubar = require("menubar")
 local hotkeys_popup = require("awful.hotkeys_popup")
+local lain = require("lain")
 
 -- More efficient CPU/temp widgets from conky here:
 --                  https://github.com/varingst/awesome-conky
@@ -22,15 +23,12 @@ local hotkeys_popup = require("awful.hotkeys_popup")
 -- stderr.
 local conky = require("conky")
 
-
 -- Enable hotkeys help widget for VIM and other apps
 -- when client with a matching name is opened:
 require("awful.hotkeys_popup.keys")
 
 
 -- {{{ Error handling
--- Check if awesome encountered an error during startup and fell back to
--- another config (This code will only ever execute for the fallback config)
 if awesome.startup_errors then
     naughty.notify({ preset = naughty.config.presets.critical,
                      title = "Oops, there were errors during startup!",
@@ -52,7 +50,6 @@ do
 end
 -- }}}
 
--- {{{ Variable definitions
 beautiful.init("/home/perry/.config/awesome/themes/zenburn/theme.lua")
 
 terminal = "urxvt"
@@ -61,12 +58,12 @@ editor_cmd = terminal .. " -e " .. editor
 
 modkey = "Mod4"
 
+max_tags = 5
 
 autostart_applications = { 
     "mate-session",
     -- Disabled everything below here and just leaning on mate
     -- "mate-settings-daemon",
-    -- "compton -c -C -i 0.85 --backend glx --vsync opengl-swc",
     -- "mate-panel",
     -- "mate-power-manager",
     -- "gpmdp",
@@ -81,20 +78,30 @@ end
 
 -- Table of layouts to cover with awful.layout.inc, order matters.
 awful.layout.layouts = {
+    lain.layout.centerwork,
+    lain.layout.termfair.center,
+    awful.layout.suit.tile.bottom,
     awful.layout.suit.tile,
     awful.layout.suit.floating,
     -- awful.layout.suit.tile.left,
-    awful.layout.suit.tile.bottom,
     -- awful.layout.suit.tile.top,
     awful.layout.suit.fair,
     -- awful.layout.suit.fair.horizontal,
-    awful.layout.suit.max,
-    awful.layout.suit.magnifier,
+    -- awful.layout.suit.max,
+    -- awful.layout.suit.magnifier,
 }
--- }}}
 
 -- {{{ Helper functions
-function launch(s) 
+local function make_default_tag(number, screen, volatile)
+    return awful.tag.add(tostring(number), {
+        screen=screen,
+        layout=awful.layout.layouts[1],
+        master_count=0,
+        volatile=volatile,
+    })
+end
+
+local function launch(s) 
     lf = function()
         awful.util.spawn(s, false)
     end
@@ -199,8 +206,9 @@ awful.screen.connect_for_each_screen(function(s)
     -- Wallpaper
     set_wallpaper(s)
 
-    -- Each screen has its own tag table.
-    awful.tag({ "1", "2", "3", "4", "5", "6", "7", "8", "9" }, s, awful.layout.layouts[1])
+    for i=1,max_tags,1 do
+        make_default_tag(i, s)
+    end
 
     -- Create a promptbox for each screen
     s.mypromptbox = awful.widget.prompt()
@@ -246,7 +254,7 @@ awful.screen.connect_for_each_screen(function(s)
             }),
             conky.widget({
                 label = "T_CPU: ",
-                conky = "${hwmon 0 temp 1}",
+                conky = "${hwmon 1 temp 1}",
             }),
             conky.widget({
                 label = "T_GPU: ",
@@ -258,6 +266,8 @@ awful.screen.connect_for_each_screen(function(s)
     }
 end)
 -- }}}
+
+-- awful.tag.view_only(awful.screen.focused().tags[1])
 
 -- {{{ Mouse bindings
 root.buttons(gears.table.join(
@@ -426,17 +436,18 @@ for i = 1, 9 do
         awful.key({ modkey }, "#" .. i + 9,
                   function ()
                         local screen = awful.screen.focused()
-                        local tag = screen.tags[i]
-                        if tag then
-                           tag:view_only()
+                        local tag = awful.tag.find_by_name(screen, tostring(i))
+                        if not tag then
+                            tag = make_default_tag(i, 1, true)
                         end
+                        tag:view_only()
                   end,
                   {description = "view tag #"..i, group = "tag"}),
         -- Toggle tag display.
         awful.key({ modkey, "Control" }, "#" .. i + 9,
                   function ()
                       local screen = awful.screen.focused()
-                      local tag = screen.tags[i]
+                      local tag = awful.tag.find_by_name(screen, tostring(i))
                       if tag then
                          awful.tag.viewtoggle(tag)
                       end
@@ -445,19 +456,21 @@ for i = 1, 9 do
         -- Move client to tag.
         awful.key({ modkey, "Shift" }, "#" .. i + 9,
                   function ()
-                      if client.focus then
-                          local tag = client.focus.screen.tags[i]
-                          if tag then
-                              client.focus:move_to_tag(tag)
-                          end
-                     end
+                      local c = client.focus
+                      if c then
+                        local tag = awful.tag.find_by_name(screen, tostring(i))
+                        if not tag then
+                            tag = make_default_tag(tostring(i),1, true) 
+                        end
+                        c:move_to_tag(tag)
+                      end
                   end,
                   {description = "move focused client to tag #"..i, group = "tag"}),
         -- Toggle tag on focused client.
         awful.key({ modkey, "Control", "Shift" }, "#" .. i + 9,
                   function ()
                       if client.focus then
-                          local tag = client.focus.screen.tags[i]
+                          local tag = awful.tag.find_by_name(screen, tostring(i))
                           if tag then
                               client.focus:toggle_tag(tag)
                           end
@@ -661,6 +674,8 @@ client.connect_signal("property::floating", function(c)
     c.size_hints_honor = true
 
 end)
+
+tag.connect_signal("", function(t) end)
 
 -- }}}
 
