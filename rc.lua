@@ -207,9 +207,9 @@ awful.screen.connect_for_each_screen(function(s)
     set_wallpaper(s)
 
     for i=1,max_tags,1 do
-        t = make_default_tag(i, s)
+        make_default_tag(i, s)
     end
-    t:view_only()
+    s.tags[1]:view_only()
     
 
     -- Create a promptbox for each screen
@@ -268,8 +268,6 @@ awful.screen.connect_for_each_screen(function(s)
     }
 end)
 -- }}}
-
--- awful.tag.view_only(awful.screen.focused().tags[1])
 
 -- {{{ Mouse bindings
 root.buttons(gears.table.join(
