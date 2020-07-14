@@ -207,8 +207,10 @@ awful.screen.connect_for_each_screen(function(s)
     set_wallpaper(s)
 
     for i=1,max_tags,1 do
-        make_default_tag(i, s)
+        t = make_default_tag(i, s)
     end
+    t:view_only()
+    
 
     -- Create a promptbox for each screen
     s.mypromptbox = awful.widget.prompt()
@@ -668,10 +670,11 @@ client.connect_signal("unfocus", function(c) c.border_color = beautiful.border_n
 client.connect_signal("property::floating", function(c)
     if c.floating  then
         awful.titlebar.show(c)
+        c.size_hints_honor = true
     else
         awful.titlebar.hide(c)
+        c.size_hints_honor = false
     end
-    c.size_hints_honor = true
 
 end)
 

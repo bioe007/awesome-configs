@@ -5,6 +5,7 @@
 
 -- Alternative icon sets and widget icons:
 --  * http://awesome.naquadah.org/wiki/Nice_Icons
+local dpi = require("beautiful.xresources").apply_dpi
 
 -- {{{ Main
 theme = {}
@@ -27,7 +28,8 @@ theme.bg_urgent = "#3F3F3F"
 -- }}}
 
 -- {{{ Borders
-theme.border_width  = "4"
+theme.useless_gap   = dpi(2)
+theme.border_width  = dpi(4)
 theme.border_normal = "#3F3636"
 theme.border_focus  = "#6FAF6F"
 theme.border_marked = "#CC9393"
