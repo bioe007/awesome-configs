@@ -3,15 +3,11 @@
 pcall(require, "luarocks.loader")
 
 
--- Standard awesome library
 local gears = require("gears")
 local awful = require("awful")
 require("awful.autofocus")
--- Widget and layout library
 local wibox = require("wibox")
--- Theme handling library
 local beautiful = require("beautiful")
--- Notification library
 local naughty = require("naughty")
 local menubar = require("menubar")
 local hotkeys_popup = require("awful.hotkeys_popup")
@@ -26,7 +22,6 @@ local conky = require("conky")
 -- Enable hotkeys help widget for VIM and other apps
 -- when client with a matching name is opened:
 require("awful.hotkeys_popup.keys")
-
 
 -- {{{ Error handling
 if awesome.startup_errors then
@@ -50,7 +45,8 @@ do
 end
 -- }}}
 
-beautiful.init("/home/perry/.config/awesome/themes/zenburn/theme.lua")
+beautiful.init(
+    gears.filesystem.get_configuration_dir() ..  "themes/zenburn/theme.lua")
 
 terminal = "urxvt"
 editor = os.getenv("EDITOR") or "vim"
@@ -72,7 +68,7 @@ autostart_applications = {
 }
 
 for app = 1, #autostart_applications do
-       awful.spawn.with_shell(autostart_applications[app])
+    awful.spawn.with_shell(autostart_applications[app])
 end
 
 
@@ -251,16 +247,44 @@ awful.screen.connect_for_each_screen(function(s)
                 conky = "${cpu}%",
             }),
             conky.widget({
+                label = " ",
+                conky = "",
+            }),
+            conky.widget({
                 label = "MEM: ",
                 conky = "${memperc}%",
+            }),
+            conky.widget({
+                label = " ",
+                conky = "",
             }),
             conky.widget({
                 label = "T_CPU: ",
                 conky = "${hwmon 1 temp 1}",
             }),
             conky.widget({
+                label = " ",
+                conky = "",
+            }),
+            conky.widget({
                 label = "T_GPU: ",
                 conky = "${nvidia temp}",
+            }),
+            conky.widget({
+                label = " ",
+                conky = "",
+            }),
+            conky.widget({
+                label = "/: ",
+                conky = "${diskio /dev/disk/by-path/pci-0000:01:00.0-nvme-1-part5}",
+            }),
+            conky.widget({
+                label = " ",
+                conky = "",
+            }),
+            conky.widget({
+                label = "var: ",
+                conky = "${diskio /dev/disk/by-path/pci-0000:01:00.0-nvme-1-part6}",
             }),
             -- wibox.widget.systray(),
             s.mylayoutbox,
@@ -290,22 +314,30 @@ globalkeys = gears.table.join(
     awful.key({ modkey,           }, "Escape", awful.tag.history.restore,
               {description = "go back", group = "tag"}),
 
-    awful.key({ modkey,           }, "j",
+    --- Experimental - by-direction...
+    awful.key({modkey,}, "j",
         function ()
-            awful.client.focus.byidx( 1)
+            awful.client.focus.global_bydirection("down", nil, true)
         end,
         {description = "focus next by index", group = "client"}
     ),
-    awful.key({ modkey,           }, "k",
+    awful.key({modkey,}, "k",
         function ()
-            awful.client.focus.byidx(-1)
+            awful.client.focus.global_bydirection("up", nil, true)
         end,
         {description = "focus previous by index", group = "client"}
     ),
-    -- awful.key({ modkey,           }, "w", function () mymainmenu:show() end,
-    --           {description = "show main menu", group = "awesome"}),
-
-    -- Layout manipulation
+    awful.key({ modkey }, "h",
+    function()
+        awful.client.focus.global_bydirection("left", nil, true)
+        if client.focus then client.focus:raise() end
+    end),
+    awful.key({ modkey }, "l",
+    function()
+        awful.client.focus.global_bydirection("right", nil, true)
+        if client.focus then client.focus:raise() end
+    end),
+    --- end experiment
     awful.key({ modkey, "Shift"   }, "j", function () awful.client.swap.byidx(  1)    end,
               {description = "swap with next client by index", group = "client"}),
     awful.key({ modkey, "Shift"   }, "k", function () awful.client.swap.byidx( -1)    end,
@@ -350,9 +382,9 @@ globalkeys = gears.table.join(
     awful.key({ modkey, "Shift"   }, "q", awesome.quit,
               {description = "quit awesome", group = "awesome"}),
 
-    awful.key({ modkey,           }, "l",     function () awful.tag.incmwfact( 0.05)          end,
+              awful.key({ modkey,           }, "-",     function () awful.tag.incmwfact( 0.05)          end,
               {description = "increase master width factor", group = "layout"}),
-    awful.key({ modkey,           }, "h",     function () awful.tag.incmwfact(-0.05)          end,
+    awful.key({ modkey, "Shift"   }, "=",     function () awful.tag.incmwfact(-0.05)          end,
               {description = "decrease master width factor", group = "layout"}),
     awful.key({ modkey, "Shift"   }, "h",     function () awful.tag.incnmaster( 1, nil, true) end,
               {description = "increase the number of master clients", group = "layout"}),
@@ -401,12 +433,19 @@ clientkeys = gears.table.join(
     awful.key({ modkey, "Control" },
               "space", function(c) awful.client.floating.toggle(c) end,
               {description = "toggle floating", group = "client"}),
-    awful.key({ modkey, "Control" }, "Return", function (c) c:swap(awful.client.getmaster()) end,
-              {description = "move to master", group = "client"}),
+    awful.key({modkey, "Control"}, "Return", function(c)
+            master = awful.client.getmaster()
+            if c == master then
+                c:swap(awful.client.focus.history.get(c.screen, 1))
+            else
+                c:swap(master)
+            end
+        end,
+        {description = "move to master", group = "client"}),
     awful.key({ modkey,           }, "o",      function (c) c:move_to_screen()               end,
               {description = "move to screen", group = "client"}),
-    awful.key({ modkey,           }, "t",      function (c) c.ontop = not c.ontop            end,
-              {description = "toggle keep on top", group = "client"}),
+    -- awful.key({ modkey,           }, "t",      function (c) c.ontop = not c.ontop            end,
+              -- {description = "toggle keep on top", group = "client"}),
     awful.key({ modkey,           }, "m",
         function (c)
             c.maximized = not c.maximized
@@ -524,6 +563,7 @@ awful.rules.rules = {
             class = {
                 "Caja",
                 "Mate-control-center",
+                "Mate-appearance-properties",
                 "Signal",
                 "Slack",
                 "Wpa_gui",
@@ -660,7 +700,10 @@ client.connect_signal("mouse::enter", function(c)
     end
 end)
 
-client.connect_signal("focus", function(c) c.border_color = beautiful.border_focus end)
+client.connect_signal("focus", function(c)
+    c.border_color = beautiful.border_focus
+    c.ontop = true
+end)
 client.connect_signal("unfocus", function(c) c.border_color = beautiful.border_normal end)
 
 client.connect_signal("property::floating", function(c)
