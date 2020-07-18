@@ -314,7 +314,7 @@ globalkeys = gears.table.join(
     awful.key({ modkey,           }, "Escape", awful.tag.history.restore,
               {description = "go back", group = "tag"}),
 
-    --- Experimental - by-direction...
+    --- Experimental - by-direction... {{{
     awful.key({modkey,}, "j",
         function ()
             awful.client.focus.global_bydirection("down", nil, true)
@@ -337,7 +337,16 @@ globalkeys = gears.table.join(
         awful.client.focus.global_bydirection("right", nil, true)
         if client.focus then client.focus:raise() end
     end),
-    --- end experiment
+    -- by direction w/cursors because sometimes windows are buried
+    awful.key({modkey}, "Up",
+    function()
+        awful.client.focus.byidx(1)
+    end),
+    awful.key({modkey}, "Down",
+    function()
+        awful.client.focus.byidx(-1)
+    end),
+    --- end experiment }}}
     awful.key({ modkey, "Shift"   }, "j", function () awful.client.swap.byidx(  1)    end,
               {description = "swap with next client by index", group = "client"}),
     awful.key({ modkey, "Shift"   }, "k", function () awful.client.swap.byidx( -1)    end,
