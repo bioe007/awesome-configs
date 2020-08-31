@@ -164,30 +164,22 @@ local taglist_buttons = gears.table.join(
                 )
 
 local tasklist_buttons = gears.table.join(
-                     awful.button({ }, 1, function (c)
-                                              if c == client.focus then
-                                                  c.minimized = true
-                                              else
-                                                  c:emit_signal(
-                                                      "request::activate",
-                                                      "tasklist",
-                                                      {raise = true}
-                                                  )
-                                              end
-                                          end),
-                     awful.button({ }, 3, client_menu_toggle_fn()),
-                     awful.button({ }, 4, function ()
-                                              awful.client.focus.byidx(1)
-                                          end),
-                     awful.button({ }, 5, function ()
-                                              awful.client.focus.byidx(-1)
-                                          end))
+    awful.button({}, 1,
+        function (c)
+            if c == client.focus then
+                c.minimized = true
+            else
+                c:emit_signal("request::activate", "tasklist", {raise = true})
+            end
+        end),
+    awful.button({}, 3, client_menu_toggle_fn()),
+    awful.button({}, 4, function() awful.client.focus.byidx(1) end),
+    awful.button({}, 5, function() awful.client.focus.byidx(-1) end)
+)
 
 local function set_wallpaper(s)
-    -- Wallpaper
     if beautiful.wallpaper then
         local wallpaper = beautiful.wallpaper
-        -- If wallpaper is a function, call it with the screen
         if type(wallpaper) == "function" then
             wallpaper = wallpaper(s)
         end
@@ -195,7 +187,7 @@ local function set_wallpaper(s)
     end
 end
 
--- Re-set wallpaper when a screen's geometry changes (e.g. different resolution)
+-- Re-set wallpaper when a screen's geometry changes
 screen.connect_signal("property::geometry", set_wallpaper)
 
 awful.screen.connect_for_each_screen(function(s)
@@ -337,7 +329,7 @@ globalkeys = gears.table.join(
         awful.client.focus.global_bydirection("right", nil, true)
         if client.focus then client.focus:raise() end
     end),
-    -- by direction w/cursors because sometimes windows are buried
+    -- by index w/cursors because sometimes windows are buried
     awful.key({modkey}, "Up",
     function()
         awful.client.focus.byidx(1)
@@ -357,7 +349,7 @@ globalkeys = gears.table.join(
               {description = "focus the previous screen", group = "screen"}),
     awful.key({ modkey,           }, "u", awful.client.urgent.jumpto,
               {description = "jump to urgent client", group = "client"}),
-    awful.key({ modkey,           }, "Tab",
+    awful.key({modkey, }, "Tab",
         function ()
             awful.client.focus.history.previous()
             if client.focus then
@@ -367,12 +359,13 @@ globalkeys = gears.table.join(
         {description = "go back", group = "client"}),
 
     -- Standard program
-    awful.key({ modkey,           }, "Return", function () awful.spawn(terminal) end,
-              {description = "open a terminal", group = "launcher"}),
+    awful.key({modkey, }, "Return", function() awful.spawn(terminal) end,
+              {description = "open a terminal", group="launcher"}),
 
-    awful.key({ modkey,           }, "w", function () awful.spawn("google-chrome") end,
+    awful.key({modkey,}, "w", function() awful.spawn("google-chrome") end,
               {description = "Browser", group = "launcher"}),
 
+    -- {{{ Media
     awful.key({}, "XF86MediaPlayer", launch("gpmdp"),
               {description = "Start music", group = "launcher"}),
     awful.key({}, "XF86AudioPlay", launch("playerctl play-pause"),
@@ -381,37 +374,37 @@ globalkeys = gears.table.join(
               {description = "Next song", group = "launcher"}),
     awful.key({}, "XF86AudioPrev", launch("playerctl previous"),
               {description = "Next song", group = "launcher"}),
-    -- awful.key({}, "XF86AudioRaiseVolume", launch("/home/perry/bin/pavol +5%"),
-              -- {description = "Raise volume", group = "launcher"}),
-    -- awful.key({}, "XF86AudioLowerVolume", launch("/home/perry/bin/pavol -5%"),
-              -- {description = "...", group = "launcher"}),
+    -- }}}
 
-    awful.key({ modkey, "Control" }, "r", awesome.restart,
+    awful.key({modkey, "Control"}, "r", awesome.restart,
               {description = "reload awesome", group = "awesome"}),
-    awful.key({ modkey, "Shift"   }, "q", awesome.quit,
+    awful.key({modkey, "Shift"}, "q", awesome.quit,
+              {description = "quit awesome", group = "awesome"}),
+    awful.key({modkey,}, "0", launch("mate-screensaver-command -l"),
               {description = "quit awesome", group = "awesome"}),
 
-              awful.key({ modkey,           }, "-",     function () awful.tag.incmwfact( 0.05)          end,
+    -- {{{ Layout Manipulation
+    awful.key({modkey,}, "-", function() awful.tag.incmwfact( 0.05) end,
               {description = "increase master width factor", group = "layout"}),
-    awful.key({ modkey, "Shift"   }, "=",     function () awful.tag.incmwfact(-0.05)          end,
+    awful.key({modkey, "Shift"}, "=", function() awful.tag.incmwfact(-0.05) end,
               {description = "decrease master width factor", group = "layout"}),
-    awful.key({ modkey, "Shift"   }, "h",     function () awful.tag.incnmaster( 1, nil, true) end,
+    awful.key({modkey, "Shift"}, "h", function() awful.tag.incnmaster( 1, nil, true) end,
               {description = "increase the number of master clients", group = "layout"}),
-    awful.key({ modkey, "Shift"   }, "l",     function () awful.tag.incnmaster(-1, nil, true) end,
+    awful.key({modkey, "Shift"}, "l", function() awful.tag.incnmaster(-1, nil, true) end,
               {description = "decrease the number of master clients", group = "layout"}),
-    awful.key({ modkey, "Control" }, "h",     function () awful.tag.incncol( 1, nil, true)    end,
+    awful.key({modkey, "Control"}, "h", function() awful.tag.incncol( 1, nil, true) end,
               {description = "increase the number of columns", group = "layout"}),
-    awful.key({ modkey, "Control" }, "l",     function () awful.tag.incncol(-1, nil, true)    end,
+    awful.key({modkey, "Control"}, "l", function() awful.tag.incncol(-1, nil, true) end,
               {description = "decrease the number of columns", group = "layout"}),
-    awful.key({ modkey, "Mod1"   }, "space", function () awful.layout.inc( 1)                end,
+    awful.key({modkey, "Mod1"   }, "space", function() awful.layout.inc( 1) end,
               {description = "select next", group = "layout"}),
-    awful.key({ modkey, "Mod1"   }, "l", function () awful.layout.inc(-1)                end,
+    awful.key({modkey, "Mod1"   }, "l", function() awful.layout.inc(-1) end,
               {description = "select previous", group = "layout"}),
+    -- }}}
 
-    -- Prompt
-    awful.key({ modkey },            "r",     function () awful.screen.focused().mypromptbox:run() end,
-              {description = "run prompt", group = "launcher"}),
-
+    awful.key({modkey}, "r",
+        function() awful.screen.focused().mypromptbox:run() end,
+        {description = "run prompt", group = "launcher"}),
     awful.key({ modkey, "Shift" }, "c",
               function ()
                   awful.prompt.run {
@@ -561,7 +554,37 @@ awful.rules.rules = {
             placement = awful.placement.no_overlap+awful.placement.no_offscreen
         }
     },
-
+    -- {
+        -- rule_any = {
+            -- -- name = {
+                -- -- "Steam HTML FullScreen",
+            -- -- },
+            -- class = {
+                -- "masseffect.exe",
+            -- },
+        -- },
+        -- properties = {
+            -- floating = true,
+            -- fullscreen = true,
+            -- ontop = true,
+            -- titlebars_enabled = false,
+        -- }
+            
+    -- },
+    {
+        rule_any = {
+        name = {"Mass Effect"},
+            class = {
+                "masseffect.exe",
+            },
+        },
+        properties = {
+            floating = false,
+            maximized = true,
+            ontop = true,
+            titlebars_enabled = false,
+        }
+    },
     -- Floating clients.
     {
         rule_any = {
