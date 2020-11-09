@@ -223,65 +223,76 @@ awful.screen.connect_for_each_screen(function(s)
         buttons = tasklist_buttons
     }
 
-    s.mywibox = awful.wibar({ position = "top", screen = s })
+    spacer = wibox.widget{
+        -- shape = gears.shape.circle,
+        color = beautiful.bg_normal,
+        widget = wibox.widget.separator,
+        forced_width = 20,
+        -- visible = false,
+        -- thickness = 4,
+        -- widget = wibox.widget.textbox,
+    }
+
+    s.mywibox = awful.wibar({position="top", screen=s})
     s.mywibox:setup {
+        spacing = 20,
+        spacing_widget = spacer,
         layout = wibox.layout.align.horizontal,
+        -- {
+            -- spacing = 100,
+            -- spacer,
+            -- spacing_widget = spacer,
+            -- layout = wibox.layout.fixed.horizontal,
+        -- },
         { -- Left widgets
+            spacing = 20,
+            spacing_widget = spacer,
             layout = wibox.layout.fixed.horizontal,
             mylauncher,
             s.mytaglist,
             s.mypromptbox,
         },
-        s.mytasklist, -- Middle widget
+        s.mytasklist,
+        -- Actual widgets here 
         {
             layout = wibox.layout.fixed.horizontal,
+            spacing = 20,
+            spacing_widget = spacer,
             conky.widget({
-                label = "CPU: ",
+                icon = beautiful.widget_cpu,
                 conky = "${cpu}%",
             }),
             conky.widget({
-                label = " ",
-                conky = "",
+                icon = beautiful.widget_temp,
+                conky = "${hwmon 0 temp 1}",
             }),
             conky.widget({
-                label = "MEM: ",
+                icon = beautiful.widget_mem,
                 conky = "${memperc}%",
             }),
             conky.widget({
-                label = " ",
-                conky = "",
-            }),
-            conky.widget({
-                label = "T_CPU: ",
-                conky = "${hwmon 1 temp 1}",
-            }),
-            conky.widget({
-                label = " ",
-                conky = "",
-            }),
-            conky.widget({
-                label = "T_GPU: ",
+                icon = beautiful.widget_temp,
                 conky = "${nvidia temp}",
             }),
             conky.widget({
-                label = " ",
-                conky = "",
+                icon = beautiful.widget_hdd,
+                conky = "${fs_used_perc /}%",
             }),
-            conky.widget({
-                label = "/: ",
-                conky = "${diskio /dev/disk/by-path/pci-0000:01:00.0-nvme-1-part5}",
-            }),
-            conky.widget({
-                label = " ",
-                conky = "",
-            }),
-            conky.widget({
-                label = "var: ",
-                conky = "${diskio /dev/disk/by-path/pci-0000:01:00.0-nvme-1-part6}",
-            }),
-            -- wibox.widget.systray(),
             s.mylayoutbox,
         },
+            -- conky.widget({
+                -- label = "/: ",
+                -- conky = "${diskio /dev/disk/by-path/pci-0000:01:00.0-nvme-1-part5}",
+            -- }),
+            -- conky.widget({
+                -- label = " ",
+                -- conky = "",
+            -- }),
+            -- conky.widget({
+                -- label = "var: ",
+                -- conky = "${diskio /dev/disk/by-path/pci-0000:01:00.0-nvme-1-part6}",
+            -- }),
+            -- wibox.widget.systray(),
     }
 end)
 -- }}}
