@@ -46,7 +46,8 @@ end
 -- }}}
 
 beautiful.init(
-    gears.filesystem.get_configuration_dir() ..  "themes/zenburn/theme.lua")
+    -- gears.filesystem.get_configuration_dir() ..  "themes/zenburn/theme.lua")
+    gears.filesystem.get_configuration_dir() ..  "themes/dracon/theme.lua")
 
 terminal = "urxvt"
 editor = os.getenv("EDITOR") or "vim"
@@ -707,11 +708,11 @@ client.connect_signal("request::titlebars", function(c)
             layout  = wibox.layout.flex.horizontal
         },
         { -- Right
-            awful.titlebar.widget.floatingbutton (c),
+            awful.titlebar.widget.floatingbutton(c),
             awful.titlebar.widget.maximizedbutton(c),
-            awful.titlebar.widget.stickybutton   (c),
-            awful.titlebar.widget.ontopbutton    (c),
-            awful.titlebar.widget.closebutton    (c),
+            awful.titlebar.widget.stickybutton(c),
+            awful.titlebar.widget.ontopbutton(c),
+            awful.titlebar.widget.closebutton(c),
             layout = wibox.layout.fixed.horizontal()
         },
         layout = wibox.layout.align.horizontal
