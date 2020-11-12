@@ -57,7 +57,7 @@ modkey = "Mod4"
 
 max_tags = 5
 
-autostart_applications = { 
+autostart_applications = {
     "mate-session",
     -- Disabled everything below here and just leaning on mate
     -- "mate-settings-daemon",
@@ -98,7 +98,7 @@ local function make_default_tag(number, screen, volatile)
     })
 end
 
-local function launch(s) 
+local function launch(s)
     lf = function()
         awful.util.spawn(s, false)
     end
@@ -199,7 +199,7 @@ awful.screen.connect_for_each_screen(function(s)
         make_default_tag(i, s)
     end
     s.tags[1]:view_only()
-    
+
 
     -- Create a promptbox for each screen
     s.mypromptbox = awful.widget.prompt()
@@ -220,44 +220,76 @@ awful.screen.connect_for_each_screen(function(s)
     s.mytasklist = awful.widget.tasklist {
         screen  = s,
         filter  = awful.widget.tasklist.filter.currenttags,
-        buttons = tasklist_buttons
-    }
+        buttons = tasklist_buttons,
+        style = { shape = gears.shape.rectangular_tag, },
+        layout = {
+            spacing_widget = {
+                {
+                    forced_width = 5,
+                    thickness = 1,
+                    color = beautiful.bg_normal,
+                    widget = wibox.widget.separator,
+                },
+                valign = 'center',
+                halign = 'center',
+                widget = wibox.container.place,
+            },
+            spacing = 1,
+            layout = wibox.layout.flex.horizontal,
+       },
+       widget_template = {
+           {
+               {
+                   {
+                       {
+                           id     = 'icon_role',
+                           widget = wibox.widget.imagebox,
+                       },
+                       margins = 2,
+                       widget  = wibox.container.margin,
+                   },
+                   {
+                       id     = 'text_role',
+                       widget = wibox.widget.textbox,
+                   },
+                   layout = wibox.layout.fixed.horizontal,
+               },
+               left  = 10,
+               right = 10,
+               widget = wibox.container.margin
+           },
+           id     = 'background_role',
+           widget = wibox.container.background,
+       },
+   }
 
     spacer = wibox.widget{
         -- shape = gears.shape.circle,
         color = beautiful.bg_normal,
         widget = wibox.widget.separator,
-        forced_width = 20,
-        -- visible = false,
-        -- thickness = 4,
-        -- widget = wibox.widget.textbox,
+        -- forced_width = 20,
     }
 
-    s.mywibox = awful.wibar({position="top", screen=s})
+    s.mywibox = awful.wibar({position="top", screen=s, width=1920, height=36})
+    -- s.mywibox.height=44
     s.mywibox:setup {
         spacing = 20,
         spacing_widget = spacer,
         layout = wibox.layout.align.horizontal,
-        -- {
-            -- spacing = 100,
-            -- spacer,
-            -- spacing_widget = spacer,
-            -- layout = wibox.layout.fixed.horizontal,
-        -- },
         { -- Left widgets
-            spacing = 20,
-            spacing_widget = spacer,
+            -- spacing = 20,
+            -- spacing_widget = spacer,
             layout = wibox.layout.fixed.horizontal,
             mylauncher,
             s.mytaglist,
             s.mypromptbox,
         },
         s.mytasklist,
-        -- Actual widgets here 
+        -- Actual widgets here
         {
             layout = wibox.layout.fixed.horizontal,
-            spacing = 20,
-            spacing_widget = spacer,
+            -- spacing = 20,
+            -- spacing_widget = spacer,
             conky.widget({
                 icon = beautiful.widget_cpu,
                 conky = "${cpu}%",
@@ -279,6 +311,7 @@ awful.screen.connect_for_each_screen(function(s)
                 conky = "${fs_used_perc /}%",
             }),
             s.mylayoutbox,
+            wibox.widget.systray(),
         },
             -- conky.widget({
                 -- label = "/: ",
@@ -292,7 +325,6 @@ awful.screen.connect_for_each_screen(function(s)
                 -- label = "var: ",
                 -- conky = "${diskio /dev/disk/by-path/pci-0000:01:00.0-nvme-1-part6}",
             -- }),
-            -- wibox.widget.systray(),
     }
 end)
 -- }}}
@@ -510,7 +542,7 @@ for i = 1, 9 do
                       if c then
                         local tag = awful.tag.find_by_name(screen, tostring(i))
                         if not tag then
-                            tag = make_default_tag(tostring(i),c.screen, true) 
+                            tag = make_default_tag(tostring(i),c.screen, true)
                         end
                         c:move_to_tag(tag)
                       end
@@ -581,7 +613,7 @@ awful.rules.rules = {
             -- ontop = true,
             -- titlebars_enabled = false,
         -- }
-            
+
     -- },
     {
         rule_any = {
@@ -641,7 +673,7 @@ awful.rules.rules = {
     },
 
     -- Add titlebars to normal clients and dialogs
-    { 
+    {
         rule_any = {
             type = { "normal", "dialog" }
         },

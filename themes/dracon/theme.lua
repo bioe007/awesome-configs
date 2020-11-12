@@ -104,7 +104,7 @@ theme.widget_scissors    = theme.dir .. "/icons/scissors.png"
 theme.widget_weather     = theme.dir .. "/icons/dish.png"
 
 theme.tasklist_plain_task_name                  = true
-theme.tasklist_disable_icon                     = true
+theme.tasklist_disable_icon                     = false
 
 theme.titlebar_close_button_focus               = theme.dir .. "/icons/titlebar/close_focus.png"
 theme.titlebar_close_button_normal              = theme.dir .. "/icons/titlebar/close_normal.png"
