@@ -44,6 +44,9 @@ theme.tasklist_bg_focus = dark_purple
 theme.tasklist_fg_focus = yellow_bright -- "#CC00CC"
 theme.tasklist_fg_normal = purple_light
 
+theme.layoutlist_bg_selected = purple_light
+theme.layoutlist_fg_selected = yellow_bright
+
 theme.useless_gap   = dpi(6)
 theme.border_width  = dpi(4)
 theme.border_normal = "#330033"
