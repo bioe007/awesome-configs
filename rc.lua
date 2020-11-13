@@ -46,7 +46,6 @@ end
 -- }}}
 
 beautiful.init(
-    -- gears.filesystem.get_configuration_dir() ..  "themes/zenburn/theme.lua")
     gears.filesystem.get_configuration_dir() ..  "themes/dracon/theme.lua")
 
 terminal = "urxvt"
@@ -55,7 +54,7 @@ editor_cmd = terminal .. " -e " .. editor
 
 modkey = "Mod4"
 
-max_tags = 5
+max_tags = 4
 
 autostart_applications = {
     "mate-session",
@@ -76,13 +75,13 @@ end
 -- Table of layouts to cover with awful.layout.inc, order matters.
 awful.layout.layouts = {
     lain.layout.centerwork,
-    lain.layout.termfair.center,
-    awful.layout.suit.tile.bottom,
     awful.layout.suit.tile,
+    awful.layout.suit.tile.bottom,
     awful.layout.suit.floating,
+    awful.layout.suit.fair,
+    -- lain.layout.termfair.center,
     -- awful.layout.suit.tile.left,
     -- awful.layout.suit.tile.top,
-    awful.layout.suit.fair,
     -- awful.layout.suit.fair.horizontal,
     -- awful.layout.suit.max,
     -- awful.layout.suit.magnifier,
@@ -93,7 +92,7 @@ local function make_default_tag(number, screen, volatile)
     return awful.tag.add(tostring(number), {
         screen=screen,
         layout=awful.layout.layouts[1],
-        master_count=0,
+        master_count=1,
         volatile=volatile,
     })
 end
@@ -117,6 +116,51 @@ local function client_menu_toggle_fn()
         end
     end
 end
+-- }}}
+
+-- {{{ Layout Dialog
+-- My new, preferred way to change layouts.
+local ll = awful.widget.layoutlist {
+    opacity = .5,   -- TODO - this isn't working.
+    base_layout = wibox.widget {
+        spacing         = 15,
+        forced_num_cols = 5,
+        layout          = wibox.layout.grid.vertical,
+    },
+    widget_template = {
+        {
+            {
+                id            = 'icon_role',
+                forced_height = 96,
+                forced_width  = 96,
+                widget        = wibox.widget.imagebox,
+            },
+            margins = 4,
+            widget  = wibox.container.margin,
+        },
+        id              = 'background_role',
+        forced_width    = 96,
+        forced_height   = 96,
+        shape           = gears.shape.rounded_rect,
+        widget          = wibox.container.background,
+    },
+}
+
+
+local layout_popup = awful.popup {
+    widget = wibox.widget {
+        ll,
+        margins = 48,
+        widget  = wibox.container.margin,
+    },
+    border_color = beautiful.fg_magenta,
+    border_width = beautiful.border_width,
+    placement    = awful.placement.centered,
+    ontop        = true,
+    visible      = false,
+    shape        = gears.shape.rounded_rect
+}
+
 -- }}}
 
 -- {{{ Menu
@@ -311,7 +355,7 @@ awful.screen.connect_for_each_screen(function(s)
                 conky = "${fs_used_perc /}%",
             }),
             s.mylayoutbox,
-            wibox.widget.systray(),
+            -- wibox.widget.systray(),
         },
             -- conky.widget({
                 -- label = "/: ",
@@ -341,7 +385,7 @@ root.buttons(gears.table.join(
 
 -- {{{ Key bindings
 globalkeys = gears.table.join(
-    awful.key({ modkey,           }, "s",      hotkeys_popup.show_help,
+    awful.key({ modkey, }, "s",      hotkeys_popup.show_help,
               {description="show help", group="awesome"}),
     awful.key({ modkey, "Shift"   }, "space",   awful.tag.viewprev,
               {description = "view previous", group = "tag"}),
@@ -391,8 +435,8 @@ globalkeys = gears.table.join(
               {description = "focus the next screen", group = "screen"}),
     awful.key({ modkey, "Control" }, "k", function () awful.screen.focus_relative(-1) end,
               {description = "focus the previous screen", group = "screen"}),
-    awful.key({ modkey,           }, "u", awful.client.urgent.jumpto,
-              {description = "jump to urgent client", group = "client"}),
+    -- awful.key({ modkey,           }, "u", awful.client.urgent.jumpto,
+              -- {description = "jump to urgent client", group = "client"}),
     awful.key({modkey, }, "Tab",
         function ()
             awful.client.focus.history.previous()
@@ -405,9 +449,12 @@ globalkeys = gears.table.join(
     -- Standard program
     awful.key({modkey, }, "Return", function() awful.spawn(terminal) end,
               {description = "open a terminal", group="launcher"}),
-
-    awful.key({modkey,}, "w", function() awful.spawn("google-chrome") end,
+    awful.key({modkey, Mod1}, "c", function() awful.spawn("code") end,
+              {description = "ide - VS Code", group = "launcher"}),
+    awful.key({modkey, Mod1}, "w", function() awful.spawn("google-chrome-stable") end,
               {description = "Browser", group = "launcher"}),
+    awful.key({modkey, Mod1}, "v", function() awful.spawn("gvim") end,
+              {description = "editor - vim", group = "launcher"}),
 
     -- {{{ Media
     awful.key({}, "XF86MediaPlayer", launch("gpmdp"),
@@ -428,9 +475,9 @@ globalkeys = gears.table.join(
               {description = "quit awesome", group = "awesome"}),
 
     -- {{{ Layout Manipulation
-    awful.key({modkey,}, "-", function() awful.tag.incmwfact( 0.05) end,
+    awful.key({modkey}, "-", function() awful.tag.incmwfact(-0.05) end,
               {description = "increase master width factor", group = "layout"}),
-    awful.key({modkey, "Shift"}, "=", function() awful.tag.incmwfact(-0.05) end,
+    awful.key({modkey}, "=", function() awful.tag.incmwfact(0.05) end,
               {description = "decrease master width factor", group = "layout"}),
     awful.key({modkey, "Shift"}, "h", function() awful.tag.incnmaster( 1, nil, true) end,
               {description = "increase the number of master clients", group = "layout"}),
@@ -440,10 +487,6 @@ globalkeys = gears.table.join(
               {description = "increase the number of columns", group = "layout"}),
     awful.key({modkey, "Control"}, "l", function() awful.tag.incncol(-1, nil, true) end,
               {description = "decrease the number of columns", group = "layout"}),
-    awful.key({modkey, "Mod1"   }, "space", function() awful.layout.inc( 1) end,
-              {description = "select next", group = "layout"}),
-    awful.key({modkey, "Mod1"   }, "l", function() awful.layout.inc(-1) end,
-              {description = "select previous", group = "layout"}),
     -- }}}
 
     awful.key({modkey}, "r",
@@ -474,7 +517,7 @@ clientkeys = gears.table.join(
     awful.key({modkey, "Shift"}, "0",
               function(c) c.sticky = not c.sticky end,
               {description = "Stick it", group = "client"}),
-    awful.key({ modkey, }, "x",      function (c) c:kill()                         end,
+    awful.key({ modkey, }, "x", function(c) c:kill() end,
               {description = "close", group = "client"}),
     awful.key({ modkey, "Control" },
               "space", function(c) awful.client.floating.toggle(c) end,
@@ -697,6 +740,29 @@ awful.rules.rules = {
 
 }
 -- }}}
+
+-- {{{ Layout Dialog manipulation
+--
+awful.keygrabber {
+    start_callback = function() layout_popup.visible = true  end,
+    stop_callback  = function() layout_popup.visible = false end,
+    export_keybindings = true,
+    release_event = 'release',
+    stop_key = {'Escape', 'Super_L', 'Super_R', 'Return'},
+    keybindings = {
+        {
+            {modkey}, "u",
+            function() awful.layout.inc(1) end
+        },
+        {
+            {modkey, "Shift"}, "u",
+            -- TODO: This works *ONCE*
+            function() awful.layout.inc(-1) end
+        },
+    }
+}
+-- }}}
+
 
 -- {{{ Signals
 -- Signal function to execute when a new client appears.
