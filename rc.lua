@@ -1,10 +1,9 @@
 -- {{{ quick TODO list - 
 -- 1. fix default layout on second monitor / distinct layouts per monitor (poss
 -- dimension based)
--- 2. 'easy' bluetooth connection at startup?
--- 3. network widget/vis
--- 4. cpu and memory widgets
-
+-- 3. network widget/vis (for laptop)
+-- 4. cpu and memory widgets (heat for laptop)
+-- 5. battery for laptop
 
 -- If LuaRocks is installed, make sure that packages installed through it are
 -- found (e.g. lgi). If LuaRocks is not installed, do nothing.
@@ -23,6 +22,8 @@ local naughty = require("naughty")
 local menubar = require("menubar")
 local hotkeys_popup = require("awful.hotkeys_popup")
 local lain = require("lain")
+
+local audio_widget = require("awesome-pulseaudio-widget")
 
 -- More efficient CPU/temp widgets from conky here:
 --                  https://github.com/varingst/awesome-conky
@@ -60,7 +61,8 @@ end
 -- }}}
 
 beautiful.init(
-    gears.filesystem.get_configuration_dir() ..  "themes/dracon/theme.lua")
+    -- gears.filesystem.get_configuration_dir() ..  "themes/dracon/theme.lua")
+    gears.filesystem.get_configuration_dir() ..  "themes/everforest/theme.lua")
 
 terminal = "urxvt"
 editor = os.getenv("EDITOR") or "vim"
@@ -304,6 +306,7 @@ awful.screen.connect_for_each_screen(function(s)
             layout = wibox.layout.fixed.horizontal,
             mykeyboardlayout,
             wibox.widget.systray(),
+            audio_widget(),
             mytextclock,
             s.mylayoutbox,
         },
@@ -320,6 +323,11 @@ root.buttons(gears.table.join(
 -- }}}
 
 -- {{{ Key bindings
+
+-- A lot of the times this just "Does the Wrong Thing(tm)" so I give up and
+-- specify always the music player. 
+local playerctl = "playerctl -p youtube-music"
+
 globalkeys = gears.table.join(
     awful.key({ modkey,           }, "/",      hotkeys_popup.show_help,
               {description="show help", group="awesome"}),
@@ -330,15 +338,18 @@ globalkeys = gears.table.join(
     awful.key({ modkey,           }, "Escape", awful.tag.history.restore,
               {description = "go back", group = "tag"}),
 
+    --- {{{ Windo Navigation
     awful.key({ modkey,           }, "j",
         function ()
-            awful.client.focus.byidx( 1)
+        awful.client.focus.global_bydirection("down", nil, true)
+        if client.focus then client.focus:raise() end
         end,
         {description = "focus next by index", group = "client"}
     ),
     awful.key({ modkey,           }, "k",
         function ()
-            awful.client.focus.byidx(-1)
+            awful.client.focus.global_bydirection("up", nil, true)
+            if client.focus then client.focus:raise() end
         end,
         {description = "focus previous by index", group = "client"}
     ),
@@ -388,7 +399,7 @@ globalkeys = gears.table.join(
               {description = "reload awesome", group = "awesome"}),
     awful.key({modkey, "Shift"}, "q", awesome.quit,
               {description = "quit awesome", group = "awesome"}),
-    awful.key({modkey,}, "0", launch("xlock -mode blank"),
+    awful.key({modkey,}, "0", launch("dm-tool lock"),
               {description = "quit awesome", group = "awesome"}),
 
     -- {{{ Layout Manipulation
@@ -439,13 +450,13 @@ globalkeys = gears.table.join(
     awful.key({ modkey }, "p", function() menubar.show() end,
               {description = "show the menubar", group = "launcher"}),
     -- Media keys
-    awful.key({}, "XF86AudioPlay", function() awful.spawn.with_shell("playerctl play-pause") end),
-    awful.key({}, "XF86AudioNext", function() awful.spawn.with_shell("playerctl next") end),
-    awful.key({}, "XF86AudioPrev", function() awful.spawn.with_shell("playerctl previous") end),
+    awful.key({}, "XF86AudioPlay", function() awful.spawn.with_shell(playerctl .. " play-pause") end),
+    awful.key({}, "XF86AudioNext", function() awful.spawn.with_shell(playerctl .. " next") end),
+    awful.key({}, "XF86AudioPrev", function() awful.spawn.with_shell(playerctl .. " previous") end),
 
     awful.key({}, "XF86AudioRaiseVolume", function() os.execute("amixer set Master 5%+") end),
     awful.key({}, "XF86AudioLowerVolume", function() os.execute("amixer set Master 5%-") end),
-    awful.key({}, "XF86AudioMute", function() os.execute("pactl set-sink-mute 0 toggle") end)
+    awful.key({}, "XF86AudioMute", function() os.execute("amixer set Master toggle") end)
 
 )
 
@@ -466,7 +477,9 @@ clientkeys = gears.table.join(
     awful.key({modkey, "Control"}, "Return", function(c)
             master = awful.client.getmaster()
             if c == master then
-                c:swap(awful.client.focus.history.get(c.screen, 1))
+                -- quick hack to handle error when no other client on screen
+                swap_target = awful.client.focus.history.get(c.screen, 1)
+                if swap_target then c:swap(swap_target) end
             else
                 c:swap(master)
             end
@@ -489,7 +502,7 @@ for i = 1, 9 do
                         local screen = awful.screen.focused()
                         local tag = screen.tags[i]
                         if tag then
-                            if client.focus.first_tag == tag then
+                            if awful.screen.focused().selected_tag == tag then
                                 awful.tag.history.restore()
                             else
                                 tag:view_only()
@@ -563,18 +576,15 @@ awful.rules.rules = {
             keys = clientkeys,
             buttons = clientbuttons,
             screen = awful.screen.preferred,
-            placement = awful.placement.no_overlap+awful.placement.no_offscreen
+            placement = awful.placement.no_overlap+awful.placement.no_offscreen,
+	    titlebars_enabled = false,
         }
     },
-    -- Add titlebars to normal clients and dialogs
-    { rule_any = {type = { "normal", "dialog" }
-      }, properties = { titlebars_enabled = true }
-    },
+
     -- Floating clients.
     {
         rule_any = {
             instance = {
-                "DTA",  -- Firefox addon DownThemAll.
                 "copyq",  -- Includes session name in class.
             },
             class = {
@@ -589,28 +599,58 @@ awful.rules.rules = {
                 "YouTube Music Desktop App",
                 "YouTube Music", -- this is youtube-music-bin from aur
             },
-
             name = {
                 "Event Tester",  -- xev.
+                "Steam Settings",
             },
             role = {
                 "pop-up",       -- e.g. Google Chrome's (detached) Developer Tools.
             },
-            -- type = { "dialog" }
+            type = { "dialog" }
         },
-        properties = { floating = true }
+        properties = {
+            floating = true,
+            titlebars_enabled = true,
+        }
     },
 
     -- sticky clients
     {
         rule = { class =  "YouTube Music" , },
-        properties = { sticky = true, floating = true },
+        properties = {
+		sticky = true,
+		floating = true,
+            titlebars_enabled = true,
+	},
     },
 
-    -- Add titlebars to normal clients and dialogs
-    { rule_any = {type = { "normal", "dialog" }
-      }, properties = { titlebars_enabled = true }
+    { rule_any = { class = { "Steam" } },
+        properties = {
+            titlebars_enabled = false,
+            floating = true,
+            border_width = 0,
+            border_color = 0,
+            size_hints_honor = false,
+        },
     },
+
+    { rule_any = {
+        class = {"disco.exe",},
+        },
+      properties = {
+          titlebars_enabled = false,
+          fullscreen = true,
+          size_hints_honor = true,
+      },
+      callback = function(c)
+          if c.fullscreen then
+              gears.timer.delayed_call(function()
+                  if c.valid then c:geometry(c.screen.geometry) end
+              end
+              )
+          end
+      end,
+    }
 
     -- Set Firefox to always map on the tag named "2" on screen 1.
     -- { rule = { class = "Firefox" },
@@ -629,6 +669,11 @@ client.connect_signal("manage", function (c)
       and not c.size_hints.user_position
       and not c.size_hints.program_position then
         -- Prevent clients from being unreachable after screen count changes.
+        awful.placement.no_offscreen(c)
+    end
+
+    if c.transient_for then
+        awful.placement.centered(c, {parent=c.transient_for})
         awful.placement.no_offscreen(c)
     end
 end)
@@ -680,4 +725,14 @@ end)
 
 client.connect_signal("focus", function(c) c.border_color = beautiful.border_focus end)
 client.connect_signal("unfocus", function(c) c.border_color = beautiful.border_normal end)
+
+-- Properly size fullscreen clients over wibar
+-- see here: https://github.com/awesomeWM/awesome/issues/1608
+client.connect_signal("property::fullscreen", function(c)
+    if c.fullscreen then
+        gears.timer.delayed_call(function()
+            if c.valid then c:geometry(c.screen.geometry)  end
+        end)
+    end
+end)
 -- }}}
