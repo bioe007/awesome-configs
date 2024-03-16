@@ -1,4 +1,4 @@
--- {{{ quick TODO list - 
+-- {{{ quick TODO list -
 -- 1. fix default layout on second monitor / distinct layouts per monitor (poss
 -- dimension based)
 -- 3. network widget/vis (for laptop)
@@ -62,7 +62,8 @@ end
 
 beautiful.init(
     -- gears.filesystem.get_configuration_dir() ..  "themes/dracon/theme.lua")
-    gears.filesystem.get_configuration_dir() ..  "themes/everforest/theme.lua")
+    -- gears.filesystem.get_configuration_dir() ..  "themes/everforest/theme.lua")
+    gears.filesystem.get_configuration_dir() ..  "themes/nord/theme.lua")
 
 terminal = "urxvt"
 editor = os.getenv("EDITOR") or "vim"
@@ -101,8 +102,8 @@ local function screen_deets()
         print("geometry of screen " .. tostring(s))
         print("geom", s.geometry.width, s.geometry.height, s.geometry.width > s.geometry.height)
         print("dpi", s.dpi)
-        print("randr", s.outputs.name) 
-    end 
+        print("randr", s.outputs.name)
+    end
 end
 
 local function make_default_tag(number, screen, volatile)
@@ -325,9 +326,8 @@ root.buttons(gears.table.join(
 -- {{{ Key bindings
 
 -- A lot of the times this just "Does the Wrong Thing(tm)" so I give up and
--- specify always the music player. 
-local playerctl = "playerctl -p youtube-music"
-
+-- specify always the music player.
+local playerctl = "playerctl -p YoutubeMusic"
 globalkeys = gears.table.join(
     awful.key({ modkey,           }, "/",      hotkeys_popup.show_help,
               {description="show help", group="awesome"}),
