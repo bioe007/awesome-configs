@@ -10,6 +10,7 @@
 pcall(require, "luarocks.loader")
 
 -- Standard awesome library
+-- local mouse = require("mouse")
 local gears = require("gears")
 local awful = require("awful")
 require("awful.autofocus")
@@ -76,7 +77,7 @@ max_tags = 4
 awful.spawn.with_shell("~/.config/awesome/autorun.sh")
 
 -- Table of layouts to cover with awful.layout.inc, order matters.
-awful.layout.layouts = {
+local my_layouts = {
     lain.layout.centerwork,
     awful.layout.suit.tile,
     awful.layout.suit.tile.left,
@@ -90,6 +91,7 @@ awful.layout.layouts = {
     -- awful.layout.suit.max,
     -- awful.layout.suit.magnifier,
 }
+awful.layout.append_default_layouts(my_layouts)
 
 local function layoutbyaspect(s)
     return awful.layout.layouts[1]
@@ -203,9 +205,6 @@ mylauncher = awful.widget.launcher({ image = beautiful.awesome_icon,
 menubar.utils.terminal = terminal -- Set the terminal for applications that require it
 -- }}}
 
--- Keyboard map indicator and switcher
-mykeyboardlayout = awful.widget.keyboardlayout()
-
 -- {{{ Wibar
 -- Create a textclock widget
 mytextclock = wibox.widget.textclock()
@@ -291,7 +290,7 @@ awful.screen.connect_for_each_screen(function(s)
     }
 
     -- Create the wibox
-    s.mywibox = awful.wibar({ position = "top", screen = s })
+    s.mywibox = awful.wibar({ position = "top", screen = s, visible = false })
 
     -- Add widgets to the wibox
     s.mywibox:setup {
@@ -305,16 +304,64 @@ awful.screen.connect_for_each_screen(function(s)
         s.mytasklist, -- Middle widget
         { -- Right widgets
             layout = wibox.layout.fixed.horizontal,
-            mykeyboardlayout,
             wibox.widget.systray(),
             audio_widget(),
             mytextclock,
             s.mylayoutbox,
         },
     }
+
+
+    s.detect = gears.timer {
+        timeout = 0.25,
+        callback = function ()
+            if (mouse.screen ~= s) or
+                (mouse.coords().y > s.mywibox.height)
+            then
+                -- print("mouse is at", mouse.coords().y)
+                -- print("box is at", s.mywibox.height -1)
+                s.mywibox.visible = false
+            s.detect:stop()
+        end
+    end
+    }
+
+    s.enable_wibar = function ()
+        s.mywibox.visible = true
+        if not s.detect.started then
+            s.detect:start()
+        end
+    end
+
+    s.activation_zone = wibox ({
+        x = s.geometry.x,
+        -- y = s.geometry.y + s.geometry.height - 1,
+        -- y = s.mywibox.height -1,
+        y = 0,
+        opacity = 0.0, width = s.geometry.width, height = 1,
+        screen = s, input_passthrough = false, visible = true,
+        ontop = true, type = "dock",
+    })
+
+
+    s.activation_zone:connect_signal("mouse::enter", function ()
+        s.enable_wibar()
+    end)
 end)
+
 -- }}}
 
+-- {{{ systray
+local my_systray = wibox.widget.systray()
+local orig_bg = beautiful.bg_systray
+function force_systray_redraw()
+    beautiful.bg_systray = "#ff0000" -- Assuming this is not the actual BG color of your systray
+    my_systray:emit_signal("widget::redraw_needed")
+    gears.timer.start_new(0.5, function()
+        beautiful.bg_systray = orig_bg
+        my_systray:emit_signal("widget::redraw_needed")
+    end)
+end
 -- {{{ Mouse bindings
 root.buttons(gears.table.join(
     awful.button({ }, 3, function () mymainmenu:toggle() end),
@@ -433,8 +480,11 @@ globalkeys = gears.table.join(
               {description = "restore minimized", group = "client"}),
 
     -- Prompt
-    awful.key({ modkey },            "r",     function () awful.screen.focused().mypromptbox:run() end,
-              {description = "run prompt", group = "launcher"}),
+    awful.key({ modkey },            "r",
+        function ()
+            awful.screen.focused().mypromptbox:run()
+        end,
+        {description = "run prompt", group = "launcher"}),
 
     awful.key({ modkey, "Shift" }, "r",
               function ()
