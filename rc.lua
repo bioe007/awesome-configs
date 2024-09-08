@@ -193,12 +193,12 @@ myawesomemenu = {
    { "quit", function() awesome.quit() end },
 }
 
-mymainmenu = awful.menu({ items = { { "awesome", myawesomemenu, beautiful.awesome_icon },
+local mymainmenu = awful.menu({ items = { { "awesome", myawesomemenu, beautiful.awesome_icon },
                                     { "open terminal", terminal }
                                   }
                         })
 
-mylauncher = awful.widget.launcher({ image = beautiful.awesome_icon,
+local mylauncher = awful.widget.launcher({ image = beautiful.awesome_icon,
                                      menu = mymainmenu })
 
 -- Menubar configuration
@@ -318,8 +318,6 @@ awful.screen.connect_for_each_screen(function(s)
             if (mouse.screen ~= s) or
                 (mouse.coords().y > s.mywibox.height)
             then
-                -- print("mouse is at", mouse.coords().y)
-                -- print("box is at", s.mywibox.height -1)
                 s.mywibox.visible = false
             s.detect:stop()
         end
@@ -348,7 +346,6 @@ awful.screen.connect_for_each_screen(function(s)
         s.enable_wibar()
     end)
 end)
-
 -- }}}
 
 -- {{{ systray
@@ -384,6 +381,11 @@ globalkeys = gears.table.join(
               {description = "view next", group = "tag"}),
     awful.key({ modkey,           }, "Escape", awful.tag.history.restore,
               {description = "go back", group = "tag"}),
+    awful.key({ modkey,           }, "b", function()
+        local s = awful.screen.focused()
+        s.mywibox.visible = not s.mywibox.visible
+    end,
+              {description = "toggle statusbar wibox", group = "tag"}),
 
     --- {{{ Windo Navigation
     awful.key({ modkey,           }, "j",
