@@ -266,7 +266,7 @@ awful.screen.connect_for_each_screen(function(s)
 
 
     -- Create a promptbox for each screen
-    s.mypromptbox = awful.widget.prompt()
+    s.mypromptbox = awful.widget.prompt({done_callback=function() s.mywibox.visible = false end})
     -- Create an imagebox widget which will contain an icon indicating which layout we're using.
     -- We need one layoutbox per screen.
     s.mylayoutbox = awful.widget.layoutbox(s)
@@ -484,17 +484,21 @@ globalkeys = gears.table.join(
     -- Prompt
     awful.key({ modkey },            "r",
         function ()
+            awful.screen.focused().mywibox.visible = true
             awful.screen.focused().mypromptbox:run()
         end,
         {description = "run prompt", group = "launcher"}),
 
     awful.key({ modkey, "Shift" }, "r",
               function ()
+                local wb = awful.screen.focused().mywibox
+                wb.visible = true
                   awful.prompt.run {
                     prompt       = "Run Lua code: ",
                     textbox      = awful.screen.focused().mypromptbox.widget,
                     exe_callback = awful.util.eval,
-                    history_path = awful.util.get_cache_dir() .. "/history_eval"
+                    history_path = awful.util.get_cache_dir() .. "/history_eval",
+                    done_callback= function() wb.visible = false end
                   }
               end,
               {description = "lua execute prompt", group = "awesome"}),
