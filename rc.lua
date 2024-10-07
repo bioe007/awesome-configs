@@ -680,7 +680,7 @@ awful.rules.rules = {
 	},
     },
 
-    { rule_any = { class = { "Steam" } },
+    { rule_any = { class = { "steam" } },
         properties = {
             titlebars_enabled = false,
             floating = true,
