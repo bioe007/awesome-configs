@@ -26,12 +26,6 @@ local lain = require("lain")
 
 local audio_widget = require("awesome-pulseaudio-widget")
 
--- More efficient CPU/temp widgets from conky here:
---                  https://github.com/varingst/awesome-conky
--- Note that have to set nvidia_display in conkyrc and set output only to
--- stderr.
--- local conky = require("conky")
-
 -- Enable hotkeys help widget for VIM and other apps
 -- when client with a matching name is opened:
 require("awful.hotkeys_popup.keys")
@@ -62,17 +56,15 @@ end
 -- }}}
 
 beautiful.init(
-    -- gears.filesystem.get_configuration_dir() ..  "themes/dracon/theme.lua")
-    -- gears.filesystem.get_configuration_dir() ..  "themes/everforest/theme.lua")
     gears.filesystem.get_configuration_dir() ..  "themes/nord/theme.lua")
 
-terminal = "urxvt"
-editor = os.getenv("EDITOR") or "vim"
-editor_cmd = terminal .. " -e " .. editor
+local terminal = "wezterm"
+local editor = os.getenv("EDITOR") or "vim"
+local editor_cmd = terminal .. " -e " .. editor
 
-modkey = "Mod4"
+local modkey = "Mod4"
 
-max_tags = 4
+local max_tags = 4
 
 awful.spawn.with_shell("~/.config/awesome/autorun.sh")
 
@@ -93,32 +85,29 @@ local my_layouts = {
 }
 awful.layout.append_default_layouts(my_layouts)
 
-local function layoutbyaspect(s)
-    return awful.layout.layouts[1]
-end
 
 -- {{{ Helper functions
--- TODO: WIP/debugging
-local function screen_deets()
-    for s in screen do
-        print("geometry of screen " .. tostring(s))
-        print("geom", s.geometry.width, s.geometry.height, s.geometry.width > s.geometry.height)
-        print("dpi", s.dpi)
-        print("randr", s.outputs.name)
-    end
+local function layout_by_aspect(s)
+    local screen_ratio = s.geometry.width / s.geometry.height
+    if screen_ratio < 1 then return awful.layout.suit.tile.bottom end
+    if screen_ratio < 2 then return awful.layout.suit.tile end
+    return lain.layout.centerwork
 end
 
+local tags = {}
 local function make_default_tag(number, screen, volatile)
-    return awful.tag.add(tostring(number), {
+    local t = awful.tag.add(tostring(number), {
         screen=screen,
-        layout=awful.layout.layouts[1],
+        layout=layout_by_aspect(screen), -- awful.layout.layouts[1],
         master_count=1,
         volatile=volatile,
     })
+    if tags[screen.index] == nil  then tags[screen.index] = {} end
+    tags[screen.index][number] = t
 end
 
 local function launch(s)
-    lf = function()
+    local lf = function()
         awful.util.spawn(s, false)
     end
     return lf
@@ -448,8 +437,22 @@ globalkeys = gears.table.join(
               {description = "reload awesome", group = "awesome"}),
     awful.key({modkey, "Shift"}, "q", awesome.quit,
               {description = "quit awesome", group = "awesome"}),
-    awful.key({modkey,}, "0", launch("dm-tool lock"),
-              {description = "quit awesome", group = "awesome"}),
+    awful.key({modkey,}, "q", launch("dm-tool lock"),
+              {description = "Lock screen", group = "awesome"}),
+    awful.key({modkey,}, "Print", function()
+            local cmd = "scrot -s " .. os.getenv("HOME") .. "/Images/Screenshots/"
+            cmd = cmd .. "%F_%T_$wx$h.png "
+            cmd = cmd .. "-e 'xclip -selection clipboard -target image/png -i $f'"
+            awful.util.spawn(cmd)
+        end,
+        {description = "Screenshot - Rectangle select", group = "awesome"}),
+    awful.key({modkey, "Shift"}, "Print", function()
+            local cmd = "scrot -u -F " .. os.getenv("HOME") .. "/Images/Screenshots/"
+            cmd = cmd .. "%F_%T_$wx$h.png "
+            cmd = cmd .. "-e 'xclip -selection clipboard -target image/png -i $f'"
+            awful.util.spawn(cmd)
+        end,
+        {description = "Screenshot - Window select", group = "awesome"}),
 
     -- {{{ Layout Manipulation
     awful.key({modkey}, "-", function() awful.tag.incmwfact(-0.05) end,
@@ -526,7 +529,7 @@ clientkeys = gears.table.join(
     awful.key({modkey, "Shift"}, "0",
               function(c) c.sticky = not c.sticky end,
               {description = "Stick it", group = "client"}),
-    awful.key({ modkey, }, "x", function(c) c:kill() end,
+    awful.key({ modkey, }, "w", function(c) c:kill() end,
               {description = "close", group = "client"}),
     awful.key({ modkey, }, "f",  awful.client.floating.toggle                     ,
               {description = "toggle floating", group = "client"}),
@@ -542,9 +545,9 @@ clientkeys = gears.table.join(
         end,
         {description = "move to master", group = "client"}),
     awful.key({ modkey,           }, "o",      function (c) c:move_to_screen()               end,
-              {description = "move to screen", group = "client"}),
-    awful.key({ modkey,           }, "t",      function (c) c.ontop = not c.ontop            end,
-              {description = "toggle keep on top", group = "client"})
+              {description = "move to screen", group = "client"})
+    -- awful.key({ modkey,           }, "t",      function (c) c.ontop = not c.ontop            end,
+    --           {description = "toggle keep on top", group = "client"})
 )
 
 -- Bind all key numbers to tags.
@@ -687,6 +690,7 @@ awful.rules.rules = {
             border_width = 0,
             border_color = 0,
             size_hints_honor = false,
+            placement = awful.placement.centered,
         },
     },
 
