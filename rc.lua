@@ -439,18 +439,18 @@ globalkeys = gears.table.join(
               {description = "quit awesome", group = "awesome"}),
     awful.key({modkey,}, "q", launch("dm-tool lock"),
               {description = "Lock screen", group = "awesome"}),
-    awful.key({modkey,}, "Print", function()
+    awful.key({}, "Print", function()
             local cmd = "scrot -s " .. os.getenv("HOME") .. "/Images/Screenshots/"
             cmd = cmd .. "%F_%T_$wx$h.png "
             cmd = cmd .. "-e 'xclip -selection clipboard -target image/png -i $f'"
-            awful.util.spawn(cmd)
+            awful.spawn(cmd)
         end,
         {description = "Screenshot - Rectangle select", group = "awesome"}),
-    awful.key({modkey, "Shift"}, "Print", function()
+    awful.key({"Shift"}, "Print", function()
             local cmd = "scrot -u -F " .. os.getenv("HOME") .. "/Images/Screenshots/"
             cmd = cmd .. "%F_%T_$wx$h.png "
             cmd = cmd .. "-e 'xclip -selection clipboard -target image/png -i $f'"
-            awful.util.spawn(cmd)
+            awful.spawn(cmd)
         end,
         {description = "Screenshot - Window select", group = "awesome"}),
 
@@ -529,7 +529,7 @@ clientkeys = gears.table.join(
     awful.key({modkey, "Shift"}, "0",
               function(c) c.sticky = not c.sticky end,
               {description = "Stick it", group = "client"}),
-    awful.key({ modkey, }, "w", function(c) c:kill() end,
+    awful.key({ modkey, }, "x", function(c) c:kill() end,
               {description = "close", group = "client"}),
     awful.key({ modkey, }, "f",  awful.client.floating.toggle                     ,
               {description = "toggle floating", group = "client"}),
