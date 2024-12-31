@@ -654,6 +654,7 @@ awful.rules.rules = {
                 "Caja",
                 "kdeconnect.app",
                 "kdeconnect.sms",
+                "mpv",
                 "Pavucontrol",
                 "YouTube Music Desktop App",
                 "YouTube Music", -- this is youtube-music-bin from aur
