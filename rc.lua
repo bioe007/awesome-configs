@@ -87,21 +87,30 @@ awful.layout.append_default_layouts(my_layouts)
 
 
 -- {{{ Helper functions
-local function layout_by_aspect(s)
-    local screen_ratio = s.geometry.width / s.geometry.height
-    if screen_ratio < 1 then return awful.layout.suit.tile.bottom end
-    if screen_ratio < 2 then return awful.layout.suit.tile end
-    return lain.layout.centerwork
+local function configure_by_aspect(t)
+    local screen_ratio = t.screen.geometry.width / t.screen.geometry.height
+    if screen_ratio < 1 then
+        -- portrait, tile w/o master just stacks all on vertical screens
+        t.layout = awful.layout.suit.tile
+        t.master_count = 0
+    elseif screen_ratio < 2 then
+        -- widescreen
+        t.layout = awful.layout.suit.tile
+    else
+        -- ultrawide
+        t.layout=  lain.layout.centerwork
+        t.master_width_factor =  t.master_width_factor -0.05
+    end
 end
 
 local tags = {}
 local function make_default_tag(number, screen, volatile)
     local t = awful.tag.add(tostring(number), {
         screen=screen,
-        layout=layout_by_aspect(screen), -- awful.layout.layouts[1],
         master_count=1,
         volatile=volatile,
     })
+    configure_by_aspect(t)
     if tags[screen.index] == nil  then tags[screen.index] = {} end
     tags[screen.index][number] = t
 end
@@ -653,10 +662,10 @@ awful.rules.rules = {
                 "Blueman-manager",
                 "Caja",
                 "kdeconnect.app",
-                "kdeconnect.sms",
+                -- "kdeconnect.sms",
                 "mpv",
                 "Pavucontrol",
-                "YouTube Music Desktop App",
+                "com.github.th_ch.youtube_music",
                 "YouTube Music", -- this is youtube-music-bin from aur
             },
             name = {
@@ -696,6 +705,7 @@ awful.rules.rules = {
     },
 
     { rule_any = {
+        -- disco elysium
         class = {"disco.exe",},
         },
       properties = {
@@ -713,9 +723,6 @@ awful.rules.rules = {
       end,
     }
 
-    -- Set Firefox to always map on the tag named "2" on screen 1.
-    -- { rule = { class = "Firefox" },
-    --   properties = { screen = 1, tag = "2" } },
 }
 -- }}}
 
