@@ -287,8 +287,9 @@ awful.screen.connect_for_each_screen(function(s)
         buttons = tasklist_buttons
     }
 
-    -- Create the wibox
-    s.mywibox = awful.wibar({ position = "top", screen = s, visible = false })
+    -- Create the wibox, only show it by default on the utility monitor
+    local screen_ratio = s.geometry.width / s.geometry.height
+    s.mywibox = awful.wibar({ position = "top", screen = s, visible = (screen_ratio < 1)})
 
     -- Add widgets to the wibox
     s.mywibox:setup {
