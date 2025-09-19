@@ -4,6 +4,7 @@
 -- 3. network widget/vis (for laptop)
 -- 4. cpu and memory widgets (heat for laptop)
 -- 5. battery for laptop
+-- }}}
 
 -- If LuaRocks is installed, make sure that packages installed through it are
 -- found (e.g. lgi). If LuaRocks is not installed, do nothing.
@@ -358,6 +359,8 @@ function force_systray_redraw()
         my_systray:emit_signal("widget::redraw_needed")
     end)
 end
+-- }}}
+
 -- {{{ Mouse bindings
 root.buttons(gears.table.join(
     awful.button({ }, 3, function () mymainmenu:toggle() end),
@@ -369,9 +372,10 @@ root.buttons(gears.table.join(
 -- {{{ Key bindings
 
 -- A lot of the times this just "Does the Wrong Thing(tm)" so I give up and
--- specify always the music player.
-local playerctl = "playerctl -p YoutubeMusic"
-globalkeys = gears.table.join(
+-- specify always the music player. Except now specifying the player breaks.
+local playerctl = "playerctl " -- -p YoutubeMusic"
+
+local Globalkeys = gears.table.join(
     awful.key({ modkey,           }, "/",      hotkeys_popup.show_help,
               {description="show help", group="awesome"}),
     awful.key({ modkey, "Shift" }, "space",   awful.tag.viewprev,
@@ -420,7 +424,20 @@ globalkeys = gears.table.join(
     function()
         awful.client.focus.byidx(-1)
     end),
+    awful.key({ modkey, "Control" }, "n",
+              function ()
+                  local c = awful.client.restore()
+                  -- Focus restored client
+                  if c then
+                    c:emit_signal(
+                        "request::activate", "key.unminimize", {raise = true}
+                    )
+                  end
+              end,
+              {description = "restore minimized", group = "client"}),
+
     --- end experiment }}}
+    --- {{{ moving windows
     awful.key({ modkey, "Shift"   }, "j", function () awful.client.swap.byidx(  1)    end,
               {description = "swap with next client by index", group = "client"}),
     awful.key({ modkey, "Shift"   }, "k", function () awful.client.swap.byidx( -1)    end,
@@ -439,30 +456,7 @@ globalkeys = gears.table.join(
             end
         end,
         {description = "go back", group = "client"}),
-
-    -- Standard program
-    awful.key({ modkey,           }, "Return", function () awful.spawn(terminal) end,
-              {description = "open a terminal", group = "launcher"}),
-    awful.key({ modkey, "Control" }, "r", awesome.restart,
-              {description = "reload awesome", group = "awesome"}),
-    awful.key({modkey, "Shift"}, "q", awesome.quit,
-              {description = "quit awesome", group = "awesome"}),
-    awful.key({modkey,}, "q", launch("dm-tool lock"),
-              {description = "Lock screen", group = "awesome"}),
-    awful.key({}, "Print", function()
-            local cmd = "scrot -s " .. os.getenv("HOME") .. "/Images/Screenshots/"
-            cmd = cmd .. "%F_%T_$wx$h.png "
-            cmd = cmd .. "-e 'xclip -selection clipboard -target image/png -i $f'"
-            awful.spawn(cmd)
-        end,
-        {description = "Screenshot - Rectangle select", group = "awesome"}),
-    awful.key({"Shift"}, "Print", function()
-            local cmd = "scrot -u -F " .. os.getenv("HOME") .. "/Images/Screenshots/"
-            cmd = cmd .. "%F_%T_$wx$h.png "
-            cmd = cmd .. "-e 'xclip -selection clipboard -target image/png -i $f'"
-            awful.spawn(cmd)
-        end,
-        {description = "Screenshot - Window select", group = "awesome"}),
+    --- }}}
 
     -- {{{ Layout Manipulation
     awful.key({modkey}, "-", function() awful.tag.incmwfact(-0.05) end,
@@ -481,18 +475,44 @@ globalkeys = gears.table.join(
               {description = "select next", group = "layout"}),
     awful.key({ modkey, }, "Prior", function () awful.layout.inc(-1)                end,
               {description = "select previous", group = "layout"}),
+    --- }}}
 
-    awful.key({ modkey, "Control" }, "n",
-              function ()
-                  local c = awful.client.restore()
-                  -- Focus restored client
-                  if c then
-                    c:emit_signal(
-                        "request::activate", "key.unminimize", {raise = true}
-                    )
-                  end
-              end,
-              {description = "restore minimized", group = "client"}),
+    -- {{{ Standard program
+    awful.key({ modkey,           }, "Return", function () awful.spawn(terminal) end,
+              {description = "open a terminal", group = "launcher"}),
+
+    -- Screenshots
+    awful.key({}, "Print", function()
+            local cmd = "scrot -s " .. os.getenv("HOME") .. "/Images/Screenshots/"
+            cmd = cmd .. "%F_%T_$wx$h.png "
+            cmd = cmd .. "-e 'xclip -selection clipboard -target image/png -i $f'"
+            awful.spawn(cmd)
+        end,
+        {description = "Screenshot - Rectangle select", group = "awesome"}),
+    awful.key({"Shift"}, "Print", function()
+            local cmd = "scrot -u -F " .. os.getenv("HOME") .. "/Images/Screenshots/"
+            cmd = cmd .. "%F_%T_$wx$h.png "
+            cmd = cmd .. "-e 'xclip -selection clipboard -target image/png -i $f'"
+            awful.spawn(cmd)
+        end,
+        {description = "Screenshot - Window select", group = "awesome"}),
+
+    awful.key({modkey}, "m", function() awful.util.spawn("/usr/bin/youtube-music") end,
+        {description = "open music player", group = "launcher"}),
+    awful.key({modkey}, "s", function() awful.util.spawn("/usr/bin/slack") end,
+        {description = "Start slack or focus it", group = "launcher"}),
+
+    --- }}}
+
+    -- window manager things
+    awful.key({ modkey, "Control" }, "r", awesome.restart,
+              {description = "reload awesome", group = "awesome"}),
+    awful.key({modkey, "Shift"}, "q", awesome.quit,
+              {description = "quit awesome", group = "awesome"}),
+    awful.key({modkey,}, "q", launch("dm-tool lock"),
+              {description = "Lock screen", group = "awesome"}),
+    awful.key({ modkey }, "p", function() menubar.show() end,
+              {description = "Show the Menubar", group = "launcher"}),
 
     -- Prompt
     awful.key({ modkey },            "r",
@@ -515,9 +535,7 @@ globalkeys = gears.table.join(
                   }
               end,
               {description = "lua execute prompt", group = "awesome"}),
-    -- Menubar
-    awful.key({ modkey }, "p", function() menubar.show() end,
-              {description = "show the menubar", group = "launcher"}),
+
     -- Media keys
     awful.key({}, "XF86AudioPlay", function() awful.spawn.with_shell(playerctl .. " play-pause") end),
     awful.key({}, "XF86AudioNext", function() awful.spawn.with_shell(playerctl .. " next") end),
@@ -564,7 +582,7 @@ clientkeys = gears.table.join(
 -- Be careful: we use keycodes to make it work on any keyboard layout.
 -- This should map on the top row of your keyboard, usually 1 to 9.
 for i = 1, 9 do
-    globalkeys = gears.table.join(globalkeys,
+    Globalkeys = gears.table.join(Globalkeys,
         -- View tag only.
         awful.key({ modkey }, "#" .. i + 9,
                   function ()
@@ -629,7 +647,7 @@ clientbuttons = gears.table.join(
 )
 
 -- Set keys
-root.keys(globalkeys)
+root.keys(Globalkeys)
 -- }}}
 
 -- {{{ Rules
@@ -690,7 +708,8 @@ awful.rules.rules = {
         properties = {
 		sticky = true,
 		floating = true,
-            titlebars_enabled = true,
+        titlebars_enabled = true,
+        -- screen = awful.screen:count(),
 	},
     },
 
