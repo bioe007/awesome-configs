@@ -684,8 +684,6 @@ awful.rules.rules = {
                 -- "kdeconnect.sms",
                 "mpv",
                 "Pavucontrol",
-                "com.github.th_ch.youtube_music",
-                "YouTube Music", -- this is youtube-music-bin from aur
             },
             name = {
                 "Event Tester",  -- xev.
@@ -704,13 +702,16 @@ awful.rules.rules = {
 
     -- sticky clients
     {
-        rule = { class =  "YouTube Music" , },
+        rule_any = {
+            class =  {
+            "com.github.th_ch.youtube_music"
+            },
+        },
         properties = {
-		sticky = true,
-		floating = true,
-        titlebars_enabled = true,
-        -- screen = awful.screen:count(),
-	},
+            sticky = true,
+            floating = true,
+            titlebars_enabled = true,
+        },
     },
 
     { rule_any = { class = { "steam" } },
